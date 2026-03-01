@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azizbek Kripto Boti</title>
+    <title>Azizbek Kripto & Game Bot Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary: #00f2ff;
             --secondary: #7000ff;
             --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
             --dark: #0a0b10;
         }
 
@@ -20,41 +22,28 @@
             min-height: 100vh; overflow-x: hidden;
         }
 
-        /* --- KIRISH RAINBOW ANIMATSIYASI --- */
+        /* Rainbow Animatsiya */
         @keyframes rainbow {
             0% { color: #ff0000; } 25% { color: #ffff00; }
             50% { color: #00ff00; } 75% { color: #00f2ff; }
             100% { color: #ff00ff; }
         }
+        .rainbow-text { animation: rainbow 3s infinite linear; font-weight: bold; }
+
         #welcome {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--dark); z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: 1s;
         }
-        .rainbow-text { animation: rainbow 2s infinite linear; font-size: 2.2rem; font-weight: bold; text-align: center; margin: 10px; }
 
-        .container { width: 95%; max-width: 500px; text-align: center; padding: 10px; box-sizing: border-box; }
+        .container { width: 95%; max-width: 500px; text-align: center; padding: 15px; box-sizing: border-box; }
         .hidden { display: none !important; }
 
-        /* --- AZIZBEK BOTI (ADMIN TRIGGER) --- */
-        .bot-title {
-            font-size: 2.3rem; font-weight: 900; cursor: pointer;
-            padding: 15px; margin-bottom: 25px; border-radius: 15px;
-            transition: 0.4s; text-transform: uppercase; letter-spacing: 3px;
-            border: 2px solid transparent;
-        }
-        .blink-alert { animation: blinkGreen 0.8s infinite alternate; border: 2px solid var(--success) !important; }
-        @keyframes blinkGreen { 
-            from { color: white; text-shadow: none; } 
-            to { color: var(--success); text-shadow: 0 0 20px var(--success); } 
-        }
-
-        /* --- QUVIB YURUVCHI NEON CHIROQLAR (CHASING LIGHTS) --- */
+        /* Neon Quvib yuruvchi chiroqlar */
         .neon-card {
-            position: relative; margin: 25px 0; padding: 3px;
+            position: relative; margin: 15px 0; padding: 3px;
             border-radius: 15px; overflow: hidden; cursor: pointer;
-            transition: 0.3s;
         }
         .neon-card::before {
             content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
@@ -62,387 +51,792 @@
             animation: rotate 3s linear infinite;
         }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
-        
-        .inner-content { 
-            position: relative; background: #0d1117; border-radius: 12px; 
-            padding: 20px; z-index: 1; font-weight: bold; font-size: 1.3rem;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
+        .inner-content { position: relative; background: #0d1117; border-radius: 12px; padding: 18px; z-index: 1; font-weight: bold; font-size: 1.2rem; }
 
-        /* --- FORMA VA CARD --- */
-        .card { background: #161b22; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-top: 20px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; font-size: 1rem; }
+        /* Tugmalar */
         .btn-glow {
             background: linear-gradient(45deg, var(--secondary), var(--primary));
             color: white; border: none; padding: 15px; border-radius: 12px;
-            width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+            width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 8px 0;
+            transition: transform 0.1s;
+        }
+        .btn-glow:active { transform: scale(0.95); }
+
+        /* Admin panelidagi yangi bildirishnoma tugmasi */
+        .btn-blink-green {
+            animation: btnBlinkGreen 0.8s infinite alternate !important;
+            background: var(--success) !important;
+            color: white !important;
+            border: 1px solid white;
+        }
+        @keyframes btnBlinkGreen {
+            0% { box-shadow: 0 0 5px var(--success); transform: scale(1); }
+            100% { box-shadow: 0 0 20px lime; transform: scale(1.03); }
         }
 
-        /* --- NUSXALASH QISMI --- */
-        .pay-box {
-            background: #000; padding: 18px; border-radius: 15px; border: 1px dashed var(--primary);
-            margin: 15px 0; word-break: break-all; position: relative; text-align: left;
-        }
-        .copy-icon-btn {
-            position: absolute; right: 12px; top: 15px; cursor: pointer;
-            width: 30px; height: 30px; fill: white; opacity: 0.8;
-        }
-        .copy-icon-btn:active { transform: scale(0.85); }
+        /* Ijtimoiy tarmoqlar */
+        .social-row { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .social-box { position: relative; width: 75px; height: 75px; padding: 2px; border-radius: 15px; overflow: hidden; cursor: pointer; }
+        .social-box::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); animation: rotate 4s linear infinite; }
+        .social-inner { position: relative; background: #0d1117; width: 100%; height: 100%; border-radius: 13px; z-index: 1; display: flex; align-items: center; justify-content: center; }
+        .social-inner svg { width: 35px; fill: white; }
 
-        /* --- ADMIN BUYURTMA CARD --- */
-        .admin-order-card {
-            background: #000; border: 1px solid var(--primary); padding: 15px; 
-            margin: 20px 0; border-radius: 15px; text-align: left; font-size: 0.9rem;
-            box-shadow: 0 0 10px rgba(0,242,255,0.1);
+        /* O'yinlar CSS */
+        .mines-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .mine-cell { aspect-ratio: 1; background: #1c2431; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border: 1px solid #333; }
+        .mine-cell.open { background: var(--secondary); }
+        .mine-cell.bomb { background: var(--danger); }
+
+        .aviator-area { background: #000; height: 220px; border-radius: 15px; position: relative; overflow: hidden; border: 1px solid #333; margin: 20px 0; }
+        .multiplier-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-weight: bold; color: var(--success); }
+        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 40px; transition: 0.1s; }
+
+        /* Kalla suyak o'yini */
+        .skull-area { position: relative; width: 280px; height: 120px; margin: 30px auto; }
+        .skull-box { 
+            position: absolute; width: 80px; height: 80px; 
+            font-size: 3.5rem; cursor: pointer; text-align: center; 
+            transition: left 0.4s ease-in-out; user-select: none;
         }
-        .order-tag {
-            padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.7rem; margin-bottom: 10px; display: inline-block;
-        }
-        .tag-buy { background: var(--success); color: white; }
-        .tag-sell { background: #e67e22; color: white; }
+
+        /* Formalar */
+        .card { background: #161b22; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-top: 15px; text-align: left;}
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        
+        .pay-box { background: #000; padding: 15px; border-radius: 12px; border: 1px dashed var(--primary); margin: 15px 0; position: relative; text-align: left; word-break: break-all; }
+        .copy-icon { position: absolute; right: 10px; top: 12px; width: 28px; cursor: pointer; fill: var(--primary); }
+        
+        .admin-order { background: #000; border: 1px solid var(--primary); padding: 15px; margin: 15px 0; border-radius: 12px; text-align: left; }
+        .blink-alert { animation: blinkMain 0.8s infinite alternate; }
+        @keyframes blinkMain { from { color: white; } to { color: var(--success); text-shadow: 0 0 15px var(--success); } }
     </style>
 </head>
 <body>
 
     <!-- Kirish Animatsiyasi -->
     <div id="welcome">
-        <h1 class="rainbow-text">Assalomu Aleykum!</h1>
-        <h2 class="rainbow-text" style="font-size: 1.4rem;">Xush kelibsiz Kripto botga</h2>
+        <h1 class="rainbow-text" style="font-size: 2.5rem;">Assalomu Aleykum!</h1>
+        <h2 class="rainbow-text">Xush kelibsiz Kripto botga</h2>
     </div>
 
     <div class="container">
-        <!-- Azizbek Boti (Admin Panel Trigger) -->
-        <div id="main-title" class="bot-title" onclick="loginAdmin()">AZIZBEK BOTI</div>
+        <!-- Title & Admin -->
+        <h1 id="main-title" class="rainbow-text" style="cursor: pointer; font-size: 2.3rem; margin-bottom: 20px;" onclick="adminLogin()">AZIZBEK BOTI</h1>
 
+        <!-- Asosiy menyu -->
         <div id="main-menu">
             <div class="neon-card" onclick="showSection('buy-list')"><div class="inner-content">SOTIB OLISH</div></div>
-            <div class="neon-card" onclick="showSection('sell-list')"><div class="inner-content" style="background: #111;">SOTISH</div></div>
+            <div class="neon-card" onclick="showSection('sell-list')"><div class="inner-content">SOTISH</div></div>
+
+            <div class="social-row">
+                <a href="https://www.instagram.com/qiyomov_2008?igsh=MTF5YzhmeThuM2N5NA==" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div></a>
+                <a href="https://www.youtube.com/@AzizKu__2008" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div></a>
+                <a href="https://t.me/Azizbekl2026" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.285.285-.436.285l.215-3.045 5.542-5.005c.24-.213-.054-.334-.373-.121l-6.853 4.314-2.954-.923c-.642-.204-.654-.643.136-.953l11.534-4.444c.534-.196 1.002.128.846.805z"/></svg></div></a>
+            </div>
+
+            <button class="btn-glow" style="background: #e67e22;" onclick="openGameMenu()">O'YINLAR VA VAZIFALAR</button>
         </div>
 
-        <!-- SOTIB OLISH RO'YXATI -->
-        <div id="buy-list" class="hidden">
-            <button onclick="showSection('main-menu')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-size:1.1rem;">⬅ ORQAGA</button>
-            <h3 style="margin-top:20px;">Sotib olish</h3>
-            <div id="buy-items"></div>
-        </div>
+        <!-- Valyuta Ro'yxatlari -->
+        <div id="buy-list" class="hidden"><button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button><div id="bl-cont"></div></div>
+        <div id="sell-list" class="hidden"><button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button><div id="sl-cont"></div></div>
 
-        <!-- SOTISH RO'YXATI -->
-        <div id="sell-list" class="hidden">
-            <button onclick="showSection('main-menu')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-size:1.1rem;">⬅ ORQAGA</button>
-            <h3 style="margin-top:20px;">Sotish</h3>
-            <div id="sell-items"></div>
-        </div>
-
-        <!-- BUYURTMA FORMASI -->
+        <!-- Buyurtma Formasi -->
         <div id="order-form" class="hidden">
-            <button id="form-back-btn" style="color:var(--primary); background:none; border:none; cursor:pointer; font-size:1.1rem;">⬅ ORQAGA</button>
-            <h2 id="form-title" style="margin:15px 0;"></h2>
+            <button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button>
+            <h2 id="f-title"></h2>
             <div class="card">
-                <p id="form-rate" style="font-weight:bold; color:var(--primary); font-size: 1.2rem;"></p>
-                <input type="number" id="amt-input" placeholder="Miqdorni kiriting" oninput="updateTotal()">
-                <input type="text" id="wallet-info-input" placeholder="">
-                <h3 id="form-total">Jami: 0 so'm</h3>
+                <p id="f-rate" style="color:var(--primary); font-weight:bold;"></p>
+                <input type="number" id="f-amount" placeholder="Miqdorni kiriting" oninput="updateOrderTotal()">
                 
+                <!-- Hamyon yoki Karta -->
+                <input type="text" id="f-info" placeholder="">
+                
+                <h3 id="f-total-text">Jami: 0 so'm</h3>
                 <div class="pay-box">
-                    <span id="pay-label" style="font-size: 0.8rem; color: #888;"></span><br>
-                    <b id="target-address" style="font-size: 1rem;"></b>
-                    <div id="memo-wrap" class="hidden" style="margin-top: 5px; color: yellow;">Memo: <b id="target-memo"></b></div>
-                    
-                    <!-- NUSXALASH BELGICI -->
-                    <svg class="copy-icon-btn" onclick="executeCopy()" viewBox="0 0 24 24">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                    </svg>
+                    <span id="f-pay-label"></span><br>
+                    <b id="f-pay-address"></b>
+                    <div id="f-memo-wrap" class="hidden">Memo: <b id="f-pay-memo"></b></div>
+                    <svg class="copy-icon" onclick="copyPayInfo()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                 </div>
-                
-                <p style="font-size: 0.9rem;">To'lov cheki (rasm) yuklang:</p>
-                <input type="file" id="receipt-file" accept="image/*">
+                <p>Chek rasmini yuklang:</p>
+                <input type="file" id="f-file" accept="image/*">
                 <button class="btn-glow" onclick="submitOrder()">TASDIQLASH</button>
             </div>
         </div>
 
-        <!-- ADMIN PANEL -->
+        <!-- O'yin Menyusi -->
+        <div id="game-menu" class="hidden">
+            <button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button>
+            <div class="card">
+                <h3 id="u-name" style="margin-top:0;">Ism: </h3>
+                <p>ID: <b id="u-id">0</b></p>
+                <div style="background:#000; padding:15px; border-radius:15px; border:1px solid var(--primary);">
+                    <p style="margin:0;">Balans:</p>
+                    <h2 id="u-balance" style="color:var(--primary); margin:5px 0;">0 so'm</h2>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn-glow" style="background:var(--success);" onclick="openDeposit()">To'ldirish</button>
+                    <button class="btn-glow" style="background:var(--danger);" onclick="openWithdraw()">Yechish</button>
+                </div>
+                <hr style="border:0.5px solid #333; margin:20px 0;">
+                
+                <h3 style="color:var(--warning)">O'YINLAR</h3>
+                <button class="btn-glow" style="background:#8e44ad" onclick="startMines()">MINES (6 Bomba)</button>
+                <button class="btn-glow" style="background:#2980b9" onclick="openAviator()">AVIATOR</button>
+                <button class="btn-glow" style="background:#c0392b" onclick="openSkullGame()">KALLA SUYAK (5x)</button>
+
+                <hr style="border:0.5px solid #333; margin:20px 0;">
+                <h3 style="color:var(--success)">PUL ISHLASH</h3>
+                <button class="btn-glow" style="background:var(--success)" onclick="openTasks()">VAZIFALAR</button>
+            </div>
+        </div>
+
+        <!-- Vazifalar Sahifasi -->
+        <div id="tasks-page" class="hidden">
+            <button class="btn-glow" onclick="openGameMenu()">Orqaga</button>
+            <h2 style="color:var(--success)">Vazifalar</h2>
+            <div id="tasks-list"></div>
+        </div>
+
+        <!-- Kalla Suyak O'yini -->
+        <div id="skull-page" class="hidden">
+            <h3 id="sk-info">Tikish: 0 so'm</h3>
+            <div class="card" style="text-align:center;">
+                <p>Koptok qayerda? Toping (Yutuq: 5x)</p>
+                <div class="skull-area" id="sk-area">
+                    <div class="skull-box" id="sk-0" onclick="pickSkull(0)">💀</div>
+                    <div class="skull-box" id="sk-1" onclick="pickSkull(1)">💀</div>
+                    <div class="skull-box" id="sk-2" onclick="pickSkull(2)">💀</div>
+                </div>
+            </div>
+            <button id="sk-start-btn" class="btn-glow" style="background:#c0392b" onclick="startSkullGame()">TIKISH (Min 1000)</button>
+            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+        </div>
+
+        <!-- Mines O'yini -->
+        <div id="mines-page" class="hidden">
+            <h3 id="m-info">Tikish: 0</h3>
+            <div class="mines-grid" id="m-grid"></div>
+            <button id="m-cash" class="btn-glow hidden" style="background:var(--success)" onclick="minesCashout()">OLISH</button>
+            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+        </div>
+
+        <!-- Aviator O'yini -->
+        <div id="aviator-page" class="hidden">
+            <div class="aviator-area">
+                <div id="av-mult" class="multiplier-text">1.00x</div>
+                <div id="av-plane" class="plane">✈️</div>
+            </div>
+            <button id="av-bet-btn" class="btn-glow" onclick="startAviator()">TIKISH (Min 1000)</button>
+            <button id="av-cash-btn" class="btn-glow hidden" style="background:var(--success)" onclick="aviatorCashout()">CASHOUT</button>
+            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+        </div>
+
+        <!-- Admin Panel -->
         <div id="admin-panel" class="hidden">
-            <h2 style="color: var(--success); letter-spacing: 2px;">ADMIN PANEL</h2>
-            <button class="btn-glow" onclick="showSection('admin-orders')" style="background:var(--success)">📦 BUYURTMALAR</button>
-            <button class="btn-glow" onclick="showSection('admin-buy-settings')" style="background:#2980b9">💰 SOTIB OLISH SOZLAMALARI</button>
-            <button class="btn-glow" onclick="showSection('admin-sell-settings')" style="background:#e67e22">💸 SOTISH SOZLAMALARI</button>
-            <button class="btn-glow" onclick="showSection('main-menu')" style="background:#444">CHIQISH</button>
+            <h2 style="color:var(--success)">ADMIN PANEL</h2>
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button id="btn-admin-orders" class="btn-glow" style="flex:1" onclick="renderAdminOrders()">Buyurtmalar</button>
+                <button id="btn-admin-deps" class="btn-glow" style="flex:1" onclick="renderAdminDeposits()">To'ldirish</button>
+                <button id="btn-admin-withs" class="btn-glow" style="flex:1" onclick="renderAdminWithdraws()">Yechish</button>
+                <button class="btn-glow" style="flex:1; background:#2980b9" onclick="showSection('admin-coins')">Valyutalar</button>
+                <button class="btn-glow" style="flex:1; background:#8e44ad" onclick="renderAdminTasks()">Vazifalar qo'shish</button>
+            </div>
+            <div id="admin-list-container"></div>
+            <button class="btn-glow" style="background:#444" onclick="showSection('main-menu')">Yopish</button>
         </div>
 
-        <!-- ADMIN SEKSIYALARI -->
-        <div id="admin-orders" class="hidden">
-            <button onclick="showSection('admin-panel')" style="color:var(--primary); background:none; border:none; cursor:pointer;">⬅ ORQAGA</button>
-            <div id="admin-order-list"></div>
-        </div>
-
-        <div id="admin-buy-settings" class="hidden">
-            <button onclick="showSection('admin-panel')">⬅ Orqaga</button>
+        <!-- Valyuta Sozlamalari -->
+        <div id="admin-coins" class="hidden">
+            <button class="btn-glow" onclick="showSection('admin-panel')">Orqaga</button>
             <div class="card">
-                <h4>Karta raqamingiz (Sotib olishda ko'rinadi)</h4>
-                <input type="text" id="adm-card-input" placeholder="Karta raqami">
-                <button class="btn-glow" onclick="saveCard()">SAQLASH</button>
+                <h4>Admin Karta</h4>
+                <input type="text" id="adm-card-val" placeholder="Karta raqami">
+                <button class="btn-glow" onclick="saveAdminCard()">Saqlash</button>
             </div>
             <div class="card">
-                <h4>Valyuta qo'shish</h4>
-                <input type="text" id="ab-name" placeholder="Nomi">
-                <input type="number" id="ab-price" placeholder="Narxi">
-                <button class="btn-glow" onclick="addBuyCurr()">QO'SHISH</button>
+                <h4>Yangi Valyuta</h4>
+                <select id="adm-coin-type" onchange="toggleMemo()">
+                    <option value="buy">Sotib olish uchun</option>
+                    <option value="sell">Sotish uchun</option>
+                </select>
+                <input type="text" id="adm-coin-name" placeholder="Nomi (Masalan: TON)">
+                <input type="number" id="adm-coin-price" placeholder="Narxi (so'mda)">
+                <input type="text" id="adm-coin-addr" placeholder="Hamyon manzili (Faqat sotishda)">
+                <input type="text" id="adm-coin-memo" placeholder="Memo (Ixtiyoriy)" style="display:none;">
+                <button class="btn-glow" onclick="addCoin()">QO'SHISH</button>
             </div>
-            <div id="ab-list"></div>
-        </div>
-
-        <div id="admin-sell-settings" class="hidden">
-            <button onclick="showSection('admin-panel')">⬅ Orqaga</button>
-            <div class="card">
-                <h4>Sotish uchun valyuta qo'shish</h4>
-                <input type="text" id="as-name" placeholder="Nomi">
-                <input type="number" id="as-price" placeholder="Narxi">
-                <input type="text" id="as-addr" placeholder="Sizning hamyon manzilingiz">
-                <input type="text" id="as-memo" placeholder="Memo (bo'sh bo'lsa qoldiring)">
-                <button class="btn-glow" onclick="addSellCurr()">QO'SHISH</button>
-            </div>
-            <div id="as-list"></div>
+            <div id="admin-coin-list-display"></div>
         </div>
     </div>
 
     <script>
-        // MA'LUMOTLAR OMBORI (LOCALSTORAGE)
-        let buyData = JSON.parse(localStorage.getItem('az_v9_buy')) || [{name:'Toncoin', price:75000}];
-        let sellData = JSON.parse(localStorage.getItem('az_v9_sell')) || [{name:'USDT', price:12800, addr:'TQ...', memo:''}];
-        let adminCard = localStorage.getItem('az_v9_card') || '8600 0000 0000 0000';
-        let orders = JSON.parse(localStorage.getItem('az_v9_orders')) || [];
-        let newOrderAlert = localStorage.getItem('az_v9_new') === 'true';
-        let currentMode = ''; 
-        let currentItem = null;
+        // --- DATA STORE ---
+        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v5')) ||[{name:'Toncoin', price:75000}];
+        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v5')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
+        let adminCard = localStorage.getItem('az_card_v5') || '8600 0000 0000 0000';
+        let users = JSON.parse(localStorage.getItem('az_users_v5')) || {};
+        let activeUid = localStorage.getItem('az_uid_v5');
+        let orders = JSON.parse(localStorage.getItem('az_orders_v5')) ||[];
+        let deposits = JSON.parse(localStorage.getItem('az_deps_v5')) ||[];
+        let withdraws = JSON.parse(localStorage.getItem('az_withs_v5')) ||[];
+        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v5')) ||[];
+        let newAlert = localStorage.getItem('az_alert_v5') === 'true';
+        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v5')) || 0;
+
+        let curMode = '', curCoin = null;
 
         window.onload = () => {
-            setTimeout(() => { 
-                document.getElementById('welcome').style.opacity = '0'; 
-                setTimeout(() => document.getElementById('welcome').style.display = 'none', 1000); 
-            }, 2500);
+            setTimeout(() => {
+                document.getElementById('welcome').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('welcome').classList.add('hidden');
+                    if(!activeUid) initUser();
+                }, 1000);
+            }, 2000);
             updateBlink();
         };
 
+        function initUser() {
+            Swal.fire({ title: 'Ismingiz?', input: 'text', allowOutsideClick: false }).then(r => {
+                if(r.value) {
+                    let id = Math.floor(100000 + Math.random() * 900000);
+                    users[id] = { name: r.value, id: id, balance: 0, completedTasks:[] };
+                    activeUid = id;
+                    save();
+                }
+            });
+        }
+
+        function save() {
+            localStorage.setItem('az_b_c_v5', JSON.stringify(buyCoins));
+            localStorage.setItem('az_s_c_v5', JSON.stringify(sellCoins));
+            localStorage.setItem('az_card_v5', adminCard);
+            localStorage.setItem('az_users_v5', JSON.stringify(users));
+            localStorage.setItem('az_uid_v5', activeUid);
+            localStorage.setItem('az_orders_v5', JSON.stringify(orders));
+            localStorage.setItem('az_deps_v5', JSON.stringify(deposits));
+            localStorage.setItem('az_withs_v5', JSON.stringify(withdraws));
+            localStorage.setItem('az_tasks_data_v5', JSON.stringify(tasks));
+            localStorage.setItem('az_alert_v5', newAlert);
+            localStorage.setItem('az_admin_lock_v5', adminLockUntil);
+            updateBlink();
+        }
+
         function updateBlink() {
-            const title = document.getElementById('main-title');
-            if(newOrderAlert) title.classList.add('blink-alert');
-            else title.classList.remove('blink-alert');
+            const t = document.getElementById('main-title');
+            if(newAlert) t.classList.add('blink-alert'); else t.classList.remove('blink-alert');
+        }
+
+        function updateAdminNotifications() {
+            // Yangi so'rovlar bor-yo'qligini tekshirish
+            let hasNewOrders = orders.some(o => o.isNew);
+            let hasNewDeps = deposits.some(d => d.isNew);
+            let hasNewWiths = withdraws.some(w => w.isNew);
+
+            // Tugmalarga yonib-o'chuvchi class qo'shish yoki olib tashlash
+            document.getElementById('btn-admin-orders').classList.toggle('btn-blink-green', hasNewOrders);
+            document.getElementById('btn-admin-deps').classList.toggle('btn-blink-green', hasNewDeps);
+            document.getElementById('btn-admin-withs').classList.toggle('btn-blink-green', hasNewWiths);
+            
+            // Agar hammasi o'qilgan bo'lsa, asosiy yozuv o'chadi
+            if(!hasNewOrders && !hasNewDeps && !hasNewWiths) {
+                newAlert = false;
+                save();
+            }
         }
 
         function showSection(id) {
-            document.querySelectorAll('.container > div').forEach(d => { if(d.id !== 'main-title') d.classList.add('hidden') });
+            document.querySelectorAll('.container > div').forEach(d => { if(d.id !== 'main-title') d.classList.add('hidden'); });
             document.getElementById(id).classList.remove('hidden');
-            
-            if(id === 'buy-list') renderUserView('buy');
-            if(id === 'sell-list') renderUserView('sell');
-            if(id === 'admin-orders') { renderAdminOrders(); newOrderAlert = false; localStorage.setItem('az_v9_new', 'false'); updateBlink(); }
-            if(id === 'admin-buy-settings') renderAdminSettings('buy');
-            if(id === 'admin-sell-settings') renderAdminSettings('sell');
+            if(id === 'buy-list') renderCoins('buy');
+            if(id === 'sell-list') renderCoins('sell');
+            if(id === 'admin-coins') { renderAdminCoinList(); toggleMemo(); }
+            if(id === 'admin-panel') updateAdminNotifications(); // Admin panel ochilganda yangilash
         }
 
-        function renderUserView(type) {
-            const container = document.getElementById(type + '-items');
-            container.innerHTML = '';
-            const list = (type === 'buy') ? buyData : sellData;
-            list.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'neon-card';
-                card.innerHTML = `<div class="inner-content">${item.name}</div>`;
-                card.onclick = () => openOrderForm(type, item);
-                container.appendChild(card);
+        // --- BUY / SELL ---
+        function toggleMemo() {
+            let t = document.getElementById('adm-coin-type').value;
+            document.getElementById('adm-coin-memo').style.display = (t === 'sell') ? 'block' : 'none';
+        }
+
+        function renderCoins(type) {
+            const cont = document.getElementById(type === 'buy' ? 'bl-cont' : 'sl-cont');
+            cont.innerHTML = '';
+            const list = type === 'buy' ? buyCoins : sellCoins;
+            list.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'neon-card';
+                div.innerHTML = `<div class="inner-content">${c.name}</div>`;
+                div.onclick = () => {
+                    curMode = type; curCoin = c;
+                    document.getElementById('f-title').innerText = c.name;
+                    document.getElementById('f-rate').innerText = `1 ${c.name} = ${c.price.toLocaleString()} so'm`;
+                    document.getElementById('f-amount').value = '';
+                    document.getElementById('f-total-text').innerText = 'Jami: 0 so\'m';
+                    
+                    if(type === 'buy') {
+                        // Sotib olishda Hamyon manzili so'raladi
+                        document.getElementById('f-info').classList.remove('hidden');
+                        document.getElementById('f-info').value = '';
+                        document.getElementById('f-info').placeholder = "Hamyon manzilingizni kiriting";
+
+                        document.getElementById('f-pay-label').innerText = "To'lov kartasi:";
+                        document.getElementById('f-pay-address').innerText = adminCard;
+                        document.getElementById('f-memo-wrap').classList.add('hidden');
+                    } else {
+                        // Sotishda Karta raqami so'raladi
+                        document.getElementById('f-info').classList.remove('hidden');
+                        document.getElementById('f-info').value = '';
+                        document.getElementById('f-info').placeholder = "Karta raqamingiz (Pul tushishi uchun)";
+
+                        document.getElementById('f-pay-label').innerText = "Hamyon manzilimiz:";
+                        document.getElementById('f-pay-address').innerText = c.addr;
+                        if(c.memo) { 
+                            document.getElementById('f-memo-wrap').classList.remove('hidden'); 
+                            document.getElementById('f-pay-memo').innerText = c.memo; 
+                        } else {
+                            document.getElementById('f-memo-wrap').classList.add('hidden');
+                        }
+                    }
+                    showSection('order-form');
+                };
+                cont.appendChild(div);
             });
         }
 
-        function openOrderForm(mode, item) {
-            currentMode = mode;
-            currentItem = item;
-            
-            // Tozalash
-            document.getElementById('amt-input').value = '';
-            document.getElementById('wallet-info-input').value = '';
-            document.getElementById('receipt-file').value = '';
-            document.getElementById('form-total').innerText = 'Jami: 0 so\'m';
-            
-            document.getElementById('form-title').innerText = item.name;
-            document.getElementById('form-rate').innerText = `1 ${item.name} = ${item.price.toLocaleString()} so'm`;
-            
-            if(mode === 'buy') {
-                document.getElementById('wallet-info-input').placeholder = "Valyuta tushadigan hamyon manzilingiz";
-                document.getElementById('pay-label').innerText = "To'lov qilish uchun bizning karta:";
-                document.getElementById('target-address').innerText = adminCard;
-                document.getElementById('memo-wrap').classList.add('hidden');
-                document.getElementById('form-back-btn').onclick = () => showSection('buy-list');
-            } else {
-                document.getElementById('wallet-info-input').placeholder = "Pul tushadigan karta raqamingiz";
-                document.getElementById('pay-label').innerText = "Kripto yuborish uchun manzilimiz:";
-                document.getElementById('target-address').innerText = item.addr;
-                if(item.memo) {
-                    document.getElementById('memo-wrap').classList.remove('hidden');
-                    document.getElementById('target-memo').innerText = item.memo;
-                } else {
-                    document.getElementById('memo-wrap').classList.add('hidden');
-                }
-                document.getElementById('form-back-btn').onclick = () => showSection('sell-list');
-            }
-            showSection('order-form');
+        function updateOrderTotal() {
+            let q = document.getElementById('f-amount').value;
+            document.getElementById('f-total-text').innerText = `Jami: ${(q * curCoin.price).toLocaleString()} so'm`;
         }
 
-        function updateTotal() {
-            const qty = document.getElementById('amt-input').value;
-            document.getElementById('form-total').innerText = `Jami: ${(qty * currentItem.price).toLocaleString()} so'm`;
-        }
-
-        // NUSXALASH FUNKSIYASI (HAR QANDAY TELEFONDA ISHLAYDI)
-        function executeCopy() {
-            const addr = document.getElementById('target-address').innerText;
-            const memoWrap = document.getElementById('memo-wrap');
-            const memo = document.getElementById('target-memo').innerText;
-            
-            let textToCopy = addr;
-            if (!memoWrap.classList.contains('hidden')) {
-                textToCopy = `Address: ${addr}\nMemo: ${memo}`;
-            }
-
-            const textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
-            textArea.style.position = "fixed"; 
-            textArea.style.left = "-9999px";
-            textArea.style.top = "0";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                Swal.fire({ title: 'Nusxalandi!', icon: 'success', timer: 1000, showConfirmButton: false });
-            } catch (err) {
-                Swal.fire('Xato', 'Nusxalash imkoni bo\'lmadi', 'error');
-            }
-            document.body.removeChild(textArea);
+        function copyPayInfo() {
+            let txt = document.getElementById('f-pay-address').innerText;
+            if(!document.getElementById('f-memo-wrap').classList.contains('hidden')) txt += "\nMemo: " + document.getElementById('f-pay-memo').innerText;
+            const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            Swal.fire({title:'Nusxalandi', icon:'success', timer:800, showConfirmButton:false});
         }
 
         function submitOrder() {
-            const amt = document.getElementById('amt-input').value;
-            const info = document.getElementById('wallet-info-input').value;
-            const file = document.getElementById('receipt-file').files[0];
-
-            if(!amt || !info || !file) {
-                Swal.fire('Xato', 'To\'liq to\'ldiring va chekni yuklang!', 'error'); return;
-            }
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function(e) {
-                const orderData = {
-                    id: 'AZ' + Math.floor(Math.random() * 100000),
-                    mode: currentMode,
-                    curr: currentItem.name,
-                    qty: amt,
-                    sum: amt * currentItem.price,
-                    user: info,
-                    img: e.target.result,
-                    date: new Date().toLocaleString()
-                };
-                orders.push(orderData);
-                localStorage.setItem('az_v9_orders', JSON.stringify(orders));
-                localStorage.setItem('az_v9_new', 'true');
-                newOrderAlert = true;
-                updateBlink();
-
-                Swal.fire({
-                    title: 'Buyurtma qabul qilindi!',
-                    text: 'Admin tez orada tekshirib o\'tkazib beradi.',
-                    icon: 'success'
-                }).then(() => showSection('main-menu'));
+            const amt = document.getElementById('f-amount').value;
+            const info = document.getElementById('f-info').value;
+            const file = document.getElementById('f-file').files[0];
+            
+            if(!amt || !file || !info) return Swal.fire('Xato','Barcha maydonlarni to\'ldiring','error');
+            
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = () => {
+                // isNew: true qilinganligi sababli Admindagi tugma yashil yonadi
+                orders.push({ id:'ID'+Math.floor(Math.random()*99999), type:curMode, name:curCoin.name, qty:amt, sum:amt*curCoin.price, user:info, img:reader.result, date:new Date().toLocaleString(), isNew: true });
+                newAlert = true; save(); Swal.fire('Muvaffaqiyatli','Adminga yuborildi','success').then(() => showSection('main-menu'));
             };
         }
 
-        // ADMIN PANEL
-        function loginAdmin() {
-            Swal.fire({ title: 'Admin Parol', input: 'password', confirmButtonText: 'Kirish' }).then(r => {
-                if(r.value === '1234') showSection('admin-panel');
-                else if(r.value) Swal.fire('Xato','Parol noto\'g\'ri','error');
+        // --- GAME MENU ---
+        function openGameMenu() {
+            let u = users[activeUid];
+            if(!u.completedTasks) u.completedTasks =[]; 
+            document.getElementById('u-name').innerText = "Ism: " + u.name;
+            document.getElementById('u-id').innerText = u.id;
+            document.getElementById('u-balance').innerText = u.balance.toLocaleString() + " so'm";
+            showSection('game-menu');
+        }
+
+        function openDeposit() {
+            Swal.fire({ title: 'Miqdor?', input: 'number' }).then(res => {
+                if(res.value) {
+                    Swal.fire({ title: 'To\'lov', html: `Karta: <b>${adminCard}</b><br>Summa: <b>${res.value}</b><br>Chek yuklang`, input: 'file' }).then(f => {
+                        if(f.value) {
+                            let reader = new FileReader(); reader.readAsDataURL(f.value);
+                            reader.onload = () => {
+                                // isNew: true
+                                deposits.push({ uid:activeUid, amount:res.value, img:reader.result, time:new Date().toLocaleString(), isNew: true });
+                                newAlert = true; save(); Swal.fire('Yuborildi','1 soatda tushadi','success');
+                            };
+                        }
+                    });
+                }
             });
         }
 
-        function saveCard() {
-            adminCard = document.getElementById('adm-card-input').value;
-            localStorage.setItem('az_v9_card', adminCard);
-            Swal.fire('Saqlandi');
-        }
-
-        function addBuyCurr() {
-            const n = document.getElementById('ab-name').value;
-            const p = document.getElementById('ab-price').value;
-            if(n && p) {
-                buyData.push({name:n, price:parseFloat(p)});
-                localStorage.setItem('az_v9_buy', JSON.stringify(buyData));
-                renderAdminSettings('buy');
-                document.getElementById('ab-name').value = ''; document.getElementById('ab-price').value = '';
-            }
-        }
-
-        function addSellCurr() {
-            const n = document.getElementById('as-name').value;
-            const p = document.getElementById('as-price').value;
-            const a = document.getElementById('as-addr').value;
-            const m = document.getElementById('as-memo').value;
-            if(n && p && a) {
-                sellData.push({name:n, price:parseFloat(p), addr:a, memo:m});
-                localStorage.setItem('az_v9_sell', JSON.stringify(sellData));
-                renderAdminSettings('sell');
-                document.getElementById('as-name').value = ''; document.getElementById('as-price').value = '';
-                document.getElementById('as-addr').value = ''; document.getElementById('as-memo').value = '';
-            }
-        }
-
-        function renderAdminSettings(type) {
-            const list = (type === 'buy') ? buyData : sellData;
-            const cont = document.getElementById((type === 'buy' ? 'ab' : 'as') + '-list');
-            cont.innerHTML = '';
-            list.forEach((item, i) => {
-                const d = document.createElement('div');
-                d.style = "display:flex; justify-content:space-between; background:#111; padding:12px; margin:5px 0; border-radius:8px;";
-                d.innerHTML = `<span>${item.name} (${item.price} so'm)</span> <button onclick="deleteCurr('${type}', ${i})" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">X</button>`;
-                cont.appendChild(d);
+        function openWithdraw() {
+            Swal.fire({ title: 'Miqdor?', input: 'number' }).then(res => {
+                if(res.value) {
+                    let a = parseInt(res.value);
+                    if(users[activeUid].balance < a) return Swal.fire('Xato','Balans kam','error');
+                    Swal.fire({ title: 'Karta?', input: 'text' }).then(c => {
+                        if(c.value) {
+                            users[activeUid].balance -= a;
+                            // isNew: true
+                            withdraws.push({ uid:activeUid, amount:a, card:c.value, isNew: true });
+                            newAlert = true; save(); openGameMenu(); Swal.fire('OK','12 soatda tushadi','success');
+                        }
+                    });
+                }
             });
         }
 
-        function deleteCurr(type, i) {
-            if(type === 'buy') buyData.splice(i,1); else sellData.splice(i,1);
-            localStorage.setItem('az_v9_' + type, JSON.stringify(type === 'buy' ? buyData : sellData));
-            renderAdminSettings(type);
+        // --- TASKS (VAZIFALAR) ---
+        function openTasks() {
+            showSection('tasks-page');
+            const list = document.getElementById('tasks-list');
+            list.innerHTML = '';
+            let u = users[activeUid];
+            let count = 0;
+            tasks.forEach((t, i) => {
+                if(u.completedTasks && u.completedTasks.includes(i)) return; // Bajarilgan
+                count++;
+                list.innerHTML += `
+                    <div class="card">
+                        <h4>${t.name}</h4>
+                        <p style="color:var(--warning)">Mukofot: ${t.price} so'm</p>
+                        <button class="btn-glow" style="padding:10px" onclick="doTask(${i}, '${t.link}', ${t.price})">Bajarish</button>
+                    </div>
+                `;
+            });
+            if(count === 0) list.innerHTML = '<p>Hozircha vazifalar yo\'q yoki hammasini bajargansiz.</p>';
+        }
+
+        function doTask(i, link, price) {
+            window.open(link, '_blank');
+            Swal.fire({
+                title: 'Kuting...',
+                text: 'Vazifa tekshirilmoqda',
+                timer: 3000,
+                showConfirmButton: false
+            }).then(() => {
+                users[activeUid].completedTasks.push(i);
+                users[activeUid].balance += parseInt(price);
+                save(); openTasks();
+                Swal.fire('Tabriklaymiz!', `${price} so'm hisobingizga qo'shildi`, 'success');
+            });
+        }
+
+        // --- MINES ---
+        let mActive = false, mGrid =[], mBet = 0, mStep = 0;
+        const mMults =[1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 15.0, 20.0, 30.0];
+        
+        function startMines() {
+            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(res => {
+                let a = parseInt(res.value);
+                if(a >= 1000 && users[activeUid].balance >= a) {
+                    users[activeUid].balance -= a; mBet = a; mStep = 0; mActive = true;
+                    mGrid = Array(6).fill('bomb').concat(Array(14).fill('gem')).sort(()=>Math.random()-0.5);
+                    save(); renderMines(); showSection('mines-page');
+                    document.getElementById('m-cash').classList.add('hidden');
+                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
+            });
+        }
+        function renderMines() {
+            const g = document.getElementById('m-grid'); g.innerHTML = '';
+            for(let i=0; i<20; i++) {
+                let c = document.createElement('div'); c.className = 'mine-cell';
+                c.onclick = () => {
+                    if(!mActive || c.innerText) return;
+
+                    // Yutish ehtimolini aniq 42% ga sozlash (Yutqazish = 58%)
+                    if(mStep === 0) {
+                        if(Math.random() < 0.58) {
+                            mGrid[i] = 'bomb'; // 58% holatda yutqazadi
+                        } else if(mGrid[i] === 'bomb') {
+                            mGrid[i] = 'gem'; // 42% holatda yutadi
+                        }
+                    }
+
+                    if(mGrid[i] === 'bomb') {
+                        c.innerText = '💣'; c.classList.add('bomb'); mActive = false;
+                        document.getElementById('m-cash').classList.add('hidden');
+                        Swal.fire('Yutqazdingiz','Bombaga duch keldingiz','error').then(openGameMenu);
+                    } else {
+                        c.innerText = '💎'; c.classList.add('open'); mStep++;
+                        document.getElementById('m-cash').classList.remove('hidden');
+                        document.getElementById('m-cash').innerText = `OLISH: ${Math.floor(mBet * (mMults[mStep-1] || 100))} so'm`;
+                    }
+                };
+                g.appendChild(c);
+            }
+            document.getElementById('m-info').innerText = `Tikish: ${mBet}`;
+        }
+        function minesCashout() {
+            if(!mActive || mStep === 0) return;
+            let win = Math.floor(mBet * mMults[mStep-1]);
+            users[activeUid].balance += win; mActive = false; save(); openGameMenu();
+        }
+
+        // --- AVIATOR ---
+        let avActive = false, avMult = 1.0, avInterval, avCrash;
+        function openAviator() { 
+            document.getElementById('av-mult').style.color = 'var(--success)';
+            document.getElementById('av-mult').innerText = '1.00x';
+            document.getElementById('av-plane').style.transform = 'none';
+            document.getElementById('av-bet-btn').classList.remove('hidden');
+            document.getElementById('av-cash-btn').classList.add('hidden');
+            showSection('aviator-page'); 
+        }
+        
+        function startAviator() {
+            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(res => {
+                let a = parseInt(res.value);
+                if(a >= 1000 && users[activeUid].balance >= a) {
+                    users[activeUid].balance -= a; mBet = a; avActive = true; avMult = 1.0;
+                    save();
+                    
+                    if(Math.random() < 0.40) {
+                        avCrash = 1.00 + (Math.random() * 0.20);
+                    } else {
+                        avCrash = 1.20 + (Math.random() * 10.8);
+                    }
+
+                    document.getElementById('av-bet-btn').classList.add('hidden');
+                    document.getElementById('av-cash-btn').classList.remove('hidden');
+                    document.getElementById('av-mult').style.color = 'var(--success)';
+                    
+                    avInterval = setInterval(() => {
+                        avMult += 0.03; 
+                        document.getElementById('av-mult').innerText = avMult.toFixed(2) + 'x';
+                        document.getElementById('av-plane').style.transform = `translate(${avMult*6}px, -${avMult*6}px)`;
+                        
+                        if(avMult >= avCrash) {
+                            clearInterval(avInterval); avActive = false;
+                            document.getElementById('av-mult').style.color = 'red';
+                            setTimeout(() => {
+                                // Qayta o'ynash uchun reset qilish
+                                document.getElementById('av-bet-btn').classList.remove('hidden');
+                                document.getElementById('av-cash-btn').classList.add('hidden');
+                                document.getElementById('av-mult').style.color = 'var(--success)';
+                                document.getElementById('av-mult').innerText = '1.00x';
+                                document.getElementById('av-plane').style.transform = 'none';
+                            }, 2000);
+                        }
+                    }, 100);
+                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
+            });
+        }
+        
+        function aviatorCashout() {
+            if(!avActive) return;
+            clearInterval(avInterval); avActive = false;
+            let win = Math.floor(mBet * avMult); users[activeUid].balance += win;
+            save(); 
+            document.getElementById('av-mult').style.color = 'var(--success)';
+            
+            Swal.fire('Yutdingiz!', win+' so\'m','success').then(() => {
+                document.getElementById('av-bet-btn').classList.remove('hidden');
+                document.getElementById('av-cash-btn').classList.add('hidden');
+                document.getElementById('av-mult').innerText = '1.00x';
+                document.getElementById('av-plane').style.transform = 'none';
+            });
+        }
+
+        // --- KALLA SUYAK (SKULL GAME) ---
+        let skBet = 0, skActive = false, skPos = 0;
+        let skPositions =[0, 100, 200]; // Kalla suyaklarning chapdan (left) joylashuv pikseli
+        let skCurrentIds = [0, 1, 2]; // Qaysi indeks qayerda joylashganini kuzatuvchi massiv
+
+        function openSkullGame() {
+            document.getElementById('sk-info').innerText = "Tikish: 0 so'm";
+            skCurrentIds =[0, 1, 2];
+            for(let i=0; i<3; i++) {
+                let skull = document.getElementById('sk-'+i);
+                skull.innerHTML = '💀';
+                skull.style.left = skPositions[i] + 'px';
+            }
+            document.getElementById('sk-start-btn').classList.remove('hidden');
+            showSection('skull-page');
+        }
+
+        function startSkullGame() {
+            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(r => {
+                let a = parseInt(r.value);
+                if(a >= 1000 && users[activeUid].balance >= a) {
+                    users[activeUid].balance -= a; save(); skBet = a; skActive = false;
+                    document.getElementById('sk-info').innerText = `Tikish: ${a} so'm`;
+                    document.getElementById('sk-start-btn').classList.add('hidden');
+                    
+                    skCurrentIds =[0, 1, 2];
+                    for(let i=0; i<3; i++) {
+                        let skull = document.getElementById('sk-'+i);
+                        skull.innerHTML = '💀';
+                        skull.style.left = skPositions[i] + 'px';
+                    }
+
+                    skPos = Math.floor(Math.random() * 3); // Koptok yashiringan haqiqiy manzil
+                    
+                    // Koptokni ko'rsatish
+                    let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
+                    document.getElementById('sk-'+skPos).innerHTML = ballHTML;
+                    
+                    setTimeout(() => {
+                        // Koptokni yashirish
+                        for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
+                        
+                        // Aralashtirish animatsiyasi
+                        let swaps = 0;
+                        let shuffleInt = setInterval(() => {
+                            let aIdx = Math.floor(Math.random()*3);
+                            let bIdx = Math.floor(Math.random()*3);
+                            while(aIdx === bIdx) bIdx = Math.floor(Math.random()*3);
+
+                            let temp = skCurrentIds[aIdx];
+                            skCurrentIds[aIdx] = skCurrentIds[bIdx];
+                            skCurrentIds[bIdx] = temp;
+
+                            document.getElementById('sk-'+aIdx).style.left = skPositions[skCurrentIds[aIdx]] + 'px';
+                            document.getElementById('sk-'+bIdx).style.left = skPositions[skCurrentIds[bIdx]] + 'px';
+
+                            swaps++;
+                            if(swaps >= 8) { 
+                                clearInterval(shuffleInt);
+                                setTimeout(() => {
+                                    skActive = true;
+                                    Swal.fire({title:'Toping!', text:'Koptok qayerda yashirindi? Birini tanlang', timer:1500, showConfirmButton:false});
+                                }, 400);
+                            }
+                        }, 400); 
+                    }, 1500);
+                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
+            });
+        }
+
+        function pickSkull(idx) {
+            if(!skActive) return;
+            skActive = false;
+            
+            for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
+            
+            let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
+            document.getElementById('sk-'+skPos).innerHTML = ballHTML;
+
+            if(idx === skPos) {
+                let win = skBet * 5;
+                users[activeUid].balance += win; save();
+                Swal.fire('Ajoyib!', `Siz topdingiz, ${win} so'm yutdingiz!`, 'success').then(() => {
+                    document.getElementById('sk-start-btn').classList.remove('hidden');
+                });
+            } else {
+                Swal.fire('Yutqazdingiz', 'Koptok boshqa joyda edi.', 'error').then(() => {
+                    document.getElementById('sk-start-btn').classList.remove('hidden');
+                });
+            }
+        }
+
+        // --- ADMIN PANEL ---
+        function adminLogin() {
+            if(Date.now() < adminLockUntil) {
+                let left = Math.ceil((adminLockUntil - Date.now())/1000);
+                return Swal.fire('Bloklangan', `Iltimos, ${left} soniya kuting.`, 'error');
+            }
+
+            Swal.fire({title:'Parol', input:'password'}).then(r => { 
+                if(!r.isConfirmed) return;
+                if(r.value === 'Azizbek1$') {
+                    showSection('admin-panel'); 
+                } else {
+                    adminLockUntil = Date.now() + 30000; 
+                    save();
+                    Swal.fire('Xato', 'Parol noto\'g\'ri! 30 soniyaga bloklandingiz.', 'error');
+                }
+            });
+        }
+
+        function saveAdminCard() {
+            const v = document.getElementById('adm-card-val').value;
+            if(v) { adminCard = v; save(); Swal.fire('Saqlandi'); }
+        }
+
+        function addCoin() {
+            let t = document.getElementById('adm-coin-type').value;
+            let n = document.getElementById('adm-coin-name').value;
+            let p = document.getElementById('adm-coin-price').value;
+            let a = document.getElementById('adm-coin-addr').value;
+            let m = document.getElementById('adm-coin-memo').value;
+
+            if(!n || !p) return Swal.fire('Xato','Nomi va narxini kiritish shart','error');
+
+            if(t === 'buy') buyCoins.push({name:n, price:parseFloat(p)});
+            else {
+                if(!a) return Swal.fire('Xato','Sotish uchun manzil kiritish shart','error');
+                sellCoins.push({name:n, price:parseFloat(p), addr:a, memo:m});
+            }
+
+            document.getElementById('adm-coin-name').value = '';
+            document.getElementById('adm-coin-price').value = '';
+            document.getElementById('adm-coin-addr').value = '';
+            document.getElementById('adm-coin-memo').value = '';
+
+            save(); renderAdminCoinList();
+            Swal.fire('Muvaffaqiyatli','Valyuta qo\'shildi','success');
+        }
+
+        function renderAdminCoinList() {
+            const d = document.getElementById('admin-coin-list-display'); d.innerHTML = '<h5>Ro\'yxat:</h5>';
+            buyCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotib olish: ${c.name}</span> <button onclick="buyCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
+            sellCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotish: ${c.name}</span> <button onclick="sellCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
         }
 
         function renderAdminOrders() {
-            const cont = document.getElementById('admin-order-list');
-            cont.innerHTML = '<h3 style="margin:20px 0;">YANGI BUYURTMALAR</h3>';
-            if(orders.length === 0) cont.innerHTML += '<p>Hozircha buyurtmalar yo\'q.</p>';
-            orders.slice().reverse().forEach(o => {
-                const isBuy = o.mode === 'buy';
-                const d = document.createElement('div');
-                d.className = 'admin-order-card';
-                d.innerHTML = `
-                    <div class="order-tag ${isBuy ? 'tag-buy' : 'tag-sell'}">${isBuy ? 'SOTIB OLISH' : 'SOTISH'}</div>
-                    <div style="float:right; font-size:0.7rem; color:#888;">ID: ${o.id}</div>
-                    <div style="clear:both; margin-top:10px;">
-                        <b>Vaqti:</b> ${o.date}<br>
-                        <b>Valyuta:</b> ${o.curr}<br>
-                        <b>Miqdor:</b> ${o.qty}<br>
-                        <b>Jami summa:</b> ${o.sum.toLocaleString()} so'm<br>
-                        <b>${isBuy ? 'Hamyon manzili:' : 'Karta raqami:'}</b> <span style="color:cyan;">${o.user}</span><br>
-                    </div>
-                    <img src="${o.img}" style="width:100%; border-radius:10px; margin-top:10px; border:1px solid #333;" onclick="window.open(this.src)">
-                    <button onclick="deleteOrder('${o.id}')" style="width:100%; background:#c0392b; border:none; color:white; padding:12px; margin-top:15px; border-radius:10px; cursor:pointer; font-weight:bold;">BUYURTMANI O'CHIRISH</button>
-                `;
-                cont.appendChild(d);
+            // Yangi so'rovlar maqomini olib tashlaymiz
+            orders.forEach(o => o.isNew = false);
+            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+
+            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>BUYURTMALAR</h4>';
+            if(orders.length===0) l.innerHTML += '<p>Buyurtmalar yo\'q.</p>';
+            orders.slice().reverse().forEach((o,i) => l.innerHTML += `<div class="admin-order"><b>[${o.type.toUpperCase()}] ${o.qty} ${o.name}</b><br>Sum: ${o.sum}<br>Info (Hamyon/Karta): ${o.user}<br><img src="${o.img}" style="width:100%; border-radius:10px;"><br><button class="btn-glow" style="background:red; padding:5px" onclick="orders.splice(${orders.length-1-i},1); save(); renderAdminOrders();">O'chirish</button></div>`);
+        }
+
+        function renderAdminDeposits() {
+            // Yangi so'rovlar maqomini olib tashlaymiz
+            deposits.forEach(d => d.isNew = false);
+            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+
+            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>TO\'LDIRISHLAR</h4>';
+            if(deposits.length===0) l.innerHTML += '<p>To\'ldirishlar yo\'q.</p>';
+            deposits.forEach((d, i) => l.innerHTML += `<div class="admin-order">ID: ${d.uid} | Sum: ${d.amount}<br>Vaqt: ${d.time}<br><img src="${d.img}" style="width:100%; border-radius:10px; margin-top:10px;"><br><div style="display:flex;gap:5px;margin-top:10px;"><button class="btn-glow" style="background:green; margin:0;" onclick="approveDep(${i})">Tasdiqlash</button><button class="btn-glow" style="background:red; margin:0;" onclick="deposits.splice(${i},1); save(); renderAdminDeposits();">Rad etish</button></div></div>`);
+        }
+
+        function approveDep(i) {
+            let d = deposits[i]; if(users[d.uid]) users[d.uid].balance += parseInt(d.amount);
+            deposits.splice(i,1); save(); renderAdminDeposits(); Swal.fire('OK','Pul tushirildi','success');
+        }
+
+        function renderAdminWithdraws() {
+            // Yangi so'rovlar maqomini olib tashlaymiz
+            withdraws.forEach(w => w.isNew = false);
+            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+
+            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>YECHISHLAR</h4>';
+            if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
+            withdraws.forEach((w, i) => l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="withdraws.splice(${i},1); save(); renderAdminWithdraws();">Bajarildi (O'chirish)</button></div>`);
+        }
+
+        function renderAdminTasks() {
+            const l = document.getElementById('admin-list-container'); 
+            l.innerHTML = `
+                <h4>YANGI VAZIFA</h4>
+                <input type="text" id="t-name" placeholder="Vazifa nomi (Masalan: Kanalga obuna)">
+                <input type="number" id="t-price" placeholder="Narxi (so'm)">
+                <input type="text" id="t-link" placeholder="Havola (Link)">
+                <button class="btn-glow" style="background:#27ae60" onclick="addTask()">QO'SHISH</button>
+                <hr style="border:0.5px solid #333; margin:20px 0;">
+                <h4>QO'SHILGAN VAZIFALAR</h4>
+            `;
+            tasks.forEach((t, i) => {
+                l.innerHTML += `<div class="admin-order"><b>${t.name}</b> - ${t.price} so'm<br><small style="color:#aaa">${t.link}</small><br><button class="btn-glow" style="background:red; padding:5px; margin-top:5px;" onclick="tasks.splice(${i},1); save(); renderAdminTasks();">O'chirish</button></div>`;
             });
         }
 
-        function deleteOrder(id) {
-            orders = orders.filter(o => o.id !== id);
-            localStorage.setItem('az_v9_orders', JSON.stringify(orders));
-            renderAdminOrders();
+        function addTask() {
+            let n = document.getElementById('t-name').value;
+            let p = document.getElementById('t-price').value;
+            let l = document.getElementById('t-link').value;
+            if(!n || !p || !l) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring', 'error');
+            tasks.push({name:n, price:parseInt(p), link:l});
+            save(); renderAdminTasks();
+            Swal.fire('OK', 'Vazifa qo\'shildi', 'success');
         }
+
     </script>
 </body>
 </html>
