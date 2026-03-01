@@ -7,6 +7,11 @@
     <!-- Telegram Web App SDK ulangan -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- FIREBASE ONLAYN BAZA SDK (Hammada bir xil ishlashi uchun) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
             --primary: #00f2ff;
@@ -96,11 +101,7 @@
 
         /* Kalla suyak o'yini */
         .skull-area { position: relative; width: 280px; height: 120px; margin: 30px auto; }
-        .skull-box { 
-            position: absolute; width: 80px; height: 80px; 
-            font-size: 3.5rem; cursor: pointer; text-align: center; 
-            transition: left 0.4s ease-in-out; user-select: none;
-        }
+        .skull-box { position: absolute; width: 80px; height: 80px; font-size: 3.5rem; cursor: pointer; text-align: center; transition: left 0.4s ease-in-out; user-select: none; }
 
         /* Formalar */
         .card { background: #161b22; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-top: 15px; text-align: left;}
@@ -112,6 +113,18 @@
         .admin-order { background: #000; border: 1px solid var(--primary); padding: 15px; margin: 15px 0; border-radius: 12px; text-align: left; }
         .blink-alert { animation: blinkMain 0.8s infinite alternate; }
         @keyframes blinkMain { from { color: white; } to { color: var(--success); text-shadow: 0 0 15px var(--success); } }
+        
+        /* iPhone Chek tugmasi uchun maxsus dizayn */
+        .file-upload-wrapper {
+            position: relative; width: 100%; padding: 15px; border-radius: 12px; 
+            overflow: hidden; background: linear-gradient(45deg, #2c3e50, #34495e); 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; box-sizing: border-box; margin-top: 10px; cursor: pointer;
+        }
+        .file-upload-wrapper input[type="file"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            opacity: 0; cursor: pointer; z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -151,9 +164,7 @@
             <div class="card">
                 <p id="f-rate" style="color:var(--primary); font-weight:bold;"></p>
                 <input type="number" id="f-amount" placeholder="Miqdorni kiriting" oninput="updateOrderTotal()">
-                
                 <input type="text" id="f-info" placeholder="">
-                
                 <h3 id="f-total-text">Jami: 0 so'm</h3>
                 <div class="pay-box">
                     <span id="f-pay-label"></span><br>
@@ -164,8 +175,10 @@
 
                 <p style="margin-bottom: 5px;">Chek rasmini yuklang:</p>
                 <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
-                <input type="file" id="f-file" accept="image/*" style="position:absolute; width:1px; height:1px; opacity:0; z-index:-1;" onchange="updateFileName()">
-                <label for="f-file" class="btn-glow" style="text-align:center; padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0; cursor:pointer;">Chek qo'yish</label>
+                <div class="file-upload-wrapper">
+                    <span>CHEK QO'YISH</span>
+                    <input type="file" id="f-file" accept="image/*" onchange="updateFileName()">
+                </div>
                 <div id="f-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
 
                 <button class="btn-glow" onclick="submitOrder()">TASDIQLASH</button>
@@ -182,13 +195,14 @@
                     <b id="d-admin-card"></b>
                     <svg class="copy-icon" onclick="copyDepositCard()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                 </div>
-                
                 <input type="number" id="d-amount" placeholder="Miqdorni kiriting (so'm)">
                 
                 <p style="margin-bottom: 5px; margin-top: 15px;">Chek rasmini yuklang:</p>
                 <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
-                <input type="file" id="d-file" accept="image/*" style="position:absolute; width:1px; height:1px; opacity:0; z-index:-1;" onchange="updateDepositFileName()">
-                <label for="d-file" class="btn-glow" style="text-align:center; padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0; cursor:pointer;">Chek yuklash</label>
+                <div class="file-upload-wrapper">
+                    <span>CHEK YUKLASH</span>
+                    <input type="file" id="d-file" accept="image/*" onchange="updateDepositFileName()">
+                </div>
                 <div id="d-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
 
                 <button class="btn-glow" style="background:var(--success)" onclick="submitDeposit()">YUBORISH</button>
@@ -305,9 +319,32 @@
         // --- TELEGRAM WEB APP API ULASH ---
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready(); // IPHONE UCHUN JUDA MUHIM - ILovani aktivlashtiradi
+        tg.ready();
 
-        // --- DATA STORE (Yangi v11 versiya) ---
+        // =========================================================
+        // ONLAYN BAZA SOZLAMALARI (202-QATOR)
+        // Bot hamma telefonda ishlashi uchun pastdagi yozuvlarni 
+        // o'zingizning Firebase kodingiz bilan ALMASHTIRISHINGIZ SHART!
+        // =========================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSy_SOXTA_KOD_BUNI_ALMASHTIRING",
+            authDomain: "sizning-botingiz.firebaseapp.com",
+            databaseURL: "https://sizning-botingiz-default-rtdb.firebaseio.com",
+            projectId: "sizning-botingiz",
+            storageBucket: "sizning-botingiz.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+        // =========================================================
+        
+        let db = null;
+        // Agar haqiqiy kod qo'yilgan bo'lsa, bazaga ulanadi
+        if(firebaseConfig.apiKey !== "AIzaSy_SOXTA_KOD_BUNI_ALMASHTIRING") {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        }
+
+        // --- DATA STORE ---
         let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v11')) ||[{name:'Toncoin', price:75000}];
         let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v11')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
         let adminCard = localStorage.getItem('az_card_v11') || '8600 0000 0000 0000';
@@ -323,12 +360,39 @@
         let curMode = '', curCoin = null;
         let activeUid = null;
 
+        // Firebase dan jonli ma'lumotlarni o'qish (Hamma telefonlar uchun)
+        if(db) {
+            db.ref('bot_data').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    buyCoins = data.buyCoins || buyCoins;
+                    sellCoins = data.sellCoins || sellCoins;
+                    adminCard = data.adminCard || adminCard;
+                    users = data.users || users;
+                    orders = data.orders || orders;
+                    deposits = data.deposits || deposits;
+                    withdraws = data.withdraws || withdraws;
+                    tasks = data.tasks || tasks;
+                    minWithdrawAmount = data.minWithdrawAmount || minWithdrawAmount;
+                    newAlert = data.newAlert || newAlert;
+                    
+                    updateBlink();
+                    if(!document.getElementById('tasks-page').classList.contains('hidden')) {
+                        openTasks(); // Vazifalar ochiq bo'lsa yangilash
+                    }
+                    if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                        updateAdminNotifications();
+                    }
+                }
+            });
+        }
+
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             activeUid = tg.initDataUnsafe.user.id.toString();
             let tgName = tg.initDataUnsafe.user.first_name || "Foydalanuvchi";
             if (!users[activeUid]) {
                 users[activeUid] = { name: tgName, id: activeUid, balance: 0, completedTasks:[] };
-                localStorage.setItem('az_users_v11', JSON.stringify(users));
+                save();
             }
         } else {
             activeUid = localStorage.getItem('az_uid_v11');
@@ -344,16 +408,13 @@
             updateBlink();
         };
 
+        // Barcha saqlash ishlari endi Onlayn bazaga ham yuboriladi
         function save() {
             localStorage.setItem('az_b_c_v11', JSON.stringify(buyCoins));
             localStorage.setItem('az_s_c_v11', JSON.stringify(sellCoins));
             localStorage.setItem('az_card_v11', adminCard);
             localStorage.setItem('az_users_v11', JSON.stringify(users));
-            
-            if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-                localStorage.setItem('az_uid_v11', activeUid);
-            }
-            
+            if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) localStorage.setItem('az_uid_v11', activeUid);
             localStorage.setItem('az_orders_v11', JSON.stringify(orders));
             localStorage.setItem('az_deps_v11', JSON.stringify(deposits));
             localStorage.setItem('az_withs_v11', JSON.stringify(withdraws));
@@ -361,7 +422,15 @@
             localStorage.setItem('az_alert_v11', newAlert);
             localStorage.setItem('az_admin_lock_v11', adminLockUntil);
             localStorage.setItem('az_min_withdraw_v11', minWithdrawAmount);
+            
             updateBlink();
+
+            // Firebase-ga yuklash
+            if(db) {
+                db.ref('bot_data').set({
+                    buyCoins, sellCoins, adminCard, users, orders, deposits, withdraws, tasks, minWithdrawAmount, newAlert
+                });
+            }
         }
 
         function updateBlink() {
@@ -477,26 +546,14 @@
             const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = () => {
                 const dObj = new Date();
-                const y = dObj.getFullYear();
-                const m = String(dObj.getMonth() + 1).padStart(2, '0');
-                const d = String(dObj.getDate()).padStart(2, '0');
-                const h = String(dObj.getHours()).padStart(2, '0');
-                const min = String(dObj.getMinutes()).padStart(2, '0');
-                
-                const formattedDate = `${y}-yil ${m}-oy ${d}-kuni, Soat: ${h}:${min}`;
+                const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
                 const opType = curMode === 'buy' ? 'SOTIB OLISH' : 'SOTISH';
 
                 orders.push({ 
                     id: 'ID' + Math.floor(Math.random()*99999), 
-                    typeText: opType,
-                    type: curMode, 
-                    name: curCoin.name, 
-                    qty: amt, 
-                    sum: amt*curCoin.price, 
-                    user: info, 
-                    img: reader.result, 
-                    date: formattedDate, 
-                    isNew: true 
+                    typeText: opType, type: curMode, name: curCoin.name, qty: amt, 
+                    sum: amt*curCoin.price, user: info, img: reader.result, 
+                    date: formattedDate, isNew: true 
                 });
                 newAlert = true; save(); Swal.fire('Muvaffaqiyatli','Adminga yuborildi','success').then(() => showSection('main-menu'));
             };
@@ -512,9 +569,7 @@
                         if(r.value) {
                             let id = Math.floor(100000 + Math.random() * 900000).toString();
                             users[id] = { name: r.value, id: id, balance: 0, completedTasks:[] };
-                            activeUid = id;
-                            save();
-                            renderGameMenu(); 
+                            activeUid = id; save(); renderGameMenu(); 
                         }
                     });
                 } else {
@@ -551,24 +606,19 @@
         function updateDepositFileName() {
             const fileInput = document.getElementById('d-file');
             const fileNameDisplay = document.getElementById('d-file-name');
-            if(fileInput.files.length > 0) {
-                fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
-            } else {
-                fileNameDisplay.innerText = "";
-            }
+            if(fileInput.files.length > 0) fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
+            else fileNameDisplay.innerText = "";
         }
 
         function submitDeposit() {
             const amt = document.getElementById('d-amount').value;
             const file = document.getElementById('d-file').files[0];
-            
             if(!amt || !file) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring', 'error');
 
             const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = () => {
                 const dObj = new Date();
                 const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
-
                 deposits.push({ uid:activeUid, amount:amt, img:reader.result, time:formattedDate, isNew: true });
                 newAlert = true; save(); 
                 Swal.fire('Yuborildi', 'Chek adminga yuborildi, 1 soat ichida ko\'rib chiqiladi', 'success').then(() => renderGameMenu());
@@ -577,9 +627,7 @@
 
         function openWithdraw() {
             Swal.fire({ 
-                title: 'Miqdor?', 
-                text: `Minimal yechish: ${minWithdrawAmount.toLocaleString()} so'm`,
-                input: 'number' 
+                title: 'Miqdor?', text: `Minimal yechish: ${minWithdrawAmount.toLocaleString()} so'm`, input: 'number' 
             }).then(res => {
                 if(res.value) {
                     let a = parseInt(res.value);
@@ -620,12 +668,7 @@
 
         function doTask(i, link, price) {
             window.open(link, '_blank');
-            Swal.fire({
-                title: 'Kuting...',
-                text: 'Vazifa tekshirilmoqda',
-                timer: 3000,
-                showConfirmButton: false
-            }).then(() => {
+            Swal.fire({ title: 'Kuting...', text: 'Vazifa tekshirilmoqda', timer: 3000, showConfirmButton: false }).then(() => {
                 users[activeUid].completedTasks.push(i);
                 users[activeUid].balance += parseInt(price);
                 save(); openTasks();
@@ -653,15 +696,10 @@
                 let c = document.createElement('div'); c.className = 'mine-cell';
                 c.onclick = () => {
                     if(!mActive || c.innerText) return;
-
                     if(mStep === 0) {
-                        if(Math.random() < 0.58) {
-                            mGrid[i] = 'bomb'; 
-                        } else if(mGrid[i] === 'bomb') {
-                            mGrid[i] = 'gem'; 
-                        }
+                        if(Math.random() < 0.58) mGrid[i] = 'bomb'; 
+                        else if(mGrid[i] === 'bomb') mGrid[i] = 'gem'; 
                     }
-
                     if(mGrid[i] === 'bomb') {
                         c.innerText = '💣'; c.classList.add('bomb'); mActive = false;
                         document.getElementById('m-cash').classList.add('hidden');
@@ -698,12 +736,8 @@
                 if(a >= 1000 && users[activeUid].balance >= a) {
                     users[activeUid].balance -= a; mBet = a; avActive = true; avMult = 1.0;
                     save();
-                    
-                    if(Math.random() < 0.40) {
-                        avCrash = 1.00 + (Math.random() * 0.20);
-                    } else {
-                        avCrash = 1.20 + (Math.random() * 10.8);
-                    }
+                    if(Math.random() < 0.40) avCrash = 1.00 + (Math.random() * 0.20);
+                    else avCrash = 1.20 + (Math.random() * 10.8);
 
                     document.getElementById('av-bet-btn').classList.add('hidden');
                     document.getElementById('av-cash-btn').classList.remove('hidden');
@@ -736,7 +770,6 @@
             let win = Math.floor(mBet * avMult); users[activeUid].balance += win;
             save(); 
             document.getElementById('av-mult').style.color = 'var(--success)';
-            
             Swal.fire('Yutdingiz!', win+' so\'m','success').then(() => {
                 document.getElementById('av-bet-btn').classList.remove('hidden');
                 document.getElementById('av-cash-btn').classList.add('hidden');
@@ -754,8 +787,7 @@
             skCurrentIds =[0, 1, 2];
             for(let i=0; i<3; i++) {
                 let skull = document.getElementById('sk-'+i);
-                skull.innerHTML = '💀';
-                skull.style.left = skPositions[i] + 'px';
+                skull.innerHTML = '💀'; skull.style.left = skPositions[i] + 'px';
             }
             document.getElementById('sk-start-btn').classList.remove('hidden');
             showSection('skull-page');
@@ -772,18 +804,15 @@
                     skCurrentIds =[0, 1, 2];
                     for(let i=0; i<3; i++) {
                         let skull = document.getElementById('sk-'+i);
-                        skull.innerHTML = '💀';
-                        skull.style.left = skPositions[i] + 'px';
+                        skull.innerHTML = '💀'; skull.style.left = skPositions[i] + 'px';
                     }
 
                     skPos = Math.floor(Math.random() * 3); 
-                    
                     let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
                     document.getElementById('sk-'+skPos).innerHTML = ballHTML;
                     
                     setTimeout(() => {
                         for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
-                        
                         let swaps = 0;
                         let shuffleInt = setInterval(() => {
                             let aIdx = Math.floor(Math.random()*3);
@@ -800,10 +829,7 @@
                             swaps++;
                             if(swaps >= 8) { 
                                 clearInterval(shuffleInt);
-                                setTimeout(() => {
-                                    skActive = true;
-                                    Swal.fire({title:'Toping!', text:'Koptok qayerda yashirindi? Birini tanlang', timer:1500, showConfirmButton:false});
-                                }, 400);
+                                setTimeout(() => { skActive = true; Swal.fire({title:'Toping!', text:'Koptok qayerda yashirindi? Birini tanlang', timer:1500, showConfirmButton:false}); }, 400);
                             }
                         }, 400); 
                     }, 1500);
@@ -814,9 +840,7 @@
         function pickSkull(idx) {
             if(!skActive) return;
             skActive = false;
-            
             for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
-            
             let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
             document.getElementById('sk-'+skPos).innerHTML = ballHTML;
 
@@ -839,14 +863,12 @@
                 let left = Math.ceil((adminLockUntil - Date.now())/1000);
                 return Swal.fire('Bloklangan', `Iltimos, ${left} soniya kuting.`, 'error');
             }
-
             Swal.fire({title:'Parol', input:'password'}).then(r => { 
                 if(!r.isConfirmed) return;
                 if(r.value === 'Azizbek1$') {
                     showSection('admin-panel'); 
                 } else {
-                    adminLockUntil = Date.now() + 30000; 
-                    save();
+                    adminLockUntil = Date.now() + 30000; save();
                     Swal.fire('Xato', 'Parol noto\'g\'ri! 30 soniyaga bloklandingiz.', 'error');
                 }
             });
@@ -865,7 +887,6 @@
             let m = document.getElementById('adm-coin-memo').value;
 
             if(!n || !p) return Swal.fire('Xato','Nomi va narxini kiritish shart','error');
-
             if(t === 'buy') buyCoins.push({name:n, price:parseFloat(p)});
             else {
                 if(!a) return Swal.fire('Xato','Sotish uchun manzil kiritish shart','error');
@@ -925,7 +946,6 @@
             save(); updateAdminNotifications(); 
 
             const l = document.getElementById('admin-list-container'); 
-            
             l.innerHTML = `
                 <h4>YECHISHLAR</h4>
                 <div class="card" style="margin-bottom:15px; padding:15px; background:#1c2431">
@@ -934,7 +954,6 @@
                     <button class="btn-glow" style="padding:10px; font-size:1rem;" onclick="saveMinWithdraw()">Saqlash</button>
                 </div>
             `;
-            
             if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
             withdraws.forEach((w, i) => l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="withdraws.splice(${i},1); save(); renderAdminWithdraws();">Bajarildi (O'chirish)</button></div>`);
         }
@@ -943,8 +962,7 @@
             let val = document.getElementById('admin-min-with').value;
             if(val) {
                 minWithdrawAmount = parseInt(val);
-                save();
-                renderAdminWithdraws();
+                save(); renderAdminWithdraws();
                 Swal.fire('Saqlandi', 'Minimal yechish summasi yangilandi', 'success');
             }
         }
@@ -974,7 +992,6 @@
             save(); renderAdminTasks();
             Swal.fire('OK', 'Vazifa qo\'shildi', 'success');
         }
-
     </script>
 </body>
 </html>
