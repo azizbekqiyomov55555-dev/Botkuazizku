@@ -322,27 +322,17 @@
         tg.ready();
 
         // =========================================================
-        // ONLAYN BAZA SOZLAMALARI (202-QATOR)
-        // Bot hamma telefonda ishlashi uchun pastdagi yozuvlarni 
-        // o'zingizning Firebase kodingiz bilan ALMASHTIRISHINGIZ SHART!
+        // SIZNING FIREBASE BAZANGIZ ULANDI
         // =========================================================
         const firebaseConfig = {
-            apiKey: "AIzaSy_SOXTA_KOD_BUNI_ALMASHTIRING",
-            authDomain: "sizning-botingiz.firebaseapp.com",
-            databaseURL: "https://sizning-botingiz-default-rtdb.firebaseio.com",
-            projectId: "sizning-botingiz",
-            storageBucket: "sizning-botingiz.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            databaseURL: "https://kiriptouz-default-rtdb.firebaseio.com",
+            projectId: "kiriptouz"
         };
-        // =========================================================
         
-        let db = null;
-        // Agar haqiqiy kod qo'yilgan bo'lsa, bazaga ulanadi
-        if(firebaseConfig.apiKey !== "AIzaSy_SOXTA_KOD_BUNI_ALMASHTIRING") {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-        }
+        // Bazani ishga tushiramiz
+        firebase.initializeApp(firebaseConfig);
+        let db = firebase.database();
+        // =========================================================
 
         // --- DATA STORE ---
         let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v11')) ||[{name:'Toncoin', price:75000}];
@@ -360,39 +350,42 @@
         let curMode = '', curCoin = null;
         let activeUid = null;
 
-        // Firebase dan jonli ma'lumotlarni o'qish (Hamma telefonlar uchun)
-        if(db) {
-            db.ref('bot_data').on('value', (snapshot) => {
-                let data = snapshot.val();
-                if(data) {
-                    buyCoins = data.buyCoins || buyCoins;
-                    sellCoins = data.sellCoins || sellCoins;
-                    adminCard = data.adminCard || adminCard;
-                    users = data.users || users;
-                    orders = data.orders || orders;
-                    deposits = data.deposits || deposits;
-                    withdraws = data.withdraws || withdraws;
-                    tasks = data.tasks || tasks;
-                    minWithdrawAmount = data.minWithdrawAmount || minWithdrawAmount;
-                    newAlert = data.newAlert || newAlert;
-                    
-                    updateBlink();
-                    if(!document.getElementById('tasks-page').classList.contains('hidden')) {
-                        openTasks(); // Vazifalar ochiq bo'lsa yangilash
-                    }
-                    if(!document.getElementById('admin-panel').classList.contains('hidden')) {
-                        updateAdminNotifications();
-                    }
+        // BAZADAN MA'LUMOTLARNI JONLI O'QISH
+        db.ref('bot_data').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if(data) {
+                buyCoins = data.buyCoins || buyCoins;
+                sellCoins = data.sellCoins || sellCoins;
+                adminCard = data.adminCard || adminCard;
+                users = data.users || users;
+                orders = data.orders || orders;
+                deposits = data.deposits || deposits;
+                withdraws = data.withdraws || withdraws;
+                tasks = data.tasks || tasks;
+                minWithdrawAmount = data.minWithdrawAmount || minWithdrawAmount;
+                newAlert = data.newAlert || newAlert;
+                
+                updateBlink();
+                
+                // Agar ekran ochiq bo'lsa yangilash
+                if(!document.getElementById('tasks-page').classList.contains('hidden')) {
+                    openTasks(); 
                 }
-            });
-        }
+                if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                    updateAdminNotifications();
+                }
+                if(!document.getElementById('game-menu').classList.contains('hidden')) {
+                    renderGameMenu(); // Balans kimdir o'zgartirsa yangilanishi uchun
+                }
+            }
+        });
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             activeUid = tg.initDataUnsafe.user.id.toString();
             let tgName = tg.initDataUnsafe.user.first_name || "Foydalanuvchi";
             if (!users[activeUid]) {
                 users[activeUid] = { name: tgName, id: activeUid, balance: 0, completedTasks:[] };
-                save();
+                save(); // Buni bazaga yozib qoyadi
             }
         } else {
             activeUid = localStorage.getItem('az_uid_v11');
@@ -408,8 +401,9 @@
             updateBlink();
         };
 
-        // Barcha saqlash ishlari endi Onlayn bazaga ham yuboriladi
+        // BARCHA MA'LUMOTLARNI BAZAGA (INTERNETGA) YOZISH
         function save() {
+            // Eski xotiraga ham ishonch uchun saqlab qo'yamiz
             localStorage.setItem('az_b_c_v11', JSON.stringify(buyCoins));
             localStorage.setItem('az_s_c_v11', JSON.stringify(sellCoins));
             localStorage.setItem('az_card_v11', adminCard);
@@ -425,12 +419,10 @@
             
             updateBlink();
 
-            // Firebase-ga yuklash
-            if(db) {
-                db.ref('bot_data').set({
-                    buyCoins, sellCoins, adminCard, users, orders, deposits, withdraws, tasks, minWithdrawAmount, newAlert
-                });
-            }
+            // Asosiysi: FIREBASE BAZAGA JONATAMIZ!
+            db.ref('bot_data').set({
+                buyCoins, sellCoins, adminCard, users, orders, deposits, withdraws, tasks, minWithdrawAmount, newAlert
+            });
         }
 
         function updateBlink() {
@@ -584,7 +576,7 @@
             if(!u.completedTasks) u.completedTasks =[]; 
             document.getElementById('u-name').innerText = "Ism: " + u.name;
             document.getElementById('u-id').innerText = u.id;
-            document.getElementById('u-balance').innerText = u.balance.toLocaleString() + " so'm";
+            document.getElementById('u-balance').innerText = (u.balance || 0).toLocaleString() + " so'm";
             showSection('game-menu');
         }
 
