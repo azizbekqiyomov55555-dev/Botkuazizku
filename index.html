@@ -22,6 +22,7 @@
             margin: 0; background: var(--dark); color: white;
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent; /* iPhone miltillashini yo'qotadi */
         }
 
         /* Rainbow Animatsiya */
@@ -60,7 +61,7 @@
             background: linear-gradient(45deg, var(--secondary), var(--primary));
             color: white; border: none; padding: 15px; border-radius: 12px;
             width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 8px 0;
-            transition: transform 0.1s;
+            transition: transform 0.1s; display: block; box-sizing: border-box;
         }
         .btn-glow:active { transform: scale(0.95); }
 
@@ -151,7 +152,6 @@
                 <p id="f-rate" style="color:var(--primary); font-weight:bold;"></p>
                 <input type="number" id="f-amount" placeholder="Miqdorni kiriting" oninput="updateOrderTotal()">
                 
-                <!-- Hamyon yoki Karta -->
                 <input type="text" id="f-info" placeholder="">
                 
                 <h3 id="f-total-text">Jami: 0 so'm</h3>
@@ -163,8 +163,9 @@
                 </div>
 
                 <p style="margin-bottom: 5px;">Chek rasmini yuklang:</p>
-                <input type="file" id="f-file" accept="image/*" class="hidden" onchange="updateFileName()">
-                <button type="button" class="btn-glow" style="padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0;" onclick="document.getElementById('f-file').click()">Chek qo'yish</button>
+                <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
+                <input type="file" id="f-file" accept="image/*" style="position:absolute; width:1px; height:1px; opacity:0; z-index:-1;" onchange="updateFileName()">
+                <label for="f-file" class="btn-glow" style="text-align:center; padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0; cursor:pointer;">Chek qo'yish</label>
                 <div id="f-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
 
                 <button class="btn-glow" onclick="submitOrder()">TASDIQLASH</button>
@@ -185,8 +186,9 @@
                 <input type="number" id="d-amount" placeholder="Miqdorni kiriting (so'm)">
                 
                 <p style="margin-bottom: 5px; margin-top: 15px;">Chek rasmini yuklang:</p>
-                <input type="file" id="d-file" accept="image/*" class="hidden" onchange="updateDepositFileName()">
-                <button type="button" class="btn-glow" style="padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0;" onclick="document.getElementById('d-file').click()">Chek yuklash</button>
+                <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
+                <input type="file" id="d-file" accept="image/*" style="position:absolute; width:1px; height:1px; opacity:0; z-index:-1;" onchange="updateDepositFileName()">
+                <label for="d-file" class="btn-glow" style="text-align:center; padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0; cursor:pointer;">Chek yuklash</label>
                 <div id="d-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
 
                 <button class="btn-glow" style="background:var(--success)" onclick="submitDeposit()">YUBORISH</button>
@@ -303,19 +305,20 @@
         // --- TELEGRAM WEB APP API ULASH ---
         let tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready(); // IPHONE UCHUN JUDA MUHIM - ILovani aktivlashtiradi
 
-        // --- DATA STORE ---
-        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v10')) ||[{name:'Toncoin', price:75000}];
-        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v10')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
-        let adminCard = localStorage.getItem('az_card_v10') || '8600 0000 0000 0000';
-        let users = JSON.parse(localStorage.getItem('az_users_v10')) || {};
-        let orders = JSON.parse(localStorage.getItem('az_orders_v10')) ||[];
-        let deposits = JSON.parse(localStorage.getItem('az_deps_v10')) ||[];
-        let withdraws = JSON.parse(localStorage.getItem('az_withs_v10')) ||[];
-        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v10')) ||[];
-        let newAlert = localStorage.getItem('az_alert_v10') === 'true';
-        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v10')) || 0;
-        let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v10')) || 10000;
+        // --- DATA STORE (Yangi v11 versiya) ---
+        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v11')) ||[{name:'Toncoin', price:75000}];
+        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v11')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
+        let adminCard = localStorage.getItem('az_card_v11') || '8600 0000 0000 0000';
+        let users = JSON.parse(localStorage.getItem('az_users_v11')) || {};
+        let orders = JSON.parse(localStorage.getItem('az_orders_v11')) ||[];
+        let deposits = JSON.parse(localStorage.getItem('az_deps_v11')) ||[];
+        let withdraws = JSON.parse(localStorage.getItem('az_withs_v11')) ||[];
+        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v11')) ||[];
+        let newAlert = localStorage.getItem('az_alert_v11') === 'true';
+        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v11')) || 0;
+        let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v11')) || 10000;
 
         let curMode = '', curCoin = null;
         let activeUid = null;
@@ -325,10 +328,10 @@
             let tgName = tg.initDataUnsafe.user.first_name || "Foydalanuvchi";
             if (!users[activeUid]) {
                 users[activeUid] = { name: tgName, id: activeUid, balance: 0, completedTasks:[] };
-                localStorage.setItem('az_users_v10', JSON.stringify(users));
+                localStorage.setItem('az_users_v11', JSON.stringify(users));
             }
         } else {
-            activeUid = localStorage.getItem('az_uid_v10');
+            activeUid = localStorage.getItem('az_uid_v11');
         }
 
         window.onload = () => {
@@ -342,22 +345,22 @@
         };
 
         function save() {
-            localStorage.setItem('az_b_c_v10', JSON.stringify(buyCoins));
-            localStorage.setItem('az_s_c_v10', JSON.stringify(sellCoins));
-            localStorage.setItem('az_card_v10', adminCard);
-            localStorage.setItem('az_users_v10', JSON.stringify(users));
+            localStorage.setItem('az_b_c_v11', JSON.stringify(buyCoins));
+            localStorage.setItem('az_s_c_v11', JSON.stringify(sellCoins));
+            localStorage.setItem('az_card_v11', adminCard);
+            localStorage.setItem('az_users_v11', JSON.stringify(users));
             
             if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-                localStorage.setItem('az_uid_v10', activeUid);
+                localStorage.setItem('az_uid_v11', activeUid);
             }
             
-            localStorage.setItem('az_orders_v10', JSON.stringify(orders));
-            localStorage.setItem('az_deps_v10', JSON.stringify(deposits));
-            localStorage.setItem('az_withs_v10', JSON.stringify(withdraws));
-            localStorage.setItem('az_tasks_data_v10', JSON.stringify(tasks));
-            localStorage.setItem('az_alert_v10', newAlert);
-            localStorage.setItem('az_admin_lock_v10', adminLockUntil);
-            localStorage.setItem('az_min_withdraw_v10', minWithdrawAmount);
+            localStorage.setItem('az_orders_v11', JSON.stringify(orders));
+            localStorage.setItem('az_deps_v11', JSON.stringify(deposits));
+            localStorage.setItem('az_withs_v11', JSON.stringify(withdraws));
+            localStorage.setItem('az_tasks_data_v11', JSON.stringify(tasks));
+            localStorage.setItem('az_alert_v11', newAlert);
+            localStorage.setItem('az_admin_lock_v11', adminLockUntil);
+            localStorage.setItem('az_min_withdraw_v11', minWithdrawAmount);
             updateBlink();
         }
 
@@ -530,6 +533,7 @@
             showSection('game-menu');
         }
 
+        // --- DEPOSIT (PUL TO'LDIRISH) ---
         function openDeposit() {
             document.getElementById('d-admin-card').innerText = adminCard;
             document.getElementById('d-amount').value = '';
@@ -879,7 +883,7 @@
 
         function renderAdminCoinList() {
             const d = document.getElementById('admin-coin-list-display'); d.innerHTML = '<h5>Ro\'yxat:</h5>';
-            buyCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotib olish: ${c.name}</span> <button onclick="buyCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
+            buyCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotib: ${c.name}</span> <button onclick="buyCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
             sellCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotish: ${c.name}</span> <button onclick="sellCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
         }
 
@@ -895,7 +899,7 @@
                     <b>[${oType}] ${o.qty} ${o.name}</b><br>
                     <small style="color:var(--success)"><b>Vaqt:</b> ${o.date || 'Noma\'lum'}</small><br>
                     Sum: ${o.sum} so'm<br>
-                    Info (Hamyon/Karta): ${o.user}<br>
+                    Info (Karta/Hamyon): ${o.user}<br>
                     <img src="${o.img}" style="width:100%; border-radius:10px; margin-top: 8px;"><br>
                     <button class="btn-glow" style="background:red; padding:5px; margin-top:8px;" onclick="orders.splice(${orders.length-1-i},1); save(); renderAdminOrders();">O'chirish</button>
                 </div>`;
