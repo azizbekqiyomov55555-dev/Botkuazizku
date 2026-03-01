@@ -159,9 +159,37 @@
                     <div id="f-memo-wrap" class="hidden">Memo: <b id="f-pay-memo"></b></div>
                     <svg class="copy-icon" onclick="copyPayInfo()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                 </div>
-                <p>Chek rasmini yuklang:</p>
-                <input type="file" id="f-file" accept="image/*">
+
+                <p style="margin-bottom: 5px;">Chek rasmini yuklang:</p>
+                <!-- Fayl tanlash maydoni vizual yashirilgan -->
+                <input type="file" id="f-file" accept="image/*" class="hidden" onchange="updateFileName()">
+                <!-- Fayl tanlash uchun kichik va uzun maxsus tugma -->
+                <button type="button" class="btn-glow" style="padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0;" onclick="document.getElementById('f-file').click()">Chek qo'yish</button>
+                <div id="f-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
+
                 <button class="btn-glow" onclick="submitOrder()">TASDIQLASH</button>
+            </div>
+        </div>
+
+        <!-- Pul To'ldirish Formasi -->
+        <div id="deposit-form" class="hidden">
+            <button class="btn-glow" onclick="renderGameMenu()">Orqaga</button>
+            <h2 style="color:var(--success)">BALANSNI TO'LDIRISH</h2>
+            <div class="card">
+                <p>To'lov uchun karta raqamimiz:</p>
+                <div class="pay-box">
+                    <b id="d-admin-card"></b>
+                    <svg class="copy-icon" onclick="copyDepositCard()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                </div>
+                
+                <input type="number" id="d-amount" placeholder="Miqdorni kiriting (so'm)">
+                
+                <p style="margin-bottom: 5px; margin-top: 15px;">Chek rasmini yuklang:</p>
+                <input type="file" id="d-file" accept="image/*" class="hidden" onchange="updateDepositFileName()">
+                <button type="button" class="btn-glow" style="padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0;" onclick="document.getElementById('d-file').click()">Chek yuklash</button>
+                <div id="d-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
+
+                <button class="btn-glow" style="background:var(--success)" onclick="submitDeposit()">YUBORISH</button>
             </div>
         </div>
 
@@ -194,7 +222,7 @@
 
         <!-- Vazifalar Sahifasi -->
         <div id="tasks-page" class="hidden">
-            <button class="btn-glow" onclick="openGameMenu()">Orqaga</button>
+            <button class="btn-glow" onclick="renderGameMenu()">Orqaga</button>
             <h2 style="color:var(--success)">Vazifalar</h2>
             <div id="tasks-list"></div>
         </div>
@@ -211,7 +239,7 @@
                 </div>
             </div>
             <button id="sk-start-btn" class="btn-glow" style="background:#c0392b" onclick="startSkullGame()">TIKISH (Min 1000)</button>
-            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
         <!-- Mines O'yini -->
@@ -219,7 +247,7 @@
             <h3 id="m-info">Tikish: 0</h3>
             <div class="mines-grid" id="m-grid"></div>
             <button id="m-cash" class="btn-glow hidden" style="background:var(--success)" onclick="minesCashout()">OLISH</button>
-            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
         <!-- Aviator O'yini -->
@@ -230,7 +258,7 @@
             </div>
             <button id="av-bet-btn" class="btn-glow" onclick="startAviator()">TIKISH (Min 1000)</button>
             <button id="av-cash-btn" class="btn-glow hidden" style="background:var(--success)" onclick="aviatorCashout()">CASHOUT</button>
-            <button class="btn-glow" style="background:#444" onclick="openGameMenu()">Chiqish</button>
+            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
         <!-- Admin Panel -->
@@ -273,17 +301,18 @@
 
     <script>
         // --- DATA STORE ---
-        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v5')) ||[{name:'Toncoin', price:75000}];
-        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v5')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
-        let adminCard = localStorage.getItem('az_card_v5') || '8600 0000 0000 0000';
-        let users = JSON.parse(localStorage.getItem('az_users_v5')) || {};
-        let activeUid = localStorage.getItem('az_uid_v5');
-        let orders = JSON.parse(localStorage.getItem('az_orders_v5')) ||[];
-        let deposits = JSON.parse(localStorage.getItem('az_deps_v5')) ||[];
-        let withdraws = JSON.parse(localStorage.getItem('az_withs_v5')) ||[];
-        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v5')) ||[];
-        let newAlert = localStorage.getItem('az_alert_v5') === 'true';
-        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v5')) || 0;
+        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v8')) ||[{name:'Toncoin', price:75000}];
+        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v8')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
+        let adminCard = localStorage.getItem('az_card_v8') || '8600 0000 0000 0000';
+        let users = JSON.parse(localStorage.getItem('az_users_v8')) || {};
+        let activeUid = localStorage.getItem('az_uid_v8');
+        let orders = JSON.parse(localStorage.getItem('az_orders_v8')) ||[];
+        let deposits = JSON.parse(localStorage.getItem('az_deps_v8')) ||[];
+        let withdraws = JSON.parse(localStorage.getItem('az_withs_v8')) ||[];
+        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v8')) ||[];
+        let newAlert = localStorage.getItem('az_alert_v8') === 'true';
+        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v8')) || 0;
+        let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v8')) || 10000;
 
         let curMode = '', curCoin = null;
 
@@ -292,35 +321,24 @@
                 document.getElementById('welcome').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('welcome').classList.add('hidden');
-                    if(!activeUid) initUser();
                 }, 1000);
             }, 2000);
             updateBlink();
         };
 
-        function initUser() {
-            Swal.fire({ title: 'Ismingiz?', input: 'text', allowOutsideClick: false }).then(r => {
-                if(r.value) {
-                    let id = Math.floor(100000 + Math.random() * 900000);
-                    users[id] = { name: r.value, id: id, balance: 0, completedTasks:[] };
-                    activeUid = id;
-                    save();
-                }
-            });
-        }
-
         function save() {
-            localStorage.setItem('az_b_c_v5', JSON.stringify(buyCoins));
-            localStorage.setItem('az_s_c_v5', JSON.stringify(sellCoins));
-            localStorage.setItem('az_card_v5', adminCard);
-            localStorage.setItem('az_users_v5', JSON.stringify(users));
-            localStorage.setItem('az_uid_v5', activeUid);
-            localStorage.setItem('az_orders_v5', JSON.stringify(orders));
-            localStorage.setItem('az_deps_v5', JSON.stringify(deposits));
-            localStorage.setItem('az_withs_v5', JSON.stringify(withdraws));
-            localStorage.setItem('az_tasks_data_v5', JSON.stringify(tasks));
-            localStorage.setItem('az_alert_v5', newAlert);
-            localStorage.setItem('az_admin_lock_v5', adminLockUntil);
+            localStorage.setItem('az_b_c_v8', JSON.stringify(buyCoins));
+            localStorage.setItem('az_s_c_v8', JSON.stringify(sellCoins));
+            localStorage.setItem('az_card_v8', adminCard);
+            localStorage.setItem('az_users_v8', JSON.stringify(users));
+            localStorage.setItem('az_uid_v8', activeUid);
+            localStorage.setItem('az_orders_v8', JSON.stringify(orders));
+            localStorage.setItem('az_deps_v8', JSON.stringify(deposits));
+            localStorage.setItem('az_withs_v8', JSON.stringify(withdraws));
+            localStorage.setItem('az_tasks_data_v8', JSON.stringify(tasks));
+            localStorage.setItem('az_alert_v8', newAlert);
+            localStorage.setItem('az_admin_lock_v8', adminLockUntil);
+            localStorage.setItem('az_min_withdraw_v8', minWithdrawAmount);
             updateBlink();
         }
 
@@ -330,17 +348,14 @@
         }
 
         function updateAdminNotifications() {
-            // Yangi so'rovlar bor-yo'qligini tekshirish
             let hasNewOrders = orders.some(o => o.isNew);
             let hasNewDeps = deposits.some(d => d.isNew);
             let hasNewWiths = withdraws.some(w => w.isNew);
 
-            // Tugmalarga yonib-o'chuvchi class qo'shish yoki olib tashlash
             document.getElementById('btn-admin-orders').classList.toggle('btn-blink-green', hasNewOrders);
             document.getElementById('btn-admin-deps').classList.toggle('btn-blink-green', hasNewDeps);
             document.getElementById('btn-admin-withs').classList.toggle('btn-blink-green', hasNewWiths);
             
-            // Agar hammasi o'qilgan bo'lsa, asosiy yozuv o'chadi
             if(!hasNewOrders && !hasNewDeps && !hasNewWiths) {
                 newAlert = false;
                 save();
@@ -353,7 +368,7 @@
             if(id === 'buy-list') renderCoins('buy');
             if(id === 'sell-list') renderCoins('sell');
             if(id === 'admin-coins') { renderAdminCoinList(); toggleMemo(); }
-            if(id === 'admin-panel') updateAdminNotifications(); // Admin panel ochilganda yangilash
+            if(id === 'admin-panel') updateAdminNotifications(); 
         }
 
         // --- BUY / SELL ---
@@ -377,8 +392,10 @@
                     document.getElementById('f-amount').value = '';
                     document.getElementById('f-total-text').innerText = 'Jami: 0 so\'m';
                     
+                    document.getElementById('f-file').value = '';
+                    document.getElementById('f-file-name').innerText = '';
+
                     if(type === 'buy') {
-                        // Sotib olishda Hamyon manzili so'raladi
                         document.getElementById('f-info').classList.remove('hidden');
                         document.getElementById('f-info').value = '';
                         document.getElementById('f-info').placeholder = "Hamyon manzilingizni kiriting";
@@ -387,7 +404,6 @@
                         document.getElementById('f-pay-address').innerText = adminCard;
                         document.getElementById('f-memo-wrap').classList.add('hidden');
                     } else {
-                        // Sotishda Karta raqami so'raladi
                         document.getElementById('f-info').classList.remove('hidden');
                         document.getElementById('f-info').value = '';
                         document.getElementById('f-info').placeholder = "Karta raqamingiz (Pul tushishi uchun)";
@@ -405,6 +421,16 @@
                 };
                 cont.appendChild(div);
             });
+        }
+
+        function updateFileName() {
+            const fileInput = document.getElementById('f-file');
+            const fileNameDisplay = document.getElementById('f-file-name');
+            if(fileInput.files.length > 0) {
+                fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
+            } else {
+                fileNameDisplay.innerText = "";
+            }
         }
 
         function updateOrderTotal() {
@@ -428,14 +454,50 @@
             
             const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = () => {
-                // isNew: true qilinganligi sababli Admindagi tugma yashil yonadi
-                orders.push({ id:'ID'+Math.floor(Math.random()*99999), type:curMode, name:curCoin.name, qty:amt, sum:amt*curCoin.price, user:info, img:reader.result, date:new Date().toLocaleString(), isNew: true });
+                const dObj = new Date();
+                const y = dObj.getFullYear();
+                const m = String(dObj.getMonth() + 1).padStart(2, '0');
+                const d = String(dObj.getDate()).padStart(2, '0');
+                const h = String(dObj.getHours()).padStart(2, '0');
+                const min = String(dObj.getMinutes()).padStart(2, '0');
+                
+                const formattedDate = `${y}-yil ${m}-oy ${d}-kuni, Soat: ${h}:${min}`;
+                const opType = curMode === 'buy' ? 'SOTIB OLISH' : 'SOTISH';
+
+                orders.push({ 
+                    id: 'ID' + Math.floor(Math.random()*99999), 
+                    typeText: opType,
+                    type: curMode, 
+                    name: curCoin.name, 
+                    qty: amt, 
+                    sum: amt*curCoin.price, 
+                    user: info, 
+                    img: reader.result, 
+                    date: formattedDate, 
+                    isNew: true 
+                });
                 newAlert = true; save(); Swal.fire('Muvaffaqiyatli','Adminga yuborildi','success').then(() => showSection('main-menu'));
             };
         }
 
-        // --- GAME MENU ---
+        // --- GAME MENU / REGISTRATION ---
         function openGameMenu() {
+            if (!activeUid || !users[activeUid]) {
+                Swal.fire({ title: 'Ismingizni kiriting', input: 'text', allowOutsideClick: false }).then(r => {
+                    if(r.value) {
+                        let id = Math.floor(100000 + Math.random() * 900000);
+                        users[id] = { name: r.value, id: id, balance: 0, completedTasks:[] };
+                        activeUid = id;
+                        save();
+                        renderGameMenu(); 
+                    }
+                });
+            } else {
+                renderGameMenu(); 
+            }
+        }
+
+        function renderGameMenu() {
             let u = users[activeUid];
             if(!u.completedTasks) u.completedTasks =[]; 
             document.getElementById('u-name').innerText = "Ism: " + u.name;
@@ -444,34 +506,66 @@
             showSection('game-menu');
         }
 
+        // --- DEPOSIT (PUL TO'LDIRISH) YANGILANGAN ---
         function openDeposit() {
-            Swal.fire({ title: 'Miqdor?', input: 'number' }).then(res => {
-                if(res.value) {
-                    Swal.fire({ title: 'To\'lov', html: `Karta: <b>${adminCard}</b><br>Summa: <b>${res.value}</b><br>Chek yuklang`, input: 'file' }).then(f => {
-                        if(f.value) {
-                            let reader = new FileReader(); reader.readAsDataURL(f.value);
-                            reader.onload = () => {
-                                // isNew: true
-                                deposits.push({ uid:activeUid, amount:res.value, img:reader.result, time:new Date().toLocaleString(), isNew: true });
-                                newAlert = true; save(); Swal.fire('Yuborildi','1 soatda tushadi','success');
-                            };
-                        }
-                    });
-                }
-            });
+            document.getElementById('d-admin-card').innerText = adminCard;
+            document.getElementById('d-amount').value = '';
+            document.getElementById('d-file').value = '';
+            document.getElementById('d-file-name').innerText = '';
+            showSection('deposit-form');
         }
 
+        function copyDepositCard() {
+            let txt = document.getElementById('d-admin-card').innerText;
+            const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            Swal.fire({title:'Nusxalandi', icon:'success', timer:800, showConfirmButton:false});
+        }
+
+        function updateDepositFileName() {
+            const fileInput = document.getElementById('d-file');
+            const fileNameDisplay = document.getElementById('d-file-name');
+            if(fileInput.files.length > 0) {
+                fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
+            } else {
+                fileNameDisplay.innerText = "";
+            }
+        }
+
+        function submitDeposit() {
+            const amt = document.getElementById('d-amount').value;
+            const file = document.getElementById('d-file').files[0];
+            
+            if(!amt || !file) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring', 'error');
+
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = () => {
+                const dObj = new Date();
+                const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
+
+                deposits.push({ uid:activeUid, amount:amt, img:reader.result, time:formattedDate, isNew: true });
+                newAlert = true; save(); 
+                Swal.fire('Yuborildi', 'Chek adminga yuborildi, 1 soat ichida ko\'rib chiqiladi', 'success').then(() => renderGameMenu());
+            };
+        }
+
+        // --- WITHDRAW (PUL YECHISH) ---
         function openWithdraw() {
-            Swal.fire({ title: 'Miqdor?', input: 'number' }).then(res => {
+            Swal.fire({ 
+                title: 'Miqdor?', 
+                text: `Minimal yechish miqdori: ${minWithdrawAmount.toLocaleString()} so'm`,
+                input: 'number' 
+            }).then(res => {
                 if(res.value) {
                     let a = parseInt(res.value);
-                    if(users[activeUid].balance < a) return Swal.fire('Xato','Balans kam','error');
-                    Swal.fire({ title: 'Karta?', input: 'text' }).then(c => {
+                    if(a < minWithdrawAmount) return Swal.fire('Xato', `Minimal yechish ${minWithdrawAmount.toLocaleString()} so'm bo'lishi kerak!`, 'error');
+                    if(users[activeUid].balance < a) return Swal.fire('Xato', 'Balansingizda yetarli mablag\' yo\'q', 'error');
+                    
+                    Swal.fire({ title: 'Karta raqamingizni kiriting?', input: 'text' }).then(c => {
                         if(c.value) {
                             users[activeUid].balance -= a;
-                            // isNew: true
                             withdraws.push({ uid:activeUid, amount:a, card:c.value, isNew: true });
-                            newAlert = true; save(); openGameMenu(); Swal.fire('OK','12 soatda tushadi','success');
+                            newAlert = true; save(); renderGameMenu(); 
+                            Swal.fire('OK', 'So\'rov adminga yuborildi, 12 soat ichida tushirib beriladi', 'success');
                         }
                     });
                 }
@@ -486,7 +580,7 @@
             let u = users[activeUid];
             let count = 0;
             tasks.forEach((t, i) => {
-                if(u.completedTasks && u.completedTasks.includes(i)) return; // Bajarilgan
+                if(u.completedTasks && u.completedTasks.includes(i)) return; 
                 count++;
                 list.innerHTML += `
                     <div class="card">
@@ -536,19 +630,18 @@
                 c.onclick = () => {
                     if(!mActive || c.innerText) return;
 
-                    // Yutish ehtimolini aniq 42% ga sozlash (Yutqazish = 58%)
                     if(mStep === 0) {
                         if(Math.random() < 0.58) {
-                            mGrid[i] = 'bomb'; // 58% holatda yutqazadi
+                            mGrid[i] = 'bomb'; 
                         } else if(mGrid[i] === 'bomb') {
-                            mGrid[i] = 'gem'; // 42% holatda yutadi
+                            mGrid[i] = 'gem'; 
                         }
                     }
 
                     if(mGrid[i] === 'bomb') {
                         c.innerText = '💣'; c.classList.add('bomb'); mActive = false;
                         document.getElementById('m-cash').classList.add('hidden');
-                        Swal.fire('Yutqazdingiz','Bombaga duch keldingiz','error').then(openGameMenu);
+                        Swal.fire('Yutqazdingiz','Bombaga duch keldingiz','error').then(renderGameMenu);
                     } else {
                         c.innerText = '💎'; c.classList.add('open'); mStep++;
                         document.getElementById('m-cash').classList.remove('hidden');
@@ -562,7 +655,7 @@
         function minesCashout() {
             if(!mActive || mStep === 0) return;
             let win = Math.floor(mBet * mMults[mStep-1]);
-            users[activeUid].balance += win; mActive = false; save(); openGameMenu();
+            users[activeUid].balance += win; mActive = false; save(); renderGameMenu();
         }
 
         // --- AVIATOR ---
@@ -602,7 +695,6 @@
                             clearInterval(avInterval); avActive = false;
                             document.getElementById('av-mult').style.color = 'red';
                             setTimeout(() => {
-                                // Qayta o'ynash uchun reset qilish
                                 document.getElementById('av-bet-btn').classList.remove('hidden');
                                 document.getElementById('av-cash-btn').classList.add('hidden');
                                 document.getElementById('av-mult').style.color = 'var(--success)';
@@ -632,8 +724,8 @@
 
         // --- KALLA SUYAK (SKULL GAME) ---
         let skBet = 0, skActive = false, skPos = 0;
-        let skPositions =[0, 100, 200]; // Kalla suyaklarning chapdan (left) joylashuv pikseli
-        let skCurrentIds = [0, 1, 2]; // Qaysi indeks qayerda joylashganini kuzatuvchi massiv
+        let skPositions =[0, 100, 200]; 
+        let skCurrentIds =[0, 1, 2]; 
 
         function openSkullGame() {
             document.getElementById('sk-info').innerText = "Tikish: 0 so'm";
@@ -662,17 +754,14 @@
                         skull.style.left = skPositions[i] + 'px';
                     }
 
-                    skPos = Math.floor(Math.random() * 3); // Koptok yashiringan haqiqiy manzil
+                    skPos = Math.floor(Math.random() * 3); 
                     
-                    // Koptokni ko'rsatish
                     let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
                     document.getElementById('sk-'+skPos).innerHTML = ballHTML;
                     
                     setTimeout(() => {
-                        // Koptokni yashirish
                         for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
                         
-                        // Aralashtirish animatsiyasi
                         let swaps = 0;
                         let shuffleInt = setInterval(() => {
                             let aIdx = Math.floor(Math.random()*3);
@@ -777,19 +866,27 @@
         }
 
         function renderAdminOrders() {
-            // Yangi so'rovlar maqomini olib tashlaymiz
             orders.forEach(o => o.isNew = false);
-            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+            save(); updateAdminNotifications(); 
 
             const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>BUYURTMALAR</h4>';
             if(orders.length===0) l.innerHTML += '<p>Buyurtmalar yo\'q.</p>';
-            orders.slice().reverse().forEach((o,i) => l.innerHTML += `<div class="admin-order"><b>[${o.type.toUpperCase()}] ${o.qty} ${o.name}</b><br>Sum: ${o.sum}<br>Info (Hamyon/Karta): ${o.user}<br><img src="${o.img}" style="width:100%; border-radius:10px;"><br><button class="btn-glow" style="background:red; padding:5px" onclick="orders.splice(${orders.length-1-i},1); save(); renderAdminOrders();">O'chirish</button></div>`);
+            orders.slice().reverse().forEach((o,i) => {
+                let oType = o.typeText || (o.type === 'buy' ? 'SOTIB OLISH' : 'SOTISH');
+                l.innerHTML += `<div class="admin-order">
+                    <b>[${oType}] ${o.qty} ${o.name}</b><br>
+                    <small style="color:var(--success)"><b>Vaqt:</b> ${o.date || 'Noma\'lum'}</small><br>
+                    Sum: ${o.sum} so'm<br>
+                    Info (Hamyon/Karta): ${o.user}<br>
+                    <img src="${o.img}" style="width:100%; border-radius:10px; margin-top: 8px;"><br>
+                    <button class="btn-glow" style="background:red; padding:5px; margin-top:8px;" onclick="orders.splice(${orders.length-1-i},1); save(); renderAdminOrders();">O'chirish</button>
+                </div>`;
+            });
         }
 
         function renderAdminDeposits() {
-            // Yangi so'rovlar maqomini olib tashlaymiz
             deposits.forEach(d => d.isNew = false);
-            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+            save(); updateAdminNotifications(); 
 
             const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>TO\'LDIRISHLAR</h4>';
             if(deposits.length===0) l.innerHTML += '<p>To\'ldirishlar yo\'q.</p>';
@@ -802,13 +899,33 @@
         }
 
         function renderAdminWithdraws() {
-            // Yangi so'rovlar maqomini olib tashlaymiz
             withdraws.forEach(w => w.isNew = false);
-            save(); updateAdminNotifications(); // Chiroqni o'chiramiz
+            save(); updateAdminNotifications(); 
 
-            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>YECHISHLAR</h4>';
+            const l = document.getElementById('admin-list-container'); 
+            
+            // Minimal yechish summasini o'zgartirish joyi (Admin uchun)
+            l.innerHTML = `
+                <h4>YECHISHLAR</h4>
+                <div class="card" style="margin-bottom:15px; padding:15px; background:#1c2431">
+                    <p style="margin:0 0 10px 0;">Min Yechish Limit: <b>${minWithdrawAmount.toLocaleString()} so'm</b></p>
+                    <input type="number" id="admin-min-with" placeholder="Yangi minimal summani kiriting">
+                    <button class="btn-glow" style="padding:10px; font-size:1rem;" onclick="saveMinWithdraw()">Saqlash</button>
+                </div>
+            `;
+            
             if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
             withdraws.forEach((w, i) => l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="withdraws.splice(${i},1); save(); renderAdminWithdraws();">Bajarildi (O'chirish)</button></div>`);
+        }
+
+        function saveMinWithdraw() {
+            let val = document.getElementById('admin-min-with').value;
+            if(val) {
+                minWithdrawAmount = parseInt(val);
+                save();
+                renderAdminWithdraws();
+                Swal.fire('Saqlandi', 'Minimal yechish summasi yangilandi', 'success');
+            }
         }
 
         function renderAdminTasks() {
