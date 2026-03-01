@@ -1,52 +1,3 @@
-**Refining Registration Logic**
-
-I am now focusing on revising the `initOrLoadUser` function within the Telegram context. I am now streamlining the user initialization process based on the presence of Telegram user data, and how it is fetched. I will also incorporate more robust error handling for fallback scenarios where Telegram user data isn't available. The plan is to trigger user name input via a SweetAlert prompt when necessary.
-
-
-**Finalizing User Handling**
-
-I'm now streamlining user management, especially for Telegram integration, and will be placing the code that follows in `openGameMenu()`. I am ensuring that the `openGameMenu` method directly assigns the active user ID and name based on `currentUserTgId`, creating a new user or falling back to the random ID method. I will also incorporate a SweetAlert prompt for non-Telegram users to input their name. I will then immediately call render after.
-
-
-
-**Implementing Order Association**
-
-I realize that orders are currently lacking user association, relying only on an `info` field. I see that associating orders with specific users, identified by their Telegram ID, is crucial for administrative clarity. I'm focusing on incorporating the `currentUserTgId` into order data for this reason, post-balance-fix.
-
-
-**Restructuring Data Storage**
-
-I'm now changing storage keys to use `_v9` suffixes, ensuring a clean slate. I'm also including the Telegram Web App script. I'm updating the load logic to dynamically set `activeUid` using the Telegram user ID if available, along with loading the data from localStorage. I will also incorporate the handling of buy/sell coins, admin cards, users, and order-related data. I am moving towards making the Telegram user ID primary.
-
-
-**Prioritizing User Data**
-
-I'm now making the Telegram user ID the primary key for all data. I'm ensuring that user data, tasks, alerts, admin lock status, and the minimum withdraw amount are all loaded from `localStorage` using version 9 keys. I've integrated checks for Telegram user presence, setting `activeUid` appropriately and saving to `localStorage` only if not a Telegram user.
-
-
-**Refining Game Menu**
-
-I am now focusing on refining the `openGameMenu` function. I'm ensuring it directly assigns the active user ID and renders if a Telegram user exists. Otherwise, it prompts for a name and then renders, handling user creation and storage if it doesn't already exist.
-
-I'm making sure that the game menu responds correctly to different user sources, whether Telegram or local. I am ready to render it.
-
-
-**Clarifying Synchronization Needs**
-
-I now understand that local storage provides data isolation, and that this behavior won't inherently synchronize user data across devices or phones. To achieve this, a backend solution is essential; I need a centralized database, and a framework. I'm focusing on highlighting the distinct user profiles within the same device, and will clarify this in Uzbek. I will make a complete set up for the user.
-
-
-
-Siz aytgan muammoning sababi shundaki, avvalgi kod oddiy brauzer xotirasidan (`localStorage`) foydalanardi. Telegramda bir telefondan turli profillarga kirsangiz ham, telefon xotirasi bitta bo'lgani uchun balanslar aralashib ketayotgan edi.
-
-Endi kodga **Telegram Web App API** ni uladim. 
-Bu nima degani? Endi botingizga kirgan har bir foydalanuvchining **Telegram ID raqami va ismi** avtomatik olinadi va o'yin profiliga aylanadi. Boshqa-boshqa profildan kirsangiz, Telegram ID har xil bo'lgani uchun **balanslar, ism va ID mutlaqo alohida bo'ladi**. Ism so'rab o'tirmaydi, to'g'ridan-to'g'ri Telegram ismini olib profil ochadi.
-
-*(Eslatma: Bu kod ma'lumotlarni vaqtincha telefon xotirasida saqlaydi. Agar loyihani haqiqiy katta bot qilib ishlatmoqchi bo'lsangiz, kelajakda Python/PHP va Ma'lumotlar bazasi (Database) ulash kerak bo'ladi).*
-
-Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
-
-```html
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -212,9 +163,7 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
                 </div>
 
                 <p style="margin-bottom: 5px;">Chek rasmini yuklang:</p>
-                <!-- Fayl tanlash maydoni vizual yashirilgan -->
                 <input type="file" id="f-file" accept="image/*" class="hidden" onchange="updateFileName()">
-                <!-- Fayl tanlash uchun kichik va uzun maxsus tugma -->
                 <button type="button" class="btn-glow" style="padding: 10px; font-size: 1rem; background: linear-gradient(45deg, #2c3e50, #34495e); margin-top: 0;" onclick="document.getElementById('f-file').click()">Chek qo'yish</button>
                 <div id="f-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
 
@@ -353,10 +302,9 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
     <script>
         // --- TELEGRAM WEB APP API ULASH ---
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Barcha ekranni to'ldirish
+        tg.expand();
 
         // --- DATA STORE ---
-        // Avvalgi bazalardan toza bo'lishi uchun versiyani v10 ga o'zgartirdik.
         let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v10')) ||[{name:'Toncoin', price:75000}];
         let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v10')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
         let adminCard = localStorage.getItem('az_card_v10') || '8600 0000 0000 0000';
@@ -372,19 +320,14 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
         let curMode = '', curCoin = null;
         let activeUid = null;
 
-        // --- TELEGRAM USERNI ANIQLASH ---
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            // Agar Telegram Web App orqali kirsa, shaxsiy ID va Ismni olamiz
             activeUid = tg.initDataUnsafe.user.id.toString();
             let tgName = tg.initDataUnsafe.user.first_name || "Foydalanuvchi";
-            
-            // Agar bazada yo'q bo'lsa, avtomatik yaratamiz
             if (!users[activeUid]) {
                 users[activeUid] = { name: tgName, id: activeUid, balance: 0, completedTasks:[] };
                 localStorage.setItem('az_users_v10', JSON.stringify(users));
             }
         } else {
-            // Agar oddiy brauzerdan kirsangiz (Telegramdan emas)
             activeUid = localStorage.getItem('az_uid_v10');
         }
 
@@ -404,7 +347,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             localStorage.setItem('az_card_v10', adminCard);
             localStorage.setItem('az_users_v10', JSON.stringify(users));
             
-            // Oddiy brauzerdan kirganlar uchun UID saqlash
             if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
                 localStorage.setItem('az_uid_v10', activeUid);
             }
@@ -560,10 +502,8 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
         // --- GAME MENU / REGISTRATION ---
         function openGameMenu() {
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                // Telegram foydalanuvchisi allaqachon ro'yxatda (tepada qilingan)
                 renderGameMenu();
             } else {
-                // Brauzerdan kirilgan bo'lsa
                 if (!activeUid || !users[activeUid]) {
                     Swal.fire({ title: 'Ismingizni kiriting', input: 'text', allowOutsideClick: false }).then(r => {
                         if(r.value) {
@@ -582,7 +522,7 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
 
         function renderGameMenu() {
             let u = users[activeUid];
-            if(!u) return; // Himoya
+            if(!u) return; 
             if(!u.completedTasks) u.completedTasks =[]; 
             document.getElementById('u-name').innerText = "Ism: " + u.name;
             document.getElementById('u-id').innerText = u.id;
@@ -590,7 +530,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             showSection('game-menu');
         }
 
-        // --- DEPOSIT (PUL TO'LDIRISH) YANGILANGAN ---
         function openDeposit() {
             document.getElementById('d-admin-card').innerText = adminCard;
             document.getElementById('d-amount').value = '';
@@ -632,7 +571,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             };
         }
 
-        // --- WITHDRAW (PUL YECHISH) ---
         function openWithdraw() {
             Swal.fire({ 
                 title: 'Miqdor?', 
@@ -656,7 +594,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             });
         }
 
-        // --- TASKS (VAZIFALAR) ---
         function openTasks() {
             showSection('tasks-page');
             const list = document.getElementById('tasks-list');
@@ -692,7 +629,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             });
         }
 
-        // --- MINES ---
         let mActive = false, mGrid =[], mBet = 0, mStep = 0;
         const mMults =[1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 15.0, 20.0, 30.0];
         
@@ -742,7 +678,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             users[activeUid].balance += win; mActive = false; save(); renderGameMenu();
         }
 
-        // --- AVIATOR ---
         let avActive = false, avMult = 1.0, avInterval, avCrash;
         function openAviator() { 
             document.getElementById('av-mult').style.color = 'var(--success)';
@@ -806,7 +741,6 @@ Mana to'liq, yangilangan va Telegramga to'liq moslashtirilgan kod:
             });
         }
 
-        // --- KALLA SUYAK (SKULL GAME) ---
         let skBet = 0, skActive = false, skPos = 0;
         let skPositions =[0, 100, 200]; 
         let skCurrentIds =[0, 1, 2]; 
