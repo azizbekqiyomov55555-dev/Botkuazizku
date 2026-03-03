@@ -98,7 +98,6 @@
         .file-upload-wrapper { position: relative; width: 100%; padding: 15px; border-radius: 12px; overflow: hidden; background: linear-gradient(45deg, #2c3e50, #34495e); display: flex; align-items: center; justify-content: center; font-weight: bold; box-sizing: border-box; margin-top: 10px; cursor: pointer; }
         .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
 
-        /* YAXSHILANGAN COINFLIP CSS */
         .cf-mult-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .cf-mult-box { background: #222; padding: 10px 15px; border-radius: 8px; font-weight: bold; color: #888; border: 1px solid #444; transition: 0.3s; }
         .cf-mult-box.active { background: #27ae60; color: white; border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.6); }
@@ -109,7 +108,6 @@
         .coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 4rem; border: 8px solid #f39c12; background: linear-gradient(45deg, #f1c40f, #f39c12); color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 15px #f1c40f; }
         .coin-back { transform: rotateY(180deg); border-color: #7f8c8d; background: linear-gradient(45deg, #bdc3c7, #95a5a6); box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 15px #bdc3c7; }
 
-        /* YONGI O'YIN: RANGLAR (ROULETTE) CSS */
         .roulette-container { width: 100%; height: 80px; background: #000; border-radius: 10px; position: relative; overflow: hidden; margin: 20px 0; border: 2px solid #333; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); }
         .roulette-selector { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: white; z-index: 10; box-shadow: 0 0 10px white; }
         .roulette-track { display: flex; height: 100%; position: absolute; left: 0; }
@@ -118,7 +116,6 @@
         .rl-blue { background: linear-gradient(to bottom, #2980b9, #2c3e50); }
         .rl-green { background: linear-gradient(to bottom, #2ecc71, #27ae60); }
 
-        /* Balloon CSS */
         .balloon-container { height: 250px; display: flex; align-items: flex-end; justify-content: center; position: relative; margin: 20px 0; background: linear-gradient(to top, #0f2027, #203a43, #2c5364); border-radius: 15px; overflow: hidden;}
         .balloon { width: 50px; height: 60px; background: radial-gradient(circle at 30% 30%, #ff4d4d, #c0392b); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; position: relative; transition: all 0.1s; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1rem; text-shadow: 1px 1px 2px black;}
         .balloon::after { content: ""; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #c0392b; }
@@ -126,7 +123,6 @@
         .balloon.popped::after { display: none; }
         .bl-string { width: 2px; height: 100px; background: rgba(255,255,255,0.5); position: absolute; bottom: -100px; left: 50%; transform: translateX(-50%); }
 
-        /* CHICKEN RUN */
         .cr-container { background: #0b1922; border-radius: 15px; overflow: hidden; border: 1px solid #1a3c34; padding-bottom: 10px;}
         .cr-header { text-align: center; padding: 10px; background: #081416; }
         .cr-header-title { color: #f1c40f; font-weight: 900; font-size: 1.8rem; margin: 0; text-shadow: 2px 2px 0px #c0392b; font-family: 'Arial Black', sans-serif; }
@@ -151,7 +147,6 @@
         .cr-stats-row { display: flex; justify-content: space-between; padding: 10px 15px 0; font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; font-weight: bold; }
         .cr-stats-val { color: #f1c40f; font-size: 1rem; display: block; margin-top: 3px; }
 
-        /* MINES */
         #mines-page { background: #111415; height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 200; overflow-y: auto; font-family: Arial, sans-serif; }
         .m1w-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
         .m1w-bal { background: #2f363f; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; }
@@ -182,6 +177,20 @@
         .m1w-bomb-sel { display: flex; justify-content: space-between; background: #111415; border-radius: 12px; padding: 5px; border: 1px solid #2f363f; }
         .m1w-bomb-sel button { flex: 1; background: transparent; color: #8892a0; border: none; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1rem; }
         .m1w-bomb-sel button.active { background: #2f363f; color: white; }
+
+        /* APPLE OF FORTUNE CSS */
+        #apple-page { background: #111415; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 200; overflow-y: auto; padding-bottom: 20px;}
+        .apple-container { background: linear-gradient(to bottom, #0f2b1d, #06170e); padding: 15px; border-radius: 15px; margin: 15px 10px; border: 2px solid #1e5a3c; }
+        .ap-grid { display: flex; flex-direction: column; gap: 8px; }
+        .ap-row { display: flex; align-items: center; justify-content: space-between; }
+        .ap-mult { width: 60px; color: #888; font-weight: bold; font-size: 0.85rem; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 15px; text-align: center; border: 1px solid #333; transition: 0.3s; }
+        .ap-mult.active { background: #27ae60; color: white; border-color: #2ecc71; box-shadow: 0 0 10px #27ae60; transform: scale(1.1); }
+        .ap-cells { display: flex; gap: 8px; flex: 1; justify-content: space-evenly; padding-left: 10px; }
+        .ap-cell { width: 42px; height: 42px; background: radial-gradient(circle, #a0522d, #5c3a21); border-radius: 50%; border: 2px solid #3e2723; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: default; transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); user-select: none; }
+        .ap-cell.active-row { border-color: #f1c40f; box-shadow: 0 0 10px #f1c40f, inset 0 0 10px rgba(0,0,0,0.5); cursor: pointer; }
+        .ap-cell.active-row:active { transform: scale(0.9); }
+        .ap-cell.revealed-good { background: radial-gradient(circle, #2ecc71, #27ae60); border-color: #fff; }
+        .ap-cell.revealed-bad { background: radial-gradient(circle, #e74c3c, #c0392b); border-color: #fff; }
     </style>
 </head>
 <body>
@@ -282,6 +291,10 @@
                         <div class="emoji">🎡</div>
                         <div class="overlay">COLOR GAME</div>
                     </div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #27ae60, #2ecc71);" onclick="openApple()">
+                        <div class="emoji">🍎</div>
+                        <div class="overlay">APPLE FORTUNE</div>
+                    </div>
                     <div class="game-card-img" style="background: linear-gradient(135deg, #f1c40f, #e67e22);" onclick="openCoinflip()">
                         <div class="emoji">🪙</div>
                         <div class="overlay">COINFLIP</div>
@@ -320,7 +333,6 @@
             <div id="tasks-list"></div>
         </div>
 
-        <!-- YANGI: COLOR GAME (Roulette) -->
         <div id="color-game-page" class="hidden">
             <h2 style="color:var(--warning)">RANGLAR O'YINI</h2>
             <div class="card" style="padding: 10px;">
@@ -330,14 +342,12 @@
                 </div>
                 <h3 id="rl-status" style="text-align: center; margin: 10px 0;">Stavkalarni joylashtiring!</h3>
             </div>
-            
             <div class="av-controls">
                 <div class="av-bet-row">
                     <button class="av-btn-round" onclick="adjRlBet(-1000)">-</button>
                     <input type="number" id="rl-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
                     <button class="av-btn-round" onclick="adjRlBet(1000)">+</button>
                 </div>
-                
                 <div style="display:flex; gap:10px; margin-top:15px;">
                     <button class="btn-glow" style="background:#e74c3c; margin:0; padding:10px; font-size:1rem;" onclick="playRoulette('red')">QIZIL (x2)</button>
                     <button class="btn-glow" style="background:#27ae60; margin:0; padding:10px; font-size:1rem;" onclick="playRoulette('green')">YASHIL (x14)</button>
@@ -347,16 +357,36 @@
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
-        <!-- YAXSHILANGAN: COINFLIP (Series) -->
+        <div id="apple-page" class="hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 15px;">
+                <h2 style="color:var(--success); margin:0;">APPLE OF FORTUNE</h2>
+                <button class="m1w-close" onclick="closeApple()">✖</button>
+            </div>
+            
+            <div class="apple-container">
+                <h3 id="ap-status" style="text-align:center; color:#fff; margin-top:0; font-size:1rem; text-shadow:1px 1px 2px #000;">Stavka kiriting va O'YNAH ni bosing</h3>
+                <div id="ap-grid-container" class="ap-grid"></div>
+            </div>
+            
+            <div class="av-controls" style="margin: 10px;">
+                <div class="av-bet-row">
+                    <button class="av-btn-round" onclick="adjApBet(-1000)">-</button>
+                    <input type="number" id="ap-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
+                    <button class="av-btn-round" onclick="adjApBet(1000)">+</button>
+                </div>
+                
+                <button id="ap-cashout-btn" class="btn-glow hidden" style="background:var(--success); margin-bottom: 10px;" onclick="cashoutApple()">OLISH</button>
+                <button id="ap-play-btn" class="btn-glow" style="background:var(--primary); margin-bottom: 10px;" onclick="startApple()">O'YNAH</button>
+            </div>
+        </div>
+
         <div id="coinflip-page" class="hidden">
             <h2 style="color:var(--warning); text-align:center;">COINFLIP</h2>
-            
             <div class="cf-mult-bar">
                 <div class="cf-mult-box" id="cf-m-1">x1.88</div>
                 <div class="cf-mult-box" id="cf-m-2">x3.76</div>
                 <div class="cf-mult-box" id="cf-m-3">x7.52</div>
             </div>
-
             <div class="card" style="text-align: center; margin-top: 0;">
                 <div class="coin-container">
                     <div id="cf-coin" class="coin">
@@ -366,16 +396,13 @@
                 </div>
                 <h3 id="cf-result-text" style="height: 30px;">Stavka kiriting va tanlang</h3>
             </div>
-
             <div class="av-controls">
                 <div class="av-bet-row" id="cf-bet-row">
                     <button class="av-btn-round" onclick="adjCfBet(-1000)">-</button>
                     <input type="number" id="cf-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
                     <button class="av-btn-round" onclick="adjCfBet(1000)">+</button>
                 </div>
-                
                 <button id="cf-cashout-btn" class="btn-glow hidden" style="background:var(--success); margin-bottom: 10px;" onclick="cashoutCoinflip()">CHIQARISH</button>
-                
                 <div style="display:flex; gap:10px;">
                     <button id="cf-btn-burgut" class="btn-glow" style="background:#e67e22; margin:0;" onclick="playCoinflip('burgut')">BURGUT 🦅</button>
                     <button id="cf-btn-dum" class="btn-glow" style="background:#7f8c8d; margin:0;" onclick="playCoinflip('dum')">DUM 🪙</button>
@@ -384,13 +411,11 @@
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
-        <!-- BALLOON O'YINI -->
         <div id="balloon-page" class="hidden">
             <h2 style="color:var(--danger)">BALLOON</h2>
             <div class="balloon-container" id="bl-area">
                 <div id="bl-balloon" class="balloon"><span id="bl-mult-display">1.00x</span><div class="bl-string"></div></div>
             </div>
-            
             <div class="av-controls">
                 <div class="av-bet-row">
                     <button class="av-btn-round" onclick="adjBlBet(-1000)">-</button>
@@ -404,7 +429,6 @@
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
-        <!-- ESKI O'YINLAR HTML QISMI (JS ORQALI YUKLANADI DEYILGAN EDI, LEKIN ISHONCHLI BO'LISHI UCHUN SHU YERGA JOYLAYMIZ) -->
         <div id="chicken-page" class="hidden">
             <div class="cr-container">
                 <div class="cr-header"><h1 class="cr-header-title">CHICKEN RUN</h1></div>
@@ -494,7 +518,6 @@
                     TIKISH
                 </button>
             </div>
-
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
@@ -584,7 +607,6 @@
         </div>
     </div>
 
-    <!-- TO'LIQ VA HECH QANDAY QISQARTIRISHLARSIZ JAVASCRIPT -->
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -609,7 +631,7 @@
         let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v21')) || 0;
         let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v21')) || 10000;
         
-        let gameWinRates = JSON.parse(localStorage.getItem('az_winrates_v21')) || { chicken: 40, mines: 40, skull: 40, aviator: 40, coinflip: 50, balloon: 40, color: 40 };
+        let gameWinRates = JSON.parse(localStorage.getItem('az_winrates_v21')) || { chicken: 40, mines: 40, skull: 40, aviator: 40, coinflip: 50, balloon: 40, color: 40, apple: 40 };
 
         let curMode = '', curCoin = null;
         let activeUid = null;
@@ -639,7 +661,8 @@
             minWithdrawAmount = data.minWithdrawAmount || 10000;
             newAlert = data.newAlert || false;
             
-            gameWinRates = data.gameWinRates || { chicken: 40, mines: 40, skull: 40, aviator: 40, coinflip: 50, balloon: 40, color: 40 };
+            gameWinRates = data.gameWinRates || { chicken: 40, mines: 40, skull: 40, aviator: 40, coinflip: 50, balloon: 40, color: 40, apple: 40 };
+            if (!gameWinRates.apple) gameWinRates.apple = 40;
 
             if (!users[activeUid]) {
                 let tgName = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.first_name : "Foydalanuvchi";
@@ -684,7 +707,11 @@
             updateBlink();
 
             db.ref('bot_data').set({
-                buyCoins, sellCoins, adminCard, users, orders, deposits, withdraws, tasks, minWithdrawAmount, newAlert, gameWinRates
+                buyCoins, sellCoins, adminCard, users, 
+                orders: orders.length > 0 ? orders : null, 
+                deposits: deposits.length > 0 ? deposits : null, 
+                withdraws: withdraws.length > 0 ? withdraws : null, 
+                tasks, minWithdrawAmount, newAlert, gameWinRates
             });
         }
 
@@ -706,7 +733,7 @@
         }
 
         function showSection(id) {
-            document.querySelectorAll('.container > div, body > #mines-page').forEach(d => { 
+            document.querySelectorAll('.container > div, body > #mines-page, body > #apple-page').forEach(d => { 
                 if(d && d.id !== 'main-title' && d.id !== 'welcome') d.classList.add('hidden'); 
             });
             let el = document.getElementById(id);
@@ -816,7 +843,7 @@
                 const dObj = new Date();
                 const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
                 const opType = curMode === 'buy' ? 'SOTIB OLISH' : 'SOTISH';
-                orders.push({ id: 'ID' + Math.floor(Math.random()*99999), typeText: opType, type: curMode, name: curCoin.name, qty: amt, sum: amt*curCoin.price, user: info, img: compressedImg, date: formattedDate, isNew: true });
+                orders.push({ id: Date.now() + Math.floor(Math.random()*1000), typeText: opType, type: curMode, name: curCoin.name, qty: amt, sum: amt*curCoin.price, user: info, img: compressedImg, date: formattedDate, isNew: true });
                 newAlert = true; save(); 
                 Swal.fire('Muvaffaqiyatli','Adminga yuborildi','success').then(() => showSection('main-menu'));
             });
@@ -862,7 +889,7 @@
             Swal.fire({title: 'Kuting...', text: 'Chek yuklanmoqda', showConfirmButton: false});
             compressImage(file, (compressedImg) => {
                 const dObj = new Date(); const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
-                deposits.push({ uid:activeUid, amount:amt, img:compressedImg, time:formattedDate, isNew: true });
+                deposits.push({ id: Date.now() + Math.floor(Math.random()*1000), uid:activeUid, amount:amt, img:compressedImg, time:formattedDate, isNew: true });
                 db.ref('bot_data/deposits').set(deposits); 
                 newAlert = true; save(); Swal.fire('Yuborildi', 'Chek adminga yuborildi, tez orada ko\'rib chiqiladi', 'success').then(() => renderGameMenu());
             });
@@ -875,7 +902,7 @@
                     if(a < minWithdrawAmount) return Swal.fire('Xato', `Minimal yechish ${minWithdrawAmount.toLocaleString()} so'm bo'lishi kerak!`, 'error');
                     if(users[activeUid].balance < a) return Swal.fire('Xato', 'Balansingizda yetarli mablag\' yo\'q', 'error');
                     Swal.fire({ title: 'Karta raqamingizni kiriting?', input: 'text' }).then(c => {
-                        if(c.value) { users[activeUid].balance -= a; withdraws.push({ uid:activeUid, amount:a, card:c.value, isNew: true }); newAlert = true; save(); renderGameMenu(); Swal.fire('OK', 'So\'rov adminga yuborildi, tez orada tushirib beriladi', 'success'); }
+                        if(c.value) { users[activeUid].balance -= a; withdraws.push({ id: Date.now() + Math.floor(Math.random()*1000), uid:activeUid, amount:a, card:c.value, isNew: true }); newAlert = true; save(); renderGameMenu(); Swal.fire('OK', 'So\'rov adminga yuborildi, tez orada tushirib beriladi', 'success'); }
                     });
                 }
             });
@@ -899,7 +926,216 @@
         }
 
         // ==========================================
-        // YANGI: COLOR GAME (ROULETTE)
+        // APPLE OF FORTUNE
+        // ==========================================
+        let apState = 'idle'; 
+        let apBet = 1000;
+        let apRow = 0; 
+        const apMults =[1.23, 1.54, 1.93, 2.41, 4.02, 6.71, 11.18, 27.97, 69.93, 349.68];
+        const apBadCount =[1, 1, 1, 1, 2, 2, 2, 3, 3, 4];
+        let apGrid =[]; 
+
+        function closeApple() {
+            if(apState === 'playing') {
+                Swal.fire({ title: "Diqqat!", text: "O'yin ketyapti. Chiqsangiz pul kuyadi!", icon: "warning", showCancelButton: true, confirmButtonText: "Chiqish", cancelButtonText: "Qolish"
+                }).then((r) => { if(r.isConfirmed) { apState = 'idle'; renderGameMenu(); } });
+            } else { renderGameMenu(); }
+        }
+
+        function openApple() {
+            apState = 'idle';
+            apRow = 0;
+            document.getElementById('ap-bet-input').disabled = false;
+            document.getElementById('ap-cashout-btn').classList.add('hidden');
+            document.getElementById('ap-play-btn').classList.remove('hidden');
+            document.getElementById('ap-play-btn').innerText = 'O\'YNAH';
+            document.getElementById('ap-status').innerText = "Stavka kiriting va O'YNAH ni bosing";
+            apGrid =[]; 
+            renderAppleGrid();
+            showSection('apple-page');
+        }
+
+        function adjApBet(val) {
+            if(apState !== 'idle') return;
+            let inp = document.getElementById('ap-bet-input');
+            let current = parseInt(inp.value) + val;
+            if(current < 1000) current = 1000;
+            inp.value = current;
+        }
+
+        function startApple() {
+            if(apState !== 'idle') return;
+            let amt = parseInt(document.getElementById('ap-bet-input').value);
+            if (!amt || amt < 1000) return Swal.fire('Xato', 'Min. stavka 1000 so\'m', 'error');
+            if (users[activeUid].balance < amt) return Swal.fire('Xato', 'Balans yetarli emas', 'error');
+
+            users[activeUid].balance -= amt;
+            save();
+            apBet = amt;
+            apState = 'playing';
+            apRow = 0;
+            
+            apGrid =[];
+            for(let r=0; r<10; r++) {
+                let row = Array(5).fill('good');
+                let bads = apBadCount[r];
+                for(let i=0; i<bads; i++) {
+                    let placed = false;
+                    while(!placed) {
+                        let idx = Math.floor(Math.random() * 5);
+                        if(row[idx] === 'good') {
+                            row[idx] = 'bad';
+                            placed = true;
+                        }
+                    }
+                }
+                apGrid.push(row);
+            }
+            
+            document.getElementById('ap-bet-input').disabled = true;
+            document.getElementById('ap-play-btn').classList.add('hidden');
+            document.getElementById('ap-cashout-btn').classList.remove('hidden');
+            document.getElementById('ap-cashout-btn').innerText = `PULNI OLISH (${apBet} so'm)`;
+            document.getElementById('ap-cashout-btn').disabled = true; 
+            document.getElementById('ap-cashout-btn').style.opacity = '0.5';
+            
+            document.getElementById('ap-status').innerText = "1-qator: Olmani tanlang!";
+            renderAppleGrid();
+        }
+
+        function renderAppleGrid() {
+            let container = document.getElementById('ap-grid-container');
+            container.innerHTML = '';
+            
+            for(let r=9; r>=0; r--) {
+                let rowDiv = document.createElement('div');
+                rowDiv.className = 'ap-row';
+                
+                let multDiv = document.createElement('div');
+                multDiv.className = 'ap-mult';
+                if(apState === 'playing' && r === apRow) multDiv.classList.add('active');
+                multDiv.innerText = `x${apMults[r]}`;
+                rowDiv.appendChild(multDiv);
+                
+                let cellsDiv = document.createElement('div');
+                cellsDiv.className = 'ap-cells';
+                for(let c=0; c<5; c++) {
+                    let cell = document.createElement('div');
+                    cell.className = 'ap-cell';
+                    
+                    if(apState === 'playing' && r === apRow) {
+                        cell.classList.add('active-row');
+                        cell.onclick = () => pickApple(r, c);
+                    }
+                    
+                    let state = apGrid[r] ? apGrid[r][c] : null;
+                    if(state === 'good-clicked') {
+                        cell.classList.add('revealed-good');
+                        cell.innerText = '🍎';
+                    } else if (state === 'bad-clicked') {
+                        cell.classList.add('revealed-bad');
+                        cell.innerText = '🍏'; 
+                    } else if (state === 'good-revealed') {
+                        cell.innerText = '🍎';
+                        cell.style.opacity = '0.4';
+                    } else if (state === 'bad-revealed') {
+                        cell.innerText = '🍏';
+                        cell.style.opacity = '0.4';
+                    } else {
+                        cell.innerText = ''; 
+                    }
+                    
+                    cellsDiv.appendChild(cell);
+                }
+                rowDiv.appendChild(cellsDiv);
+                container.appendChild(rowDiv);
+            }
+        }
+
+        function pickApple(r, c) {
+            if(apState !== 'playing' || r !== apRow) return;
+            
+            let winProb = (gameWinRates.apple || 40) / 100;
+            let isWin = Math.random() < winProb;
+            
+            let cellType = apGrid[r][c];
+            
+            if(isWin && cellType === 'bad') {
+                let goodIdx = apGrid[r].indexOf('good');
+                apGrid[r][goodIdx] = 'bad';
+                apGrid[r][c] = 'good';
+                cellType = 'good';
+            } else if (!isWin && cellType === 'good') {
+                let badIdx = apGrid[r].indexOf('bad');
+                apGrid[r][badIdx] = 'good';
+                apGrid[r][c] = 'bad';
+                cellType = 'bad';
+            }
+            
+            if(cellType === 'good') {
+                apGrid[r][c] = 'good-clicked';
+                apRow++;
+                let currentWin = Math.floor(apBet * apMults[r]);
+                
+                let btn = document.getElementById('ap-cashout-btn');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.innerText = `OLISH (${currentWin} so'm)`;
+                
+                if(apRow > 9) {
+                    apState = 'idle';
+                    users[activeUid].balance += currentWin;
+                    save();
+                    document.getElementById('ap-status').innerText = `TABRIKLAYMIZ! MAX YUTUQ: ${currentWin} so'm`;
+                    Swal.fire('Tabriklaymiz!', `Siz maksimal darajaga yetdingiz va ${currentWin} so'm yutdingiz!`, 'success');
+                    btn.classList.add('hidden');
+                    document.getElementById('ap-play-btn').classList.remove('hidden');
+                    document.getElementById('ap-play-btn').innerText = 'YANGIDAN O\'YNAH';
+                } else {
+                    document.getElementById('ap-status').innerText = `${apRow + 1}-qator: Davom eting yoki oling!`;
+                }
+            } else {
+                apGrid[r][c] = 'bad-clicked';
+                apState = 'idle';
+                document.getElementById('ap-status').innerText = `YUTQAZDINGIZ!`;
+                
+                for(let i=0; i<5; i++) {
+                    if(apGrid[r][i] === 'good') apGrid[r][i] = 'good-revealed';
+                    if(apGrid[r][i] === 'bad') apGrid[r][i] = 'bad-revealed';
+                }
+                
+                document.getElementById('ap-cashout-btn').classList.add('hidden');
+                document.getElementById('ap-play-btn').classList.remove('hidden');
+                document.getElementById('ap-play-btn').innerText = 'YANGIDAN O\'YNAH';
+            }
+            
+            renderAppleGrid();
+        }
+
+        function cashoutApple() {
+            if(apState !== 'playing' || apRow === 0) return;
+            
+            let currentWin = Math.floor(apBet * apMults[apRow - 1]);
+            users[activeUid].balance += currentWin;
+            save();
+            
+            apState = 'idle';
+            document.getElementById('ap-status').innerText = `YUTUQ OLINDI: ${currentWin} so'm`;
+            Swal.fire('Olib tashlandi!', `${currentWin} so'm balansingizga qo'shildi!`, 'success');
+            
+            document.getElementById('ap-cashout-btn').classList.add('hidden');
+            document.getElementById('ap-play-btn').classList.remove('hidden');
+            document.getElementById('ap-play-btn').innerText = 'YANGIDAN O\'YNAH';
+            
+            for(let i=0; i<5; i++) {
+                if(apGrid[apRow][i] === 'good') apGrid[apRow][i] = 'good-revealed';
+                if(apGrid[apRow][i] === 'bad') apGrid[apRow][i] = 'bad-revealed';
+            }
+            renderAppleGrid();
+        }
+
+        // ==========================================
+        // RANGLAR (ROULETTE)
         // ==========================================
         let rlActive = false;
 
@@ -945,7 +1181,7 @@
             if (isWin) {
                 resultColor = selectedColor;
             } else {
-                let colors = ['red', 'blue', 'green'].filter(c => c !== selectedColor);
+                let colors =['red', 'blue', 'green'].filter(c => c !== selectedColor);
                 if (colors.includes('green') && Math.random() > 0.05) {
                      resultColor = colors.find(c => c !== 'green');
                 } else {
@@ -1005,40 +1241,26 @@
         }
 
         // ==========================================
-        // YAXSHILANGAN: COINFLIP (SERIES)
+        // COINFLIP
         // ==========================================
-        let cfStep = 0;
-        let cfMults =[1.88, 3.76, 7.52];
-        let cfBet = 1000;
-        let cfActive = false;
-        let cfIsPlayingSequence = false;
+        let cfStep = 0; let cfMults =[1.88, 3.76, 7.52]; let cfBet = 1000; let cfActive = false; let cfIsPlayingSequence = false;
 
-        function openCoinflip() {
-            resetCoinflip();
-            showSection('coinflip-page');
-        }
+        function openCoinflip() { resetCoinflip(); showSection('coinflip-page'); }
 
         function updateCfUI() {
             for(let i=1; i<=3; i++) {
                 let box = document.getElementById('cf-m-'+i);
-                if(box) {
-                    if(cfStep >= i) box.classList.add('active');
-                    else box.classList.remove('active');
-                }
+                if(box) { if(cfStep >= i) box.classList.add('active'); else box.classList.remove('active'); }
             }
         }
 
         function resetCoinflip() {
-            cfIsPlayingSequence = false;
-            cfStep = 0;
-            cfActive = false;
+            cfIsPlayingSequence = false; cfStep = 0; cfActive = false;
             document.getElementById('cf-bet-input').disabled = false;
             document.getElementById('cf-cashout-btn').classList.add('hidden');
             document.getElementById('cf-result-text').innerText = "Stavka kiriting va tanlang";
             let coin = document.getElementById('cf-coin');
-            coin.style.transition = 'none';
-            coin.classList.remove('spin-burgut', 'spin-dum');
-            coin.style.transform = 'rotateY(0deg)';
+            coin.style.transition = 'none'; coin.classList.remove('spin-burgut', 'spin-dum'); coin.style.transform = 'rotateY(0deg)';
             updateCfUI();
         }
 
@@ -1046,8 +1268,7 @@
             if(cfActive || cfIsPlayingSequence) return;
             let inp = document.getElementById('cf-bet-input');
             let current = parseInt(inp.value) + val;
-            if(current < 1000) current = 1000;
-            inp.value = current;
+            if(current < 1000) current = 1000; inp.value = current;
         }
 
         function playCoinflip(choice) {
@@ -1058,25 +1279,19 @@
                 if (!amt || amt < 1000) return Swal.fire('Xato', 'Min. stavka 1000 so\'m', 'error');
                 if (users[activeUid].balance < amt) return Swal.fire('Xato', 'Balans yetarli emas', 'error');
 
-                users[activeUid].balance -= amt;
-                save();
-                cfBet = amt;
-                cfStep = 0;
-                cfIsPlayingSequence = true;
+                users[activeUid].balance -= amt; save();
+                cfBet = amt; cfStep = 0; cfIsPlayingSequence = true;
                 document.getElementById('cf-bet-input').disabled = true;
             }
 
-            cfActive = true;
-            document.getElementById('cf-result-text').innerText = "Aylanmoqda...";
+            cfActive = true; document.getElementById('cf-result-text').innerText = "Aylanmoqda...";
             
             let winProb = (gameWinRates.coinflip || 50) / 100;
             let isWin = Math.random() < winProb;
             let resultSide = isWin ? choice : (choice === 'burgut' ? 'dum' : 'burgut');
 
             let coin = document.getElementById('cf-coin');
-            coin.style.transition = 'none';
-            coin.classList.remove('spin-burgut', 'spin-dum');
-            coin.style.transform = 'rotateY(0deg)';
+            coin.style.transition = 'none'; coin.classList.remove('spin-burgut', 'spin-dum'); coin.style.transform = 'rotateY(0deg)';
             
             void coin.offsetWidth;
 
@@ -1086,13 +1301,10 @@
             setTimeout(() => {
                 cfActive = false;
                 if (isWin) {
-                    cfStep++;
-                    updateCfUI();
-                    
+                    cfStep++; updateCfUI();
                     if (cfStep === 3) {
                         let winAmt = Math.floor(cfBet * cfMults[2]);
-                        users[activeUid].balance += winAmt;
-                        save();
+                        users[activeUid].balance += winAmt; save();
                         Swal.fire('Tabriklaymiz!', `Siz maksimal darajaga yetdingiz va ${winAmt} so'm yutdingiz!`, 'success');
                         resetCoinflip();
                     } else {
@@ -1111,38 +1323,25 @@
         function cashoutCoinflip() {
             if (!cfIsPlayingSequence || cfStep === 0 || cfActive) return;
             let currentWin = Math.floor(cfBet * cfMults[cfStep-1]);
-            users[activeUid].balance += currentWin;
-            save();
+            users[activeUid].balance += currentWin; save();
             Swal.fire('Olib tashlandi!', `${currentWin} so'm balansingizga qo'shildi!`, 'success');
             resetCoinflip();
         }
 
         // ==========================================
-        // BALLOON O'YINI (Shar)
+        // BALLOON 
         // ==========================================
-        let blState = 'idle'; 
-        let blBet = 1000;
-        let blMult = 1.0;
-        let blInterval = null;
-        let blCrash = 1.0;
+        let blState = 'idle'; let blBet = 1000; let blMult = 1.0; let blInterval = null; let blCrash = 1.0;
 
         function openBalloon() {
-            blState = 'idle';
-            document.getElementById('bl-balloon').className = 'balloon';
-            document.getElementById('bl-balloon').style.transform = 'scale(1)';
+            blState = 'idle'; document.getElementById('bl-balloon').className = 'balloon'; document.getElementById('bl-balloon').style.transform = 'scale(1)';
             document.getElementById('bl-mult-display').innerText = '1.00x';
-            let btn = document.getElementById('bl-play-btn');
-            btn.className = 'av-btn-green';
-            btn.innerText = 'PUL TIKISH VA SHISHIRISH';
-            showSection('balloon-page');
+            let btn = document.getElementById('bl-play-btn'); btn.className = 'av-btn-green'; btn.innerText = 'PUL TIKISH VA SHISHIRISH'; showSection('balloon-page');
         }
 
         function adjBlBet(val) {
-            if(blState !== 'idle') return;
-            let inp = document.getElementById('bl-bet-input');
-            let current = parseInt(inp.value) + val;
-            if(current < 1000) current = 1000;
-            inp.value = current;
+            if(blState !== 'idle') return; let inp = document.getElementById('bl-bet-input'); let current = parseInt(inp.value) + val;
+            if(current < 1000) current = 1000; inp.value = current;
         }
 
         function handleBalloonAction() {
@@ -1151,71 +1350,37 @@
 
             if (blState === 'idle') {
                 if(users[activeUid].balance < inputVal) return Swal.fire('Xato', 'Mablag\' yetarli emas', 'error');
-                users[activeUid].balance -= inputVal; 
-                save(); 
+                users[activeUid].balance -= inputVal; save(); 
                 
-                blBet = inputVal; 
-                blState = 'inflating'; 
-                blMult = 1.0;
+                blBet = inputVal; blState = 'inflating'; blMult = 1.0;
 
                 let winProb = (gameWinRates.balloon || 40) / 100;
-                if(Math.random() < winProb) {
-                    blCrash = 1.50 + (Math.random() * 5.00); 
-                } else {
-                    let rand = Math.random();
-                    if (rand < 0.20) blCrash = 1.00; 
-                    else if (rand < 0.60) blCrash = 1.01 + (Math.random() * 0.20); 
-                    else blCrash = 1.20 + (Math.random() * 0.29); 
-                }
+                if(Math.random() < winProb) { blCrash = 1.50 + (Math.random() * 5.00); } 
+                else { let rand = Math.random(); if (rand < 0.20) blCrash = 1.00; else if (rand < 0.60) blCrash = 1.01 + (Math.random() * 0.20); else blCrash = 1.20 + (Math.random() * 0.29); }
 
                 document.getElementById('bl-balloon').className = 'balloon';
-                let btn = document.getElementById('bl-play-btn');
-                btn.className = 'av-btn-orange';
-                btn.innerText = `OLISH (${blBet} so'm)`;
+                let btn = document.getElementById('bl-play-btn'); btn.className = 'av-btn-orange'; btn.innerText = `OLISH (${blBet} so'm)`;
 
                 if (blCrash === 1.00) { crashBalloon(); return; }
 
                 blInterval = setInterval(() => {
-                    blMult += 0.01;
-                    let scale = 1 + (blMult - 1) * 0.5; 
-                    if (scale > 3) scale = 3;
+                    blMult += 0.01; let scale = 1 + (blMult - 1) * 0.5; if (scale > 3) scale = 3;
 
                     if(blMult >= blCrash) { blMult = blCrash; crashBalloon(); } 
-                    else {
-                        document.getElementById('bl-mult-display').innerText = blMult.toFixed(2) + 'x';
-                        document.getElementById('bl-balloon').style.transform = `scale(${scale})`;
-                        let currentWin = Math.floor(blBet * blMult); 
-                        btn.innerText = `OLISH (${currentWin} so'm)`;
-                    }
+                    else { document.getElementById('bl-mult-display').innerText = blMult.toFixed(2) + 'x'; document.getElementById('bl-balloon').style.transform = `scale(${scale})`; let currentWin = Math.floor(blBet * blMult); btn.innerText = `OLISH (${currentWin} so'm)`; }
                 }, 100);
-
             } else if (blState === 'inflating') {
-                clearInterval(blInterval);
-                blState = 'idle';
-                let win = Math.floor(blBet * blMult);
-                users[activeUid].balance += win; 
-                save();
-                
-                document.getElementById('bl-balloon').style.transform = 'scale(1)';
-                let btn = document.getElementById('bl-play-btn');
-                btn.className = 'av-btn-green';
-                btn.innerText = 'PUL TIKISH VA SHISHIRISH';
-                
+                clearInterval(blInterval); blState = 'idle'; let win = Math.floor(blBet * blMult); users[activeUid].balance += win; save();
+                document.getElementById('bl-balloon').style.transform = 'scale(1)'; let btn = document.getElementById('bl-play-btn'); btn.className = 'av-btn-green'; btn.innerText = 'PUL TIKISH VA SHISHIRISH';
                 Swal.fire('Yutdingiz!', `${win} so'm yechib olindi!`, 'success');
             }
         }
 
         function crashBalloon() {
-            clearInterval(blInterval);
-            blState = 'idle';
-            let balloon = document.getElementById('bl-balloon');
-            balloon.className = 'balloon popped';
+            clearInterval(blInterval); blState = 'idle';
+            let balloon = document.getElementById('bl-balloon'); balloon.className = 'balloon popped';
             document.getElementById('bl-mult-display').innerText = '💥 ' + blCrash.toFixed(2) + 'x';
-            
-            let btn = document.getElementById('bl-play-btn');
-            btn.className = 'av-btn-disabled';
-            btn.innerText = 'YORILDI!';
-            
+            let btn = document.getElementById('bl-play-btn'); btn.className = 'av-btn-disabled'; btn.innerText = 'YORILDI!';
             setTimeout(() => { openBalloon(); }, 2000);
         }
 
@@ -1252,29 +1417,24 @@
         }
 
         function chickenGo() {
-            if(!crActive) return;
-            let loseProb = 1 - (gameWinRates.chicken / 100); 
+            if(!crActive) return; let loseProb = 1 - (gameWinRates.chicken / 100); 
             if(Math.random() < loseProb) {
                 document.getElementById('cr-chicken').innerText = '🍗'; document.getElementById('cr-chicken').style.bottom = '10px';
                 document.getElementById('cr-bubble').classList.add('hidden'); document.getElementById('cr-status-text').innerText = "Yutqazdingiz!";
                 crActive = false; document.getElementById('cr-controls-active').classList.add('hidden');
                 setTimeout(() => { document.getElementById('cr-controls-setup').classList.remove('hidden'); updateCrUI(); }, 1500); save();
             } else {
-                crStep++;
-                let newLeft = 10 + (crStep * 15); if(newLeft > 80) newLeft = 80;
-                document.getElementById('cr-chicken').style.left = newLeft + '%';
-                let nextMult = crMults[crStep] || (crMults[crMults.length-1] + (crStep - crMults.length+1));
+                crStep++; let newLeft = 10 + (crStep * 15); if(newLeft > 80) newLeft = 80;
+                document.getElementById('cr-chicken').style.left = newLeft + '%'; let nextMult = crMults[crStep] || (crMults[crMults.length-1] + (crStep - crMults.length+1));
                 document.getElementById('cr-bubble').innerText = nextMult + 'X'; document.getElementById('cr-status-text').innerText = "Yaxshi! Davom etasizmi?"; updateCrUI();
             }
         }
 
         function chickenCashout() {
-            if(!crActive) return;
-            let winAmt = crStep > 0 ? Math.floor(crBetAmt * crMults[crStep-1]) : crBetAmt;
+            if(!crActive) return; let winAmt = crStep > 0 ? Math.floor(crBetAmt * crMults[crStep-1]) : crBetAmt;
             users[activeUid].balance += winAmt; save(); crActive = false;
             document.getElementById('cr-bubble').classList.add('hidden'); document.getElementById('cr-status-text').innerText = `YUTDINGIZ: ${winAmt} so'm`;
-            document.getElementById('cr-controls-active').classList.add('hidden'); document.getElementById('cr-controls-setup').classList.remove('hidden');
-            updateCrUI();
+            document.getElementById('cr-controls-active').classList.add('hidden'); document.getElementById('cr-controls-setup').classList.remove('hidden'); updateCrUI();
         }
 
         // ==========================================
@@ -1284,21 +1444,16 @@
 
         function openMines1W() {
             m1wActive = false; m1wStep = 0; document.getElementById('m1w-bet-input').value = m1wBet;
-            setM1Bombs(m1wBombs); resetM1WBtn(); renderM1WGrid(false); updateM1WUI();
-            showSection('mines-page');
+            setM1Bombs(m1wBombs); resetM1WBtn(); renderM1WGrid(false); updateM1WUI(); showSection('mines-page');
         }
 
         function closeMines1W() {
-            if(m1wActive) {
-                Swal.fire({ title: "Diqqat!", text: "O'yin ketyapti. Chiqsangiz pul kuyadi!", icon: "warning", showCancelButton: true, confirmButtonText: "Chiqish", cancelButtonText: "Qolish"
-                }).then((r) => { if(r.isConfirmed) { m1wActive = false; renderGameMenu(); } });
-            } else { renderGameMenu(); }
+            if(m1wActive) { Swal.fire({ title: "Diqqat!", text: "O'yin ketyapti. Chiqsangiz pul kuyadi!", icon: "warning", showCancelButton: true, confirmButtonText: "Chiqish", cancelButtonText: "Qolish" }).then((r) => { if(r.isConfirmed) { m1wActive = false; renderGameMenu(); } }); } else { renderGameMenu(); }
         }
 
         function setM1Bombs(n) {
             if(m1wActive) return; m1wBombs = n;
-            document.querySelectorAll('#m1w-bomb-sel button').forEach(b => { b.classList.remove('active'); if(parseInt(b.innerText) === n) b.classList.add('active'); });
-            updateM1WUI();
+            document.querySelectorAll('#m1w-bomb-sel button').forEach(b => { b.classList.remove('active'); if(parseInt(b.innerText) === n) b.classList.add('active'); }); updateM1WUI();
         }
 
         function validateM1Bet() { let val = parseInt(document.getElementById('m1w-bet-input').value); if(val && val > 0 && !m1wActive) m1wBet = val; }
@@ -1309,8 +1464,7 @@
 
         function updateM1WUI() {
             document.getElementById('m1w-bal-text').innerText = (users[activeUid].balance || 0).toLocaleString();
-            document.getElementById('m1w-safe-count').innerText = 25 - m1wBombs - m1wStep;
-            document.getElementById('m1w-bomb-count').innerText = m1wBombs;
+            document.getElementById('m1w-safe-count').innerText = 25 - m1wBombs - m1wStep; document.getElementById('m1w-bomb-count').innerText = m1wBombs;
             let mHTML = ''; let startStep = m1wStep === 0 ? 1 : m1wStep;
             for(let i = startStep; i < startStep + 6; i++) {
                 if(i > (25 - m1wBombs)) break; let mult = getM1WMult(m1wBombs, i); let cls = (m1wStep >= i) ? 'active' : '';
@@ -1336,30 +1490,23 @@
                 let win = Math.floor(m1wBet * getM1WMult(m1wBombs, m1wStep));
                 users[activeUid].balance += win; m1wActive = false; save();
                 Swal.fire({ title: 'Yutdingiz!', text: `${win.toLocaleString()} UZS`, icon: 'success', timer: 2000, showConfirmButton: false });
-                renderM1WGrid(true); resetM1WBtn(); updateM1WUI();
-                return;
+                renderM1WGrid(true); resetM1WBtn(); updateM1WUI(); return;
             }
             let inputVal = parseInt(document.getElementById('m1w-bet-input').value);
             if(!inputVal || inputVal < 100) return Swal.fire('Xato', 'Min stavka 100 UZS', 'error');
             if(inputVal > users[activeUid].balance) return Swal.fire('Xato', 'Balansda yetarli mablag mavjud emas', 'error');
 
             m1wBet = inputVal; users[activeUid].balance -= m1wBet; save();
-            m1wActive = true; m1wStep = 0;
-            m1wGrid = Array(m1wBombs).fill('bomb').concat(Array(25 - m1wBombs).fill('star')).sort(() => Math.random() - 0.5);
-            
+            m1wActive = true; m1wStep = 0; m1wGrid = Array(m1wBombs).fill('bomb').concat(Array(25 - m1wBombs).fill('star')).sort(() => Math.random() - 0.5);
             let btn = document.getElementById('m1w-play-btn'); btn.classList.add('cashout'); btn.innerText = "Katak tanlang";
             renderM1WGrid(false); updateM1WUI();
         }
 
         function clickM1WCell(i, cellElement) {
-            if(!m1wActive) return;
-            if(cellElement.classList.contains('star') || cellElement.classList.contains('bomb')) return;
+            if(!m1wActive) return; if(cellElement.classList.contains('star') || cellElement.classList.contains('bomb')) return;
 
             let loseProb = 1 - (gameWinRates.mines / 100);
-            
-            if(m1wStep === 0 && Math.random() < loseProb) {
-                if(m1wGrid[i] !== 'bomb') { let bombIdx = m1wGrid.indexOf('bomb'); m1wGrid[bombIdx] = 'star'; m1wGrid[i] = 'bomb'; }
-            }
+            if(m1wStep === 0 && Math.random() < loseProb) { if(m1wGrid[i] !== 'bomb') { let bombIdx = m1wGrid.indexOf('bomb'); m1wGrid[bombIdx] = 'star'; m1wGrid[i] = 'bomb'; } }
 
             if(m1wGrid[i] === 'bomb') {
                 cellElement.classList.add('bomb'); cellElement.innerText = '💣'; m1wActive = false;
@@ -1368,38 +1515,21 @@
             } else {
                 cellElement.classList.add('star'); cellElement.innerText = '⭐'; m1wGrid[i] = 'opened'; m1wStep++;
                 let currentWin = Math.floor(m1wBet * getM1WMult(m1wBombs, m1wStep));
-                document.getElementById('m1w-play-btn').innerText = `Olish ${currentWin.toLocaleString()}`;
-                updateM1WUI();
+                document.getElementById('m1w-play-btn').innerText = `Olish ${currentWin.toLocaleString()}`; updateM1WUI();
                 if(m1wStep === (25 - m1wBombs)) playMines1W(); 
             }
         }
 
-        function resetM1WBtn() {
-            const btn = document.getElementById('m1w-play-btn');
-            btn.classList.remove('cashout'); btn.style.background = '#0088ff'; btn.innerText = 'Stavka ⭐';
-        }
+        function resetM1WBtn() { const btn = document.getElementById('m1w-play-btn'); btn.classList.remove('cashout'); btn.style.background = '#0088ff'; btn.innerText = 'Stavka ⭐'; }
 
         // ==========================================
         // KALLA SUYAK
         // ==========================================
-        let skBet = 1000, skActive = false, skPos = 0;
-        let skPositions =[0, 100, 200]; let skCurrentIds =[0, 1, 2]; 
+        let skBet = 1000, skActive = false, skPos = 0; let skPositions =[0, 100, 200]; let skCurrentIds =[0, 1, 2]; 
 
-        function adjSkBet(val) {
-            if(skActive) return; let current = parseInt(document.getElementById('sk-bet-input').value) || 1000; current += val;
-            if(current < 1000) current = 1000; document.getElementById('sk-bet-input').value = current;
-        }
-
-        function multSkBet(val) {
-            if(skActive) return; let current = parseInt(document.getElementById('sk-bet-input').value) || 1000; current = Math.floor(current * val);
-            if(current < 1000) current = 1000; document.getElementById('sk-bet-input').value = current;
-        }
-
-        function setSkBet(type) {
-            if(skActive) return;
-            if(type === 'min') { document.getElementById('sk-bet-input').value = 1000; } 
-            else if(type === 'max') { let bal = users[activeUid].balance || 0; document.getElementById('sk-bet-input').value = bal > 1000 ? bal : 1000; }
-        }
+        function adjSkBet(val) { if(skActive) return; let current = parseInt(document.getElementById('sk-bet-input').value) || 1000; current += val; if(current < 1000) current = 1000; document.getElementById('sk-bet-input').value = current; }
+        function multSkBet(val) { if(skActive) return; let current = parseInt(document.getElementById('sk-bet-input').value) || 1000; current = Math.floor(current * val); if(current < 1000) current = 1000; document.getElementById('sk-bet-input').value = current; }
+        function setSkBet(type) { if(skActive) return; if(type === 'min') { document.getElementById('sk-bet-input').value = 1000; } else if(type === 'max') { let bal = users[activeUid].balance || 0; document.getElementById('sk-bet-input').value = bal > 1000 ? bal : 1000; } }
 
         function openSkullGame() {
             document.getElementById('sk-info').innerText = "Tikish: 0 so'm"; skCurrentIds =[0, 1, 2];
@@ -1436,21 +1566,15 @@
 
         function pickSkull(idx) {
             if(!skActive) return; skActive = false;
-            
-            let winProb = gameWinRates.skull / 100;
-            let isWin = Math.random() < winProb; 
-            
-            if(isWin) { skPos = idx; } 
-            else { let wrongOptions =[0, 1, 2].filter(x => x !== idx); skPos = wrongOptions[Math.floor(Math.random() * wrongOptions.length)]; }
+            let winProb = gameWinRates.skull / 100; let isWin = Math.random() < winProb; 
+            if(isWin) { skPos = idx; } else { let wrongOptions =[0, 1, 2].filter(x => x !== idx); skPos = wrongOptions[Math.floor(Math.random() * wrongOptions.length)]; }
 
             for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
             let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
             document.getElementById('sk-'+skPos).innerHTML = ballHTML;
             let btn = document.getElementById('sk-start-btn'); btn.className = 'av-btn-green'; btn.innerText = 'TIKISH';
 
-            if(idx === skPos) {
-                let win = skBet * 5; users[activeUid].balance += win; save(); Swal.fire('Ajoyib!', `Siz topdingiz, ${win} so'm yutdingiz!`, 'success');
-            } else { Swal.fire('Yutqazdingiz', 'Koptok boshqa joyda edi.', 'error'); }
+            if(idx === skPos) { let win = skBet * 5; users[activeUid].balance += win; save(); Swal.fire('Ajoyib!', `Siz topdingiz, ${win} so'm yutdingiz!`, 'success'); } else { Swal.fire('Yutqazdingiz', 'Koptok boshqa joyda edi.', 'error'); }
         }
 
         // ==========================================
@@ -1477,18 +1601,8 @@
                 avBetAmount = inputVal; avState = 'flying'; avMult = 1.0;
                 
                 let winProb = gameWinRates.aviator / 100;
-                if(Math.random() < winProb) {
-                    avCrash = 2.00 + (Math.random() * 8.00); 
-                } else {
-                    let rand = Math.random();
-                    if (rand < 0.30) {
-                        avCrash = 1.00; 
-                    } else if (rand < 0.70) {
-                        avCrash = 1.01 + (Math.random() * 0.39); 
-                    } else {
-                        avCrash = 1.40 + (Math.random() * 0.59); 
-                    }
-                }
+                if(Math.random() < winProb) { avCrash = 2.00 + (Math.random() * 8.00); } 
+                else { let rand = Math.random(); if (rand < 0.30) { avCrash = 1.00; } else if (rand < 0.70) { avCrash = 1.01 + (Math.random() * 0.39); } else { avCrash = 1.40 + (Math.random() * 0.59); } }
                 
                 let btn = document.getElementById('av-action-btn'); btn.className = 'av-btn-orange'; document.getElementById('av-btn-title').innerText = 'OLISH'; document.getElementById('av-btn-amount').innerText = avBetAmount + " so'm";
                 document.getElementById('av-mult').innerText = '1.00x'; document.getElementById('av-mult').style.color = 'white'; document.getElementById('av-status').classList.add('hidden');
@@ -1502,16 +1616,12 @@
                     else {
                         document.getElementById('av-mult').innerText = avMult.toFixed(2) + 'x';
                         let currentWin = Math.floor(avBetAmount * avMult); document.getElementById('av-btn-amount').innerText = currentWin + " so'm";
-                        
                         let w = Math.min(220, tick * 2.5); let h = Math.min(180, tick * 2);
-                        document.getElementById('av-curve').style.width = w + 'px'; 
-                        document.getElementById('av-curve').style.height = h + 'px'; 
-                        document.getElementById('av-plane').style.transform = `translate(${w}px, -${h}px)`;
+                        document.getElementById('av-curve').style.width = w + 'px'; document.getElementById('av-curve').style.height = h + 'px'; document.getElementById('av-plane').style.transform = `translate(${w}px, -${h}px)`;
                     }
                 }, 50);
             } else if(avState === 'flying') {
-                clearInterval(avInterval); avState = 'idle';
-                let win = Math.floor(avBetAmount * avMult); users[activeUid].balance += win; save();
+                clearInterval(avInterval); avState = 'idle'; let win = Math.floor(avBetAmount * avMult); users[activeUid].balance += win; save();
                 avHistory.unshift(avMult); if(avHistory.length > 15) avHistory.pop(); renderAvHistory();
                 document.getElementById('av-mult').style.color = 'var(--success)';
                 Swal.fire('Yutdingiz!', `${win} so'm`, 'success').then(() => { resetAvBtn(); openAviator(); });
@@ -1532,8 +1642,7 @@
         }
 
         function renderAvHistory() {
-            let html = '';
-            avHistory.forEach(m => { let color = m < 2.0 ? '#e74c3c' : (m < 5.0 ? '#9b59b6' : '#2ecc71'); html += `<span style="color:${color}; background:#222; padding:3px 8px; border-radius:10px; font-family:sans-serif;">${m.toFixed(2)}x</span>`; });
+            let html = ''; avHistory.forEach(m => { let color = m < 2.0 ? '#e74c3c' : (m < 5.0 ? '#9b59b6' : '#2ecc71'); html += `<span style="color:${color}; background:#222; padding:3px 8px; border-radius:10px; font-family:sans-serif;">${m.toFixed(2)}x</span>`; });
             document.getElementById('av-history').innerHTML = html;
         }
 
@@ -1568,19 +1677,16 @@
             let amt = parseInt(document.getElementById('admin-add-amount').value);
             if (!amt || amt <= 0) return Swal.fire('Xato', 'To\'g\'ri summa kiriting', 'error');
             
-            if (action === 'add') {
-                users[rechargeTargetId].balance += amt;
-                Swal.fire('Muvaffaqiyatli', `${amt} so'm qo'shildi`, 'success');
-            } else if (action === 'sub') {
+            if (action === 'add') { users[rechargeTargetId].balance += amt; Swal.fire('Muvaffaqiyatli', `${amt} so'm qo'shildi`, 'success'); } 
+            else if (action === 'sub') {
                 if (users[rechargeTargetId].balance < amt) return Swal.fire('Xato', 'Balansda yetarli mablag\' yo\'q', 'error');
-                users[rechargeTargetId].balance -= amt;
-                Swal.fire('Muvaffaqiyatli', `${amt} so'm ayirildi`, 'success');
+                users[rechargeTargetId].balance -= amt; Swal.fire('Muvaffaqiyatli', `${amt} so'm ayirildi`, 'success');
             }
-            save();
-            searchUserForRecharge(); 
-            document.getElementById('admin-add-amount').value = '';
+            db.ref('bot_data/users/' + rechargeTargetId).set(users[rechargeTargetId]);
+            save(); searchUserForRecharge(); document.getElementById('admin-add-amount').value = '';
         }
 
+        // TASDIQLASH VA RAD ETISH
         function renderAdminDeposits() {
             let changed = false;
             deposits.forEach(d => { if(d.isNew) { d.isNew = false; changed = true; } });
@@ -1590,26 +1696,40 @@
             const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>TO\'LDIRISHLAR</h4>';
             if(deposits.length === 0) l.innerHTML += '<p>To\'ldirishlar yo\'q.</p>';
             
-            deposits.forEach((d, i) => l.innerHTML += `<div class="admin-order">ID: ${d.uid} | Sum: ${d.amount}<br>Vaqt: ${d.time}<br><img src="${d.img}" style="width:100%; border-radius:10px; margin-top:10px;"><br><div style="display:flex;gap:5px;margin-top:10px;"><button class="btn-glow" style="background:green; margin:0;" onclick="approveDep(${i})">Tasdiqlash</button><button class="btn-glow" style="background:red; margin:0;" onclick="rejectDep(${i})">Rad etish</button></div></div>`);
+            deposits.forEach((d, i) => {
+                let did = d.id ? d.id : i;
+                l.innerHTML += `<div class="admin-order">ID: ${d.uid} | Sum: ${d.amount}<br>Vaqt: ${d.time}<br><img src="${d.img}" style="width:100%; border-radius:10px; margin-top:10px;"><br><div style="display:flex;gap:5px;margin-top:10px;"><button class="btn-glow" style="background:green; margin:0;" onclick="approveDep(${did})">Tasdiqlash</button><button class="btn-glow" style="background:red; margin:0;" onclick="rejectDep(${did})">Rad etish</button></div></div>`;
+            });
         }
 
-        function approveDep(i) {
-            let d = deposits[i]; 
-            if(users[d.uid]) users[d.uid].balance += parseInt(d.amount);
+        function approveDep(did) {
+            let idx = deposits.findIndex(x => x.id === did);
+            if(idx === -1 && typeof did === 'number' && deposits[did]) idx = did; 
             
-            deposits.splice(i, 1);
-            db.ref('bot_data/deposits').set(deposits); 
-            save(); 
-            renderAdminDeposits(); 
-            Swal.fire('OK','Pul tushirildi','success');
+            if(idx > -1) {
+                let d = deposits[idx]; 
+                if(users[d.uid]) {
+                    users[d.uid].balance += parseInt(d.amount);
+                    db.ref('bot_data/users/' + d.uid).set(users[d.uid]);
+                }
+                
+                deposits.splice(idx, 1);
+                db.ref('bot_data/deposits').set(deposits.length > 0 ? deposits : null); 
+                save(); renderAdminDeposits(); 
+                Swal.fire('OK','Pul tushirildi va ro\'yxatdan o\'chirildi','success');
+            }
         }
 
-        function rejectDep(i) {
-            deposits.splice(i, 1);
-            db.ref('bot_data/deposits').set(deposits); 
-            save();
-            renderAdminDeposits();
-            Swal.fire('OK','Rad etildi va o\'chirildi','success');
+        function rejectDep(did) {
+            let idx = deposits.findIndex(x => x.id === did);
+            if(idx === -1 && typeof did === 'number' && deposits[did]) idx = did; 
+            
+            if(idx > -1) {
+                deposits.splice(idx, 1);
+                db.ref('bot_data/deposits').set(deposits.length > 0 ? deposits : null); 
+                save(); renderAdminDeposits();
+                Swal.fire('OK','Rad etildi va o\'chirildi','success');
+            }
         }
 
         function renderAdminOrders() {
@@ -1617,9 +1737,20 @@
             const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>BUYURTMALAR</h4>';
             if(orders.length===0) l.innerHTML += '<p>Buyurtmalar yo\'q.</p>';
             orders.slice().reverse().forEach((o,i) => {
+                let did = o.id ? o.id : (orders.length - 1 - i);
                 let oType = o.typeText || (o.type === 'buy' ? 'SOTIB OLISH' : 'SOTISH');
-                l.innerHTML += `<div class="admin-order"><b>[${oType}] ${o.qty} ${o.name}</b><br><small style="color:var(--success)"><b>Vaqt:</b> ${o.date || 'Noma\'lum'}</small><br>Sum: ${o.sum} so'm<br>Info: ${o.user}<br><img src="${o.img}" style="width:100%; border-radius:10px; margin-top: 8px;"><br><button class="btn-glow" style="background:red; padding:5px; margin-top:8px;" onclick="orders.splice(${orders.length-1-i},1); db.ref('bot_data/orders').set(orders); save(); renderAdminOrders();">O'chirish</button></div>`;
+                l.innerHTML += `<div class="admin-order"><b>[${oType}] ${o.qty} ${o.name}</b><br><small style="color:var(--success)"><b>Vaqt:</b> ${o.date || 'Noma\'lum'}</small><br>Sum: ${o.sum} so'm<br>Info: ${o.user}<br><img src="${o.img}" style="width:100%; border-radius:10px; margin-top: 8px;"><br><button class="btn-glow" style="background:red; padding:5px; margin-top:8px;" onclick="deleteOrder(${did})">O'chirish</button></div>`;
             });
+        }
+
+        function deleteOrder(did) {
+            let idx = orders.findIndex(x => x.id === did);
+            if(idx === -1 && typeof did === 'number' && orders[did]) idx = did;
+            if (idx > -1) {
+                orders.splice(idx, 1);
+                db.ref('bot_data/orders').set(orders.length > 0 ? orders : null);
+                save(); renderAdminOrders();
+            }
         }
 
         function renderAdminWithdraws() {
@@ -1627,7 +1758,20 @@
             const l = document.getElementById('admin-list-container'); 
             l.innerHTML = `<h4>YECHISHLAR</h4><div class="card" style="margin-bottom:15px; background:#1c2431"><p>Min Yechish: <b>${minWithdrawAmount.toLocaleString()} so'm</b></p><input type="number" id="admin-min-with"><button class="btn-glow" onclick="saveMinWithdraw()">Saqlash</button></div>`;
             if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
-            withdraws.forEach((w, i) => l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="withdraws.splice(${i},1); db.ref('bot_data/withdraws').set(withdraws); save(); renderAdminWithdraws();">Bajarildi (O'chirish)</button></div>`);
+            withdraws.forEach((w, i) => {
+                let did = w.id ? w.id : i;
+                l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="completeWithdraw(${did})">Bajarildi (O'chirish)</button></div>`;
+            });
+        }
+
+        function completeWithdraw(did) {
+            let idx = withdraws.findIndex(x => x.id === did);
+            if(idx === -1 && typeof did === 'number' && withdraws[did]) idx = did;
+            if(idx > -1) {
+                withdraws.splice(idx, 1);
+                db.ref('bot_data/withdraws').set(withdraws.length > 0 ? withdraws : null);
+                save(); renderAdminWithdraws();
+            }
         }
 
         function saveMinWithdraw() { let val = document.getElementById('admin-min-with').value; if(val) { minWithdrawAmount = parseInt(val); save(); renderAdminWithdraws(); } }
@@ -1646,12 +1790,13 @@
                 <h4 style="color:var(--warning)">O'YINLAR YUTISH FOIZI (0% - 100%)</h4>
                 <div class="card" style="margin-bottom:15px; padding:15px; background:#1c2431">
                     <label style="color:white;">Ranglar O'yini (Color):</label><input type="number" id="wr-cl" value="${gameWinRates.color || 40}">
+                    <label style="color:white;">Apple of Fortune (Olma):</label><input type="number" id="wr-ap" value="${gameWinRates.apple || 40}">
                     <label style="color:white;">Coinflip (Tanga):</label><input type="number" id="wr-cf" value="${gameWinRates.coinflip || 50}">
                     <label style="color:white;">Balloon (Shar):</label><input type="number" id="wr-bl" value="${gameWinRates.balloon || 40}">
-                    <label style="color:white;">Chicken Run:</label><input type="number" id="wr-ch" value="${gameWinRates.chicken}">
-                    <label style="color:white;">Mines:</label><input type="number" id="wr-mn" value="${gameWinRates.mines}">
-                    <label style="color:white;">Kalla Suyak:</label><input type="number" id="wr-sk" value="${gameWinRates.skull}">
-                    <label style="color:white;">Aviator (>2x):</label><input type="number" id="wr-av" value="${gameWinRates.aviator}">
+                    <label style="color:white;">Chicken Run:</label><input type="number" id="wr-ch" value="${gameWinRates.chicken || 40}">
+                    <label style="color:white;">Mines:</label><input type="number" id="wr-mn" value="${gameWinRates.mines || 40}">
+                    <label style="color:white;">Kalla Suyak:</label><input type="number" id="wr-sk" value="${gameWinRates.skull || 40}">
+                    <label style="color:white;">Aviator (>2x):</label><input type="number" id="wr-av" value="${gameWinRates.aviator || 40}">
                     <button class="btn-glow" style="background:#27ae60; margin-top:15px;" onclick="saveWinRates()">SAQLASH</button>
                 </div>
             `;
@@ -1659,6 +1804,7 @@
         
         function saveWinRates() {
             gameWinRates.color = Math.min(100, Math.max(0, parseInt(document.getElementById('wr-cl').value)||40));
+            gameWinRates.apple = Math.min(100, Math.max(0, parseInt(document.getElementById('wr-ap').value)||40));
             gameWinRates.coinflip = Math.min(100, Math.max(0, parseInt(document.getElementById('wr-cf').value)||50));
             gameWinRates.balloon = Math.min(100, Math.max(0, parseInt(document.getElementById('wr-bl').value)||40));
             gameWinRates.chicken = Math.min(100, Math.max(0, parseInt(document.getElementById('wr-ch').value)||40));
