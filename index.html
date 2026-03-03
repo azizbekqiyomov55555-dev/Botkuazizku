@@ -2,988 +2,466 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Azizbek Kripto & Game Bot Pro</title>
-    <!-- Telegram Web App SDK ulangan -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- FIREBASE ONLAYN BAZA SDK (Hammada bir xil ishlashi uchun) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root {
-            --primary: #00f2ff;
-            --secondary: #7000ff;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f1c40f;
-            --dark: #0a0b10;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0; background: var(--dark); color: white;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent; /* iPhone miltillashini yo'qotadi */
-        }
-
-        /* Rainbow Animatsiya */
-        @keyframes rainbow {
-            0% { color: #ff0000; } 25% { color: #ffff00; }
-            50% { color: #00ff00; } 75% { color: #00f2ff; }
-            100% { color: #ff00ff; }
-        }
+        :root { --primary: #00f2ff; --secondary: #7000ff; --success: #2ecc71; --danger: #e74c3c; --warning: #f1c40f; --dark: #0a0b10; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--dark); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        @keyframes rainbow { 0% { color: #ff0000; } 25% { color: #ffff00; } 50% { color: #00ff00; } 75% { color: #00f2ff; } 100% { color: #ff00ff; } }
         .rainbow-text { animation: rainbow 3s infinite linear; font-weight: bold; }
-
-        #welcome {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--dark); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 1s;
-        }
-
-        .container { width: 95%; max-width: 500px; text-align: center; padding: 15px; box-sizing: border-box; }
+        #welcome { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s; }
+        .container { width: 100%; max-width: 500px; text-align: center; padding: 15px; box-sizing: border-box; }
         .hidden { display: none !important; }
-
-        /* Neon Quvib yuruvchi chiroqlar */
-        .neon-card {
-            position: relative; margin: 15px 0; padding: 3px;
-            border-radius: 15px; overflow: hidden; cursor: pointer;
-        }
-        .neon-card::before {
-            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent, var(--primary), var(--secondary), var(--success), transparent);
-            animation: rotate 3s linear infinite;
-        }
+        .neon-card { position: relative; margin: 15px 0; padding: 3px; border-radius: 15px; overflow: hidden; cursor: pointer; }
+        .neon-card::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, var(--primary), var(--secondary), var(--success), transparent); animation: rotate 3s linear infinite; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
         .inner-content { position: relative; background: #0d1117; border-radius: 12px; padding: 18px; z-index: 1; font-weight: bold; font-size: 1.2rem; }
-
-        /* Tugmalar */
-        .btn-glow {
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            color: white; border: none; padding: 15px; border-radius: 12px;
-            width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 8px 0;
-            transition: transform 0.1s; display: block; box-sizing: border-box;
-        }
+        .btn-glow { background: linear-gradient(45deg, var(--secondary), var(--primary)); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 8px 0; transition: transform 0.1s; display: block; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3); }
         .btn-glow:active { transform: scale(0.95); }
-
-        /* Admin panelidagi yangi bildirishnoma tugmasi */
-        .btn-blink-green {
-            animation: btnBlinkGreen 0.8s infinite alternate !important;
-            background: var(--success) !important;
-            color: white !important;
-            border: 1px solid white;
-        }
-        @keyframes btnBlinkGreen {
-            0% { box-shadow: 0 0 5px var(--success); transform: scale(1); }
-            100% { box-shadow: 0 0 20px lime; transform: scale(1.03); }
-        }
-
-        /* Ijtimoiy tarmoqlar */
+        .btn-blink-green { animation: btnBlinkGreen 0.8s infinite alternate !important; background: var(--success) !important; color: white !important; border: 1px solid white; }
+        @keyframes btnBlinkGreen { 0% { box-shadow: 0 0 5px var(--success); transform: scale(1); } 100% { box-shadow: 0 0 20px lime; transform: scale(1.03); } }
+        .btn-running-lights { position: relative; background: #000; color: white; font-weight: 900; font-size: 1.2rem; border: none; padding: 18px; border-radius: 15px; cursor: pointer; overflow: hidden; z-index: 1; width: 100%; margin-top: 20px; text-transform: uppercase; }
+        .btn-running-lights::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(transparent, transparent, transparent, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, transparent); animation: spin-lights 2s linear infinite; z-index: -2; }
+        .btn-running-lights::after { content: ''; position: absolute; inset: 4px; background: #111; border-radius: 11px; z-index: -1; }
+        @keyframes spin-lights { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .game-card-img { position: relative; width: 100%; aspect-ratio: 1; border-radius: 15px; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; flex-direction: column; transition: transform 0.2s; }
+        .game-card-img:active { transform: scale(0.95); }
+        .game-card-img .emoji { font-size: 3.5rem; z-index: 2; margin-bottom: 20px; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
+        .game-card-img .overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent); padding: 25px 5px 10px; text-align: center; font-weight: 900; font-size: 1rem; color: white; text-transform: uppercase; font-family: 'Arial Black', sans-serif; z-index: 3; box-sizing: border-box;}
         .social-row { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
         .social-box { position: relative; width: 75px; height: 75px; padding: 2px; border-radius: 15px; overflow: hidden; cursor: pointer; }
         .social-box::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); animation: rotate 4s linear infinite; }
         .social-inner { position: relative; background: #0d1117; width: 100%; height: 100%; border-radius: 13px; z-index: 1; display: flex; align-items: center; justify-content: center; }
-        .social-inner svg { width: 35px; fill: white; }
-
-        /* O'yinlar CSS */
-        .mines-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .mine-cell { aspect-ratio: 1; background: #1c2431; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border: 1px solid #333; }
-        .mine-cell.open { background: var(--secondary); }
-        .mine-cell.bomb { background: var(--danger); }
-
-        .aviator-area { background: #000; height: 220px; border-radius: 15px; position: relative; overflow: hidden; border: 1px solid #333; margin: 20px 0; }
-        .multiplier-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-weight: bold; color: var(--success); }
-        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 40px; transition: 0.1s; }
-
-        /* Kalla suyak o'yini */
-        .skull-area { position: relative; width: 280px; height: 120px; margin: 30px auto; }
-        .skull-box { position: absolute; width: 80px; height: 80px; font-size: 3.5rem; cursor: pointer; text-align: center; transition: left 0.4s ease-in-out; user-select: none; }
-
-        /* Formalar */
-        .card { background: #161b22; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-top: 15px; text-align: left;}
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
-        
+        .social-inner svg { width: 35px; height: 35px; fill: white; }
+        .card { background: #161b22; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-top: 15px; text-align: left; position:relative;}
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; font-size: 16px !important; }
         .pay-box { background: #000; padding: 15px; border-radius: 12px; border: 1px dashed var(--primary); margin: 15px 0; position: relative; text-align: left; word-break: break-all; }
         .copy-icon { position: absolute; right: 10px; top: 12px; width: 28px; cursor: pointer; fill: var(--primary); }
-        
         .admin-order { background: #000; border: 1px solid var(--primary); padding: 15px; margin: 15px 0; border-radius: 12px; text-align: left; }
         .blink-alert { animation: blinkMain 0.8s infinite alternate; }
         @keyframes blinkMain { from { color: white; } to { color: var(--success); text-shadow: 0 0 15px var(--success); } }
+        .file-upload-wrapper { position: relative; width: 100%; padding: 15px; border-radius: 12px; overflow: hidden; background: linear-gradient(45deg, #2c3e50, #34495e); display: flex; align-items: center; justify-content: center; font-weight: bold; box-sizing: border-box; margin-top: 10px; cursor: pointer; }
+        .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+
+        /* UZUM/GAME CONTROLS COMMON */
+        .av-controls { background: #1a1b26; padding: 15px; border-radius: 15px; margin-top: 15px; border: 1px solid #333; }
+        .av-bet-row { display: flex; align-items: center; justify-content: space-between; background: #000; border-radius: 30px; padding: 5px; margin-bottom: 10px; border: 1px solid #444; }
+        .av-btn-round { width: 40px; height: 40px; border-radius: 50%; border: none; background: #333; color: white; font-size: 1.5rem; cursor: pointer; font-weight:bold; }
+        .av-btn-round:active { transform:scale(0.9); }
+        .av-btn-input { text-align: center; font-size: 1.2rem; font-weight: bold; background: transparent; border: none; width: 50%; color: white; margin: 0; padding: 0; outline: none; }
+        .av-quick-bets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
+        .av-quick-bets button { background: #2a2b36; border: 1px solid #444; color: #ccc; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .av-quick-bets button:active { background: #444; }
+        .av-btn-green { background: #2ecc71; color: white; width: 100%; padding: 15px; border-radius: 15px; border: none; font-size: 1.2rem; font-weight: bold; display: flex; flex-direction: column; align-items: center; cursor: pointer; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); }
+        .av-btn-green:active { transform: scale(0.97); }
+        .av-btn-disabled { background: #555 !important; color: #999 !important; box-shadow:none !important; cursor: not-allowed !important; transform: scale(1) !important;}
         
-        /* iPhone Chek tugmasi uchun maxsus dizayn */
-        .file-upload-wrapper {
-            position: relative; width: 100%; padding: 15px; border-radius: 12px; 
-            overflow: hidden; background: linear-gradient(45deg, #2c3e50, #34495e); 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; box-sizing: border-box; margin-top: 10px; cursor: pointer;
-        }
-        .file-upload-wrapper input[type="file"] {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            opacity: 0; cursor: pointer; z-index: 10;
-        }
+        /* 1. ROULETTE (Gorizontal Yuguruvchi Dizayn) */
+        .rl-window { position: relative; width: 100%; height: 90px; background: #000; border-radius: 10px; overflow: hidden; border: 3px solid #333; margin: 0 auto 15px; display:flex; align-items:center; box-shadow: inset 0px 0px 20px rgba(0,0,0,0.8); }
+        .rl-pointer { position: absolute; left: 50%; top: 0; width: 4px; height: 100%; background: white; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px white; }
+        .rl-track { display: flex; height: 100%; width: max-content; align-items: center; transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        .rl-tile { width: 80px; height: 75px; margin: 0 3px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: white; text-shadow: 1px 1px 2px black; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); }
+        .color-btn { flex: 1; border: 2px solid transparent; color: white; padding: 12px 5px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .color-btn.active { border-color: white; transform: scale(1.05); filter: brightness(1.2); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+        /* 2. COIN FLIP (3D Tanga) */
+        .coin-wrap { perspective: 1000px; width: 130px; height: 130px; margin: 0 auto 15px; }
+        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 50%; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; border: 8px solid rgba(255,255,255,0.4); box-sizing: border-box; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .coin-front { background: radial-gradient(circle, #f1c40f, #b8860b); color: #fff; }
+        .coin-back { background: radial-gradient(circle, #bdc3c7, #7f8c8d); color: #fff; transform: rotateY(180deg); }
+        
+        /* AVIATOR */
+        .av-graph-area { background: #000; height: 220px; border-radius: 15px; position: relative; overflow: hidden; border: 1px solid #333; margin: 20px 0; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);}
+        .av-history { display: flex; gap: 8px; overflow-x: auto; background: #111; padding: 10px; border-radius: 10px 10px 0 0; font-size: 0.9rem; font-weight: bold; border: 1px solid #333; border-bottom: none; }
+        .av-history::-webkit-scrollbar { display: none; }
+        .av-mult { font-size: 4.5rem; font-weight: 900; color: white; z-index: 10; font-family: Impact, sans-serif; }
+        .av-status { position: absolute; top: 30px; color: #e74c3c; font-size: 1.5rem; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 10px; }
+        .av-plane { position: absolute; bottom: 0px; left: 0px; font-size: 45px; transition: 0.05s linear; z-index: 50; filter: drop-shadow(0px 5px 10px rgba(255,0,0,0.6)); transform-origin: center; }
+        .av-curve { position: absolute; bottom: 0; left: 0; border-top: 4px solid #e74c3c; border-right: 4px solid #e74c3c; border-top-right-radius: 100%; background: linear-gradient(45deg, rgba(231,76,60,0.4) 0%, transparent 100%); transition: 0.05s linear; width: 0px; height: 0px; }
+
+        /* MINES */
+        #mines-page { background: #111415; height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 200; overflow-y: auto; font-family: Arial, sans-serif; }
+        .m1w-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
+        .m1w-bal { background: #2f363f; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; }
+        .m1w-bal-icon { background: white; color: black; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+        .m1w-close { background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .m1w-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 0 15px 15px; margin: 0 auto; max-width: 400px; width: 100%; box-sizing: border-box; }
+        .m1w-cell { aspect-ratio: 1; background: #2f363f; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; color: #5a6472; font-weight: bold; transition: 0.2s; user-select: none; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2); }
+        .m1w-cell:active { transform: scale(0.9); }
+        .m1w-cell.star { background: #1c2733; font-size: 1.8rem; animation: pop 0.3s ease; box-shadow: none; }
+        .m1w-cell.bomb { background: #3b1b22; font-size: 1.8rem; animation: pop 0.3s ease; box-shadow: none; }
+        @keyframes pop { 0% {transform: scale(0.5); opacity:0;} 100% {transform: scale(1); opacity:1;} }
+        
+        /* CHICKEN RUN */
+        .cr-game-area { height: 250px; background: linear-gradient(180deg, #0e3025 0%, #154d39 100%); position: relative; border-bottom: 3px solid #0f2c22; overflow: hidden; border-radius:15px 15px 0 0;}
+        .cr-chicken { position: absolute; bottom: 30px; left: 10px; font-size: 4rem; transition: left 0.4s ease, bottom 0.2s ease; z-index: 5; text-shadow: 0px 5px 5px rgba(0,0,0,0.5);}
+        .cr-bubble { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); background: #ecf0f1; border: 5px solid #7f8c8d; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; color: #2c3e50; transition: 0.3s; z-index: 4; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
     </style>
 </head>
 <body>
 
-    <!-- Kirish Animatsiyasi -->
     <div id="welcome">
         <h1 class="rainbow-text" style="font-size: 2.5rem;">Assalomu Aleykum!</h1>
         <h2 class="rainbow-text">Xush kelibsiz Kripto botga</h2>
     </div>
 
     <div class="container">
-        <!-- Title & Admin -->
-        <h1 id="main-title" class="rainbow-text" style="cursor: pointer; font-size: 2.3rem; margin-bottom: 20px;" onclick="adminLogin()">AZIZBEK BOTI</h1>
+        <h1 id="main-title" class="rainbow-text" style="cursor: pointer; font-size: 2.3rem; margin-bottom: 20px;" onclick="adminLogin()">AZIZBEK</h1>
 
-        <!-- Asosiy menyu -->
         <div id="main-menu">
-            <div class="neon-card" onclick="showSection('buy-list')"><div class="inner-content">SOTIB OLISH</div></div>
-            <div class="neon-card" onclick="showSection('sell-list')"><div class="inner-content">SOTISH</div></div>
-
+            <div class="neon-card" onclick="showSec('buy-list')"><div class="inner-content">SOTIB OLISH</div></div>
+            <div class="neon-card" onclick="showSec('sell-list')"><div class="inner-content">SOTISH</div></div>
             <div class="social-row">
-                <a href="https://www.instagram.com/qiyomov_2008?igsh=MTF5YzhmeThuM2N5NA==" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div></a>
-                <a href="https://www.youtube.com/@AzizKu__2008" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div></a>
-                <a href="https://t.me/Azizbekl2026" target="_blank" class="social-box"><div class="social-inner"><svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.285.285-.436.285l.215-3.045 5.542-5.005c.24-.213-.054-.334-.373-.121l-6.853 4.314-2.954-.923c-.642-.204-.654-.643.136-.953l11.534-4.444c.534-.196 1.002.128.846.805z"/></svg></div></a>
+                <a href="https://www.instagram.com/qiyomov_2008?igsh=MTF5YzhmeThuM2N5NA==" target="_blank" class="social-box"><div class="social-inner">IG</div></a>
+                <a href="https://www.youtube.com/@AzizKu__2008" target="_blank" class="social-box"><div class="social-inner">YT</div></a>
+                <a href="https://t.me/Azizbekl2026" target="_blank" class="social-box"><div class="social-inner">TG</div></a>
             </div>
-
-            <button class="btn-glow" style="background: #e67e22;" onclick="openGameMenu()">O'YINLAR VA VAZIFALAR</button>
+            <button class="btn-running-lights" onclick="openMenu()">O'YINLAR VA VAZIFALAR</button>
         </div>
 
-        <!-- Valyuta Ro'yxatlari -->
-        <div id="buy-list" class="hidden"><button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button><div id="bl-cont"></div></div>
-        <div id="sell-list" class="hidden"><button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button><div id="sl-cont"></div></div>
+        <div id="buy-list" class="hidden"><button class="btn-glow" onclick="showSec('main-menu')">Orqaga</button><div id="bl-cont"></div></div>
+        <div id="sell-list" class="hidden"><button class="btn-glow" onclick="showSec('main-menu')">Orqaga</button><div id="sl-cont"></div></div>
 
-        <!-- Buyurtma Formasi -->
         <div id="order-form" class="hidden">
-            <button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button>
+            <button class="btn-glow" onclick="showSec('main-menu')">Orqaga</button>
             <h2 id="f-title"></h2>
             <div class="card">
                 <p id="f-rate" style="color:var(--primary); font-weight:bold;"></p>
-                <input type="number" id="f-amount" placeholder="Miqdorni kiriting" oninput="updateOrderTotal()">
+                <input type="number" id="f-amount" placeholder="Miqdorni kiriting" oninput="updTotal()">
                 <input type="text" id="f-info" placeholder="">
                 <h3 id="f-total-text">Jami: 0 so'm</h3>
                 <div class="pay-box">
-                    <span id="f-pay-label"></span><br>
-                    <b id="f-pay-address"></b>
+                    <span id="f-pay-label"></span><br><b id="f-pay-address"></b>
                     <div id="f-memo-wrap" class="hidden">Memo: <b id="f-pay-memo"></b></div>
-                    <svg class="copy-icon" onclick="copyPayInfo()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                 </div>
-
-                <p style="margin-bottom: 5px;">Chek rasmini yuklang:</p>
-                <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
-                <div class="file-upload-wrapper">
-                    <span>CHEK QO'YISH</span>
-                    <input type="file" id="f-file" accept="image/*" onchange="updateFileName()">
-                </div>
-                <div id="f-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
-
-                <button class="btn-glow" onclick="submitOrder()">TASDIQLASH</button>
+                <div class="file-upload-wrapper"><span>CHEK QO'YISH</span><input type="file" id="f-file" accept="image/*" onchange="updFName('f-file','f-file-name')"></div>
+                <div id="f-file-name" style="color:var(--success); margin:5px 0 10px; font-size:0.85rem;"></div>
+                <button class="btn-glow" onclick="subOrder()">TASDIQLASH</button>
             </div>
         </div>
 
-        <!-- Pul To'ldirish Formasi -->
         <div id="deposit-form" class="hidden">
-            <button class="btn-glow" onclick="renderGameMenu()">Orqaga</button>
-            <h2 style="color:var(--success)">BALANSNI TO'LDIRISH</h2>
+            <button class="btn-glow" onclick="renderMenu()">Orqaga</button>
+            <h2 style="color:var(--success)">BALANS TO'LDIRISH</h2>
             <div class="card">
-                <p>To'lov uchun karta raqamimiz:</p>
-                <div class="pay-box">
-                    <b id="d-admin-card"></b>
-                    <svg class="copy-icon" onclick="copyDepositCard()" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                </div>
+                <p>Karta raqamimiz:</p>
+                <div class="pay-box"><b id="d-admin-card"></b></div>
                 <input type="number" id="d-amount" placeholder="Miqdorni kiriting (so'm)">
-                
-                <p style="margin-bottom: 5px; margin-top: 15px;">Chek rasmini yuklang:</p>
-                <!-- iPHONE UCHUN XAVFSIZ FAYL YUKLASH TIZIMI -->
-                <div class="file-upload-wrapper">
-                    <span>CHEK YUKLASH</span>
-                    <input type="file" id="d-file" accept="image/*" onchange="updateDepositFileName()">
-                </div>
-                <div id="d-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
-
-                <button class="btn-glow" style="background:var(--success)" onclick="submitDeposit()">YUBORISH</button>
+                <div class="file-upload-wrapper" style="margin-top:15px;"><span>CHEK YUKLASH</span><input type="file" id="d-file" accept="image/*" onchange="updFName('d-file','d-file-name')"></div>
+                <div id="d-file-name" style="color:var(--success); margin:5px 0 10px; font-size:0.85rem;"></div>
+                <button class="btn-glow" style="background:var(--success)" onclick="subDeposit()">YUBORISH</button>
             </div>
         </div>
 
-        <!-- O'yin Menyusi -->
         <div id="game-menu" class="hidden">
-            <button class="btn-glow" onclick="showSection('main-menu')">Orqaga</button>
-            <div class="card">
-                <h3 id="u-name" style="margin-top:0;">Ism: </h3>
-                <p>ID: <b id="u-id">0</b></p>
-                <div style="background:#000; padding:15px; border-radius:15px; border:1px solid var(--primary);">
+            <button class="btn-glow" onclick="showSec('main-menu')">Orqaga</button>
+            <div class="card" style="padding: 15px 10px;">
+                <h3 id="u-name" style="margin:0 5px;">Ism: </h3>
+                <p style="padding:0 5px; margin:5px 0;">ID: <b id="u-id">0</b></p>
+                <div style="background:#000; padding:15px; border-radius:15px; border:1px solid var(--primary); margin:0 5px;">
                     <p style="margin:0;">Balans:</p>
                     <h2 id="u-balance" style="color:var(--primary); margin:5px 0;">0 so'm</h2>
                 </div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="btn-glow" style="background:var(--success);" onclick="openDeposit()">To'ldirish</button>
-                    <button class="btn-glow" style="background:var(--danger);" onclick="openWithdraw()">Yechish</button>
+                <div style="display:flex; gap:10px; margin-top:15px; padding:0 5px;">
+                    <button class="btn-glow" style="background:var(--success); margin:0;" onclick="showSec('deposit-form'); $('d-admin-card').innerText=admCard; $('d-amount').value='';">To'ldirish</button>
+                    <button class="btn-glow" style="background:var(--danger); margin:0;" onclick="openWithdraw()">Yechish</button>
                 </div>
-                <hr style="border:0.5px solid #333; margin:20px 0;">
-                
-                <h3 style="color:var(--warning)">O'YINLAR</h3>
-                <button class="btn-glow" style="background:#8e44ad" onclick="startMines()">MINES (6 Bomba)</button>
-                <button class="btn-glow" style="background:#2980b9" onclick="openAviator()">AVIATOR</button>
-                <button class="btn-glow" style="background:#c0392b" onclick="openSkullGame()">KALLA SUYAK (5x)</button>
-
-                <hr style="border:0.5px solid #333; margin:20px 0;">
-                <h3 style="color:var(--success)">PUL ISHLASH</h3>
-                <button class="btn-glow" style="background:var(--success)" onclick="openTasks()">VAZIFALAR</button>
+                <hr style="border:0.5px solid #333; margin:20px 5px;">
+                <h3 style="color:var(--warning); padding:0 5px;">O'YINLAR</h3>
+                <div class="games-grid">
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #f1c40f, #e67e22);" onclick="oChik()"><div class="emoji">🐔</div><div class="overlay">CHICKEN RUN</div></div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #3498db, #2980b9);" onclick="oMines()"><div class="emoji">💣</div><div class="overlay">MINES</div></div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #e74c3c, #c0392b);" onclick="oAv()"><div class="emoji">✈️</div><div class="overlay">AVIATOR</div></div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="oSkull()"><div class="emoji">💀</div><div class="overlay">KALLA SUYAK</div></div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #2c3e50, #bdc3c7);" onclick="oRoul()"><div class="emoji">🎡</div><div class="overlay">RULETKA</div></div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #d4ac0d, #7f8c8d);" onclick="oCoin()"><div class="emoji">🪙</div><div class="overlay">TANGA</div></div>
+                </div>
+                <hr style="border:0.5px solid #333; margin:20px 5px;">
+                <button class="btn-glow" style="background:var(--success); margin:0 5px; width:calc(100% - 10px);" onclick="oTask()">VAZIFALAR</button>
             </div>
         </div>
 
-        <!-- Vazifalar Sahifasi -->
-        <div id="tasks-page" class="hidden">
-            <button class="btn-glow" onclick="renderGameMenu()">Orqaga</button>
-            <h2 style="color:var(--success)">Vazifalar</h2>
-            <div id="tasks-list"></div>
+        <!-- ROULETTE -->
+        <div id="roulette-page" class="hidden">
+            <h2 style="color: #3498db;">RULETKA</h2>
+            <div class="card" style="text-align:center; background:#111;">
+                <div class="rl-window"><div class="rl-pointer"></div><div id="rl-track" class="rl-track"></div></div>
+                <p id="rl-status" style="margin:5px 0 0; font-weight:bold; font-size:1.1rem; color:#ccc;">Rang tanlang va pul tiking!</p>
+            </div>
+            <div class="av-controls">
+                <div class="av-bet-row">
+                    <button class="av-btn-round" onclick="adjB('rl-bet-input',-1000)">-</button>
+                    <input type="number" id="rl-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
+                    <button class="av-btn-round" onclick="adjB('rl-bet-input',1000)">+</button>
+                </div>
+                <div style="display:flex; gap:8px; margin-bottom:15px;">
+                    <button id="rl-red" class="color-btn active" style="background:#e74c3c;" onclick="sRl('red')">Qizil 2x</button>
+                    <button id="rl-green" class="color-btn" style="background:#2ecc71;" onclick="sRl('green')">Yashil 2x</button>
+                    <button id="rl-blue" class="color-btn" style="background:#3498db;" onclick="sRl('blue')">Ko'k 14x</button>
+                </div>
+                <button id="rl-btn" class="av-btn-green" onclick="pRl()">TIKISH</button>
+            </div>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderMenu()">Chiqish</button>
         </div>
 
-        <!-- Kalla Suyak O'yini -->
+        <!-- COIN FLIP -->
+        <div id="coinflip-page" class="hidden">
+            <h2 style="color: #f1c40f;">TANGA O'YINI</h2>
+            <div class="card" style="text-align:center; background:#111;">
+                <div class="coin-wrap">
+                    <div id="cf-coin" class="coin">
+                        <div class="coin-face coin-front">Sariq</div>
+                        <div class="coin-face coin-back">Kulrang</div>
+                    </div>
+                </div>
+                <p id="cf-status" style="margin:0; font-weight:bold; font-size:1.1rem; color:#ccc;">Sariq yoki Kulrang tanlang!</p>
+            </div>
+            <div class="av-controls">
+                <div class="av-bet-row">
+                    <button class="av-btn-round" onclick="adjB('cf-bet-input',-1000)">-</button>
+                    <input type="number" id="cf-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
+                    <button class="av-btn-round" onclick="adjB('cf-bet-input',1000)">+</button>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <button id="cf-yellow" class="color-btn active" style="background:#f1c40f; color:#000;" onclick="sCf('yellow')">Sariq 2x</button>
+                    <button id="cf-gray" class="color-btn" style="background:#95a5a6;" onclick="sCf('gray')">Kulrang 2x</button>
+                </div>
+                <button id="cf-btn" class="av-btn-green" onclick="pCf()">TIKISH</button>
+            </div>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderMenu()">Chiqish</button>
+        </div>
+
+        <!-- AVIATOR -->
+        <div id="aviator-page" class="hidden">
+            <div id="av-history" class="av-history"></div>
+            <div class="av-graph-area"><div id="av-curve" class="av-curve"></div><div id="av-plane" class="av-plane">✈️</div><div id="av-mult" class="av-mult">1.00x</div><div id="av-status" class="av-status hidden">UCHIB KETDI!</div></div>
+            <div class="av-controls">
+                <div class="av-bet-row"><button class="av-btn-round" onclick="adjB('av-bet-input',-1000)">-</button><input type="number" id="av-bet-input" class="av-btn-input" value="1000" min="1000" step="1000"><button class="av-btn-round" onclick="adjB('av-bet-input',1000)">+</button></div>
+                <div class="av-quick-bets"><button onclick="$('av-bet-input').value=1000">1000</button><button onclick="$('av-bet-input').value=2000">2000</button><button onclick="$('av-bet-input').value=5000">5000</button><button onclick="$('av-bet-input').value=10000">10000</button></div>
+                <button id="av-btn" class="av-btn-green" onclick="pAv()">PUL TIKISH</button>
+            </div>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderMenu()">Chiqish</button>
+        </div>
+
+        <!-- SKULL -->
         <div id="skull-page" class="hidden">
             <h3 id="sk-info">Tikish: 0 so'm</h3>
             <div class="card" style="text-align:center;">
                 <p>Koptok qayerda? Toping (Yutuq: 5x)</p>
-                <div class="skull-area" id="sk-area">
-                    <div class="skull-box" id="sk-0" onclick="pickSkull(0)">💀</div>
-                    <div class="skull-box" id="sk-1" onclick="pickSkull(1)">💀</div>
-                    <div class="skull-box" id="sk-2" onclick="pickSkull(2)">💀</div>
+                <div class="skull-area">
+                    <div class="skull-box" id="sk-0" onclick="pSk(0)">💀</div><div class="skull-box" id="sk-1" onclick="pSk(1)">💀</div><div class="skull-box" id="sk-2" onclick="pSk(2)">💀</div>
                 </div>
             </div>
-            <button id="sk-start-btn" class="btn-glow" style="background:#c0392b" onclick="startSkullGame()">TIKISH (Min 1000)</button>
-            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
-        </div>
-
-        <!-- Mines O'yini -->
-        <div id="mines-page" class="hidden">
-            <h3 id="m-info">Tikish: 0</h3>
-            <div class="mines-grid" id="m-grid"></div>
-            <button id="m-cash" class="btn-glow hidden" style="background:var(--success)" onclick="minesCashout()">OLISH</button>
-            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
-        </div>
-
-        <!-- Aviator O'yini -->
-        <div id="aviator-page" class="hidden">
-            <div class="aviator-area">
-                <div id="av-mult" class="multiplier-text">1.00x</div>
-                <div id="av-plane" class="plane">✈️</div>
+            <div class="av-controls">
+                <div class="av-bet-row"><button class="av-btn-round" onclick="adjB('sk-bet-input',-1000)">-</button><input type="number" id="sk-bet-input" class="av-btn-input" value="1000" min="1000" step="1000"><button class="av-btn-round" onclick="adjB('sk-bet-input',1000)">+</button></div>
+                <div class="av-quick-bets"><button onclick="$('sk-bet-input').value=Math.max(1000, $('sk-bet-input').value/2)">/2</button><button onclick="$('sk-bet-input').value*=2">x2</button><button onclick="$('sk-bet-input').value=1000">MIN</button><button onclick="$('sk-bet-input').value=Math.max(1000, uBal())">MAX</button></div>
+                <button id="sk-btn" class="av-btn-green" onclick="startSk()">TIKISH</button>
             </div>
-            <button id="av-bet-btn" class="btn-glow" onclick="startAviator()">TIKISH (Min 1000)</button>
-            <button id="av-cash-btn" class="btn-glow hidden" style="background:var(--success)" onclick="aviatorCashout()">CASHOUT</button>
-            <button class="btn-glow" style="background:#444" onclick="renderGameMenu()">Chiqish</button>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderMenu()">Chiqish</button>
         </div>
 
-        <!-- Admin Panel -->
+        <!-- CHICKEN -->
+        <div id="chicken-page" class="hidden">
+            <div class="cr-container">
+                <div class="cr-header"><h1 class="cr-header-title">CHICKEN RUN</h1></div>
+                <div class="cr-game-area">
+                    <div class="cr-jungle-bg"></div><div class="cr-water"></div>
+                    <div class="cr-lily" style="left:20%;"></div><div class="cr-lily" style="left:55%;"></div><div class="cr-lily" style="left:85%; width:40px;"></div>
+                    <div id="cr-chicken" class="cr-chicken">🐔</div><div id="cr-bubble" class="cr-bubble hidden">1.3X</div>
+                    <h3 id="cr-status-text" style="position:absolute; top:5px; width:100%; text-align:center; margin:0; z-index:10;">O'yinni boshlang</h3>
+                </div>
+                <div class="cr-controls" id="cr-setup">
+                    <div class="cr-diff-grid"><button class="cr-diff-btn active">Oson</button><button class="cr-diff-btn">O'rta</button><button class="cr-diff-btn">Qiyin</button><button class="cr-diff-btn">Hardkor</button></div>
+                    <div class="cr-bet-row"><button class="cr-round-btn" onclick="adjCr(-1000)">-</button><div style="text-align:center;"><small>STAVKA</small><br><b id="cr-bet-val" style="font-size:1.5rem;color:#ffc107">1000</b></div><button class="cr-round-btn" onclick="adjCr(1000)">+</button></div>
+                    <button class="cr-play-btn" onclick="startCr()">O'YNA</button>
+                </div>
+                <div class="cr-controls hidden" id="cr-active">
+                    <div style="display:flex; gap:10px;"><button class="cr-play-btn" style="background:#27ae60; color:white;" onclick="cashCr()">OLISH</button><button class="cr-play-btn" style="background:#e74c3c; color:white;" onclick="goCr()">BORISH</button></div>
+                </div>
+            </div>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderMenu()">Chiqish</button>
+        </div>
+
+        <!-- MINES -->
+        <div id="mines-page" class="hidden">
+            <div class="m1w-header"><div class="m1w-bal"><span class="m1w-bal-icon">1w</span><span id="m1w-bal-text">0</span></div><button class="m1w-close" onclick="closeMines()">✖</button></div>
+            <div class="m1w-stats"><div class="m1w-stats-box" style="color:#4da6ff;">⭐ <span id="m1w-safe">22</span></div><div class="m1w-stats-box" style="color:#ff4d4d;">💣 <span id="m1w-bomb">3</span></div></div>
+            <div id="m1w-grid" class="m1w-grid"></div><div id="m1w-mults" class="m1w-mults"></div>
+            <div class="m1w-controls">
+                <div class="m1w-betrow"><input type="number" id="m1w-bet" value="2500"><div><button class="m1w-btn-sm" onclick="adjB('m1w-bet',-500)">-</button><button class="m1w-btn-sm" onclick="adjB('m1w-bet',500)">+</button></div></div>
+                <button id="m1w-btn" class="m1w-play" onclick="playM()">Stavka ⭐</button>
+                <span class="m1w-bomb-label">Bombalar soni</span>
+                <div class="m1w-bomb-sel" id="m1w-bsel"><button onclick="sMb(2)">2</button><button class="active" onclick="sMb(3)">3</button><button onclick="sMb(5)">5</button><button onclick="sMb(7)">7</button></div>
+            </div>
+        </div>
+
+        <!-- TASKS -->
+        <div id="tasks-page" class="hidden"><button class="btn-glow" onclick="renderMenu()">Orqaga</button><h2 style="color:var(--success)">Vazifalar</h2><div id="tasks-list"></div></div>
+
+        <!-- ADMIN -->
         <div id="admin-panel" class="hidden">
             <h2 style="color:var(--success)">ADMIN PANEL</h2>
             <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                <button id="btn-admin-orders" class="btn-glow" style="flex:1" onclick="renderAdminOrders()">Buyurtmalar</button>
-                <button id="btn-admin-deps" class="btn-glow" style="flex:1" onclick="renderAdminDeposits()">To'ldirish</button>
-                <button id="btn-admin-withs" class="btn-glow" style="flex:1" onclick="renderAdminWithdraws()">Yechish</button>
-                <button class="btn-glow" style="flex:1; background:#2980b9" onclick="showSection('admin-coins')">Valyutalar</button>
-                <button class="btn-glow" style="flex:1; background:#8e44ad" onclick="renderAdminTasks()">Vazifalar</button>
+                <button id="ab1" class="btn-glow" style="flex:1 1 30%" onclick="rAdO()">Buyurtmalar</button>
+                <button id="ab2" class="btn-glow" style="flex:1 1 30%" onclick="rAdD()">To'ldirish</button>
+                <button id="ab3" class="btn-glow" style="flex:1 1 30%" onclick="rAdW()">Yechish</button>
+                <button class="btn-glow" style="flex:1 1 30%; background:#2980b9" onclick="showSec('admin-coins'); rAdC();">Valyuta</button>
+                <button class="btn-glow" style="flex:1 1 30%; background:#8e44ad" onclick="rAdT()">Vazifa</button>
+                <button class="btn-glow" style="flex:1 1 30%; background:#e67e22" onclick="rAdS()">Foizlar</button>
+                <button class="btn-glow" style="flex:1 1 30%; background:#34495e" onclick="rAdB()">ID Balans</button>
             </div>
-            <div id="admin-list-container"></div>
-            <button class="btn-glow" style="background:#444" onclick="showSection('main-menu')">Yopish</button>
+            <div id="admin-list" style="margin-top:15px;"></div>
+            <button class="btn-glow" style="background:#444" onclick="showSec('main-menu')">Yopish</button>
         </div>
-
-        <!-- Valyuta Sozlamalari -->
         <div id="admin-coins" class="hidden">
-            <button class="btn-glow" onclick="showSection('admin-panel')">Orqaga</button>
-            <div class="card">
-                <h4>Admin Karta</h4>
-                <input type="text" id="adm-card-val" placeholder="Karta raqami">
-                <button class="btn-glow" onclick="saveAdminCard()">Saqlash</button>
-            </div>
-            <div class="card">
-                <h4>Yangi Valyuta</h4>
-                <select id="adm-coin-type" onchange="toggleMemo()">
-                    <option value="buy">Sotib olish uchun</option>
-                    <option value="sell">Sotish uchun</option>
-                </select>
-                <input type="text" id="adm-coin-name" placeholder="Nomi (Masalan: TON)">
-                <input type="number" id="adm-coin-price" placeholder="Narxi (so'mda)">
-                <input type="text" id="adm-coin-addr" placeholder="Hamyon manzili (Faqat sotishda)">
-                <input type="text" id="adm-coin-memo" placeholder="Memo (Ixtiyoriy)" style="display:none;">
-                <button class="btn-glow" onclick="addCoin()">QO'SHISH</button>
-            </div>
-            <div id="admin-coin-list-display"></div>
+            <button class="btn-glow" onclick="showSec('admin-panel')">Orqaga</button>
+            <div class="card"><h4>Admin Karta</h4><input type="text" id="adm-c-v"><button class="btn-glow" onclick="svCard()">Saqlash</button></div>
+            <div class="card"><h4>Yangi Valyuta</h4><select id="adm-c-t"><option value="buy">Sotib olish</option><option value="sell">Sotish</option></select><input type="text" id="adm-c-n" placeholder="Nomi"><input type="number" id="adm-c-p" placeholder="Narxi"><input type="text" id="adm-c-a" placeholder="Hamyon manzil (sotish)"><button class="btn-glow" onclick="adC()">QO'SHISH</button></div>
+            <div id="adm-c-list"></div>
         </div>
     </div>
 
     <script>
-        // --- TELEGRAM WEB APP API ULASH ---
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        const $ = id => document.getElementById(id);
+        let tg = window.Telegram.WebApp; tg.expand(); tg.ready();
 
-        // =========================================================
-        // SIZNING FIREBASE BAZANGIZ ULANDI
-        // =========================================================
-        const firebaseConfig = {
-            databaseURL: "https://kiriptouz-default-rtdb.firebaseio.com",
-            projectId: "kiriptouz"
-        };
-        
-        // Bazani ishga tushiramiz
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp({ databaseURL: "https://kiriptouz-default-rtdb.firebaseio.com", projectId: "kiriptouz" });
         let db = firebase.database();
-        // =========================================================
 
-        // --- DATA STORE ---
-        let buyCoins = JSON.parse(localStorage.getItem('az_b_c_v11')) ||[{name:'Toncoin', price:75000}];
-        let sellCoins = JSON.parse(localStorage.getItem('az_s_c_v11')) ||[{name:'USDT', price:12800, addr:'TQ...', memo:''}];
-        let adminCard = localStorage.getItem('az_card_v11') || '8600 0000 0000 0000';
-        let users = JSON.parse(localStorage.getItem('az_users_v11')) || {};
-        let orders = JSON.parse(localStorage.getItem('az_orders_v11')) ||[];
-        let deposits = JSON.parse(localStorage.getItem('az_deps_v11')) ||[];
-        let withdraws = JSON.parse(localStorage.getItem('az_withs_v11')) ||[];
-        let tasks = JSON.parse(localStorage.getItem('az_tasks_data_v11')) ||[];
-        let newAlert = localStorage.getItem('az_alert_v11') === 'true';
-        let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v11')) || 0;
-        let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v11')) || 10000;
+        let bC = JSON.parse(localStorage.getItem('az_bc_v19')) ||[{name:'Toncoin', price:75000}];
+        let sC = JSON.parse(localStorage.getItem('az_sc_v19')) ||[{name:'USDT', price:12800, addr:'TQ...'}];
+        let admCard = localStorage.getItem('az_card_v19') || '8600 0000 0000 0000';
+        let users = JSON.parse(localStorage.getItem('az_us_v19')) || {};
+        let ords = JSON.parse(localStorage.getItem('az_or_v19')) ||[];
+        let deps = JSON.parse(localStorage.getItem('az_dp_v19')) ||[];
+        let withs = JSON.parse(localStorage.getItem('az_wt_v19')) ||[];
+        let tasks = JSON.parse(localStorage.getItem('az_ts_v19')) ||[];
+        let nAlert = localStorage.getItem('az_al_v19') === 'true';
+        let aLck = parseInt(localStorage.getItem('az_lk_v19')) || 0;
+        let mWith = parseInt(localStorage.getItem('az_mw_v19')) || 10000;
+        let wR = JSON.parse(localStorage.getItem('az_wr_v19')) || { chicken:40, mines:40, skull:40, aviator:40, roulette:40, coinflip:40 };
 
-        let curMode = '', curCoin = null;
-        let activeUid = null;
+        let cMod = '', cCo = null, aUid = null, loaded = false;
 
-        // BAZADAN MA'LUMOTLARNI JONLI O'QISH
-        db.ref('bot_data').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if(data) {
-                buyCoins = data.buyCoins || buyCoins;
-                sellCoins = data.sellCoins || sellCoins;
-                adminCard = data.adminCard || adminCard;
-                users = data.users || users;
-                orders = data.orders || orders;
-                deposits = data.deposits || deposits;
-                withdraws = data.withdraws || withdraws;
-                tasks = data.tasks || tasks;
-                minWithdrawAmount = data.minWithdrawAmount || minWithdrawAmount;
-                newAlert = data.newAlert || newAlert;
-                
-                updateBlink();
-                
-                // Agar ekran ochiq bo'lsa yangilash
-                if(!document.getElementById('tasks-page').classList.contains('hidden')) {
-                    openTasks(); 
-                }
-                if(!document.getElementById('admin-panel').classList.contains('hidden')) {
-                    updateAdminNotifications();
-                }
-                if(!document.getElementById('game-menu').classList.contains('hidden')) {
-                    renderGameMenu(); // Balans kimdir o'zgartirsa yangilanishi uchun
-                }
-            }
-        });
+        if (tg.initDataUnsafe?.user) aUid = tg.initDataUnsafe.user.id.toString();
+        else { aUid = localStorage.getItem('az_uid_v19'); if(!aUid) { aUid = Math.floor(100000+Math.random()*900000).toString(); localStorage.setItem('az_uid_v19', aUid); } }
 
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            activeUid = tg.initDataUnsafe.user.id.toString();
-            let tgName = tg.initDataUnsafe.user.first_name || "Foydalanuvchi";
-            if (!users[activeUid]) {
-                users[activeUid] = { name: tgName, id: activeUid, balance: 0, completedTasks:[] };
-                save(); // Buni bazaga yozib qoyadi
-            }
-        } else {
-            activeUid = localStorage.getItem('az_uid_v11');
+        db.ref('bot_data').on('value', (s) => {
+            let d = s.val() || {};
+            bC = d.buyCoins || bC; sC = d.sellCoins || sC; admCard = d.adminCard || admCard; users = d.users || users; ords = d.orders || ords; deps = d.deposits || deps; withs = d.withdraws || withs; tasks = d.tasks || tasks; mWith = d.mWith || mWith; nAlert = d.newAlert || false; wR = d.wRates || wR;
+            if (!users[aUid]) { users[aUid] = { name: tg.initDataUnsafe?.user?.first_name || "User", id: aUid, balance: 0, cT:[] }; db.ref('bot_data/users/'+aUid).set(users[aUid]); }
+            loaded = true; uBlink();
+            if(!$('tasks-page').classList.contains('hidden')) oTask();
+            if(!$('admin-panel').classList.contains('hidden')) uAdN();
+            if(!$('game-menu').classList.contains('hidden')) $('u-balance').innerText = (users[aUid].balance || 0) + " so'm";
+        }, () => { loaded = true; });
+
+        window.onload = () => { setTimeout(()=>{ $('welcome').style.opacity='0'; setTimeout(()=>$('welcome').classList.add('hidden'),1000); }, 2000); uBlink(); };
+
+        function sav() {
+            if(!loaded) return;
+            localStorage.setItem('az_bc_v19', JSON.stringify(bC)); localStorage.setItem('az_sc_v19', JSON.stringify(sC)); localStorage.setItem('az_card_v19', admCard); localStorage.setItem('az_us_v19', JSON.stringify(users)); localStorage.setItem('az_or_v19', JSON.stringify(ords)); localStorage.setItem('az_dp_v19', JSON.stringify(deps)); localStorage.setItem('az_wt_v19', JSON.stringify(withs)); localStorage.setItem('az_ts_v19', JSON.stringify(tasks)); localStorage.setItem('az_al_v19', nAlert); localStorage.setItem('az_lk_v19', aLck); localStorage.setItem('az_mw_v19', mWith); localStorage.setItem('az_wr_v19', JSON.stringify(wR));
+            uBlink(); db.ref('bot_data').set({ buyCoins:bC, sellCoins:sC, adminCard:admCard, users, orders:ords, deposits:deps, withdraws:withs, tasks, mWith, newAlert:nAlert, wRates:wR });
         }
+        function uBlink() { nAlert ? $('main-title').classList.add('blink-alert') : $('main-title').classList.remove('blink-alert'); }
+        function uAdN() { 
+            let o=ords.some(x=>x.nw), d=deps.some(x=>x.nw), w=withs.some(x=>x.nw); 
+            $('ab1').classList.toggle('btn-blink-green', o); $('ab2').classList.toggle('btn-blink-green', d); $('ab3').classList.toggle('btn-blink-green', w);
+            if(!o&&!d&&!w) { nAlert=false; sav(); }
+        }
+        function showSec(id) { document.querySelectorAll('.container>div, body>#mines-page').forEach(d=>{ if(d.id!=='main-title'&&d.id!=='welcome') d.classList.add('hidden'); }); $(id).classList.remove('hidden'); if(id==='buy-list') rC('buy'); if(id==='sell-list') rC('sell'); if(id==='admin-panel') uAdN(); }
+        function uBal() { return users[aUid].balance || 0; }
+        function adjB(id, a) { let v=parseInt($(id).value)||1000; v+=a; $(id).value = Math.max(1000, v); }
+        function updFName(i, o) { $(o).innerText = $(i).files.length>0 ? "Tanlandi: "+$(i).files[0].name : ""; }
+        function compress(f, cb) { let r = new FileReader(); r.readAsDataURL(f); r.onload = e => { let i = new Image(); i.src = e.target.result; i.onload = () => { let c = document.createElement('canvas'); let w=i.width, h=i.height; if(w>800){ h*=800/w; w=800; } c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); cb(c.toDataURL('image/jpeg',0.5)); }; }; }
 
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('welcome').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('welcome').classList.add('hidden');
-                }, 1000);
-            }, 2000);
-            updateBlink();
-        };
-
-        // BARCHA MA'LUMOTLARNI BAZAGA (INTERNETGA) YOZISH
-        function save() {
-            // Eski xotiraga ham ishonch uchun saqlab qo'yamiz
-            localStorage.setItem('az_b_c_v11', JSON.stringify(buyCoins));
-            localStorage.setItem('az_s_c_v11', JSON.stringify(sellCoins));
-            localStorage.setItem('az_card_v11', adminCard);
-            localStorage.setItem('az_users_v11', JSON.stringify(users));
-            if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) localStorage.setItem('az_uid_v11', activeUid);
-            localStorage.setItem('az_orders_v11', JSON.stringify(orders));
-            localStorage.setItem('az_deps_v11', JSON.stringify(deposits));
-            localStorage.setItem('az_withs_v11', JSON.stringify(withdraws));
-            localStorage.setItem('az_tasks_data_v11', JSON.stringify(tasks));
-            localStorage.setItem('az_alert_v11', newAlert);
-            localStorage.setItem('az_admin_lock_v11', adminLockUntil);
-            localStorage.setItem('az_min_withdraw_v11', minWithdrawAmount);
-            
-            updateBlink();
-
-            // Asosiysi: FIREBASE BAZAGA JONATAMIZ!
-            db.ref('bot_data').set({
-                buyCoins, sellCoins, adminCard, users, orders, deposits, withdraws, tasks, minWithdrawAmount, newAlert
+        function rC(t) {
+            let c = t==='buy'?$('bl-cont'):$('sl-cont'); c.innerHTML=''; (t==='buy'?bC:sC).forEach(x => {
+                let d = document.createElement('div'); d.className='neon-card'; d.innerHTML=`<div class="inner-content">${x.name}</div>`;
+                d.onclick=()=>{ cMod=t; cCo=x; $('f-title').innerText=x.name; $('f-rate').innerText=`1 ${x.name} = ${x.price} so'm`; $('f-amount').value=''; $('f-total-text').innerText="Jami: 0 so'm"; $('f-file').value=''; $('f-file-name').innerText=''; $('f-info').value=''; $('f-info').placeholder=t==='buy'?"Hamyon manzil":"Karta raqam"; $('f-pay-label').innerText=t==='buy'?"To'lov karta:":"Hamyon manzil:"; $('f-pay-address').innerText=t==='buy'?admCard:x.addr; showSec('order-form'); }; c.appendChild(d);
             });
         }
+        function updTotal() { $('f-total-text').innerText = `Jami: ${($('f-amount').value*cCo.price).toLocaleString()} so'm`; }
+        function copyPayInfo() { let t=document.createElement('textarea'); t.value=$('f-pay-address').innerText; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); Swal.fire({title:'Nusxalandi',icon:'success',timer:800,showConfirmButton:false}); }
+        function subOrder() { let a=$('f-amount').value, i=$('f-info').value, f=$('f-file').files[0]; if(!a||!f||!i) return Swal.fire('Xato','To\'ldiring','error'); Swal.fire({title:'Kuting...',showConfirmButton:false}); compress(f, img=>{ ords.push({t:cMod, n:cCo.name, q:a, s:a*cCo.price, u:i, img, nw:true}); nAlert=true; sav(); Swal.fire('OK','Yuborildi','success').then(()=>showSec('main-menu')); }); }
 
-        function updateBlink() {
-            const t = document.getElementById('main-title');
-            if(newAlert) t.classList.add('blink-alert'); else t.classList.remove('blink-alert');
-        }
+        function openMenu() { if(!loaded) return Swal.fire('Kuting','Baza yuklanmoqda','info'); if(!users[aUid]) { Swal.fire({title:'Ism?',input:'text',allowOutsideClick:false}).then(r=>{ if(r.value){ users[aUid]={name:r.value,id:aUid,balance:0,cT:[]}; sav(); renderMenu(); } }); } else renderMenu(); }
+        function renderMenu() { let u=users[aUid]; $('u-name').innerText="Ism: "+u.name; $('u-id').innerText=u.id; $('u-balance').innerText=(u.balance||0)+" so'm"; showSec('game-menu'); }
+        function copyDepositCard(){ copyPayInfo(); }
+        function subDeposit() { let a=$('d-amount').value, f=$('d-file').files[0]; if(!a||!f) return Swal.fire('Xato','To\'ldiring','error'); Swal.fire({title:'Kuting...',showConfirmButton:false}); compress(f, img=>{ deps=deps.filter(x=>x.uid!==aUid); deps.push({uid:aUid, a:a, img, nw:true}); nAlert=true; sav(); Swal.fire('OK','Yuborildi','success').then(()=>renderMenu()); }); }
+        function openWithdraw() { Swal.fire({title:`Min: ${mWith}`,input:'number'}).then(r=>{ let a=parseInt(r.value); if(a>=mWith && uBal()>=a) { Swal.fire({title:'Karta?',input:'text'}).then(c=>{ if(c.value) { users[aUid].balance-=a; withs.push({uid:aUid, a:a, c:c.value, nw:true}); nAlert=true; sav(); renderMenu(); Swal.fire('OK','Yuborildi','success'); } }); } else if(r.value) Swal.fire('Xato','Balans/Limit xato','error'); }); }
+        function oTask() { showSec('tasks-page'); let l=$('tasks-list'), u=users[aUid], c=0; l.innerHTML=''; tasks.forEach((t,i)=>{ if(u.cT&&u.cT.includes(i)) return; c++; l.innerHTML+=`<div class="card"><h4>${t.name}</h4><p>Mukofot: ${t.price}</p><button class="btn-glow" onclick="doT(${i},'${t.link}',${t.price})">Bajarish</button></div>`; }); if(!c) l.innerHTML='<p>Vazifa yoq</p>'; }
+        function doT(i,l,p) { window.open(l,'_blank'); Swal.fire({title:'Kuting...',timer:3000,showConfirmButton:false}).then(()=>{ users[aUid].cT.push(i); users[aUid].balance+=p; sav(); oTask(); Swal.fire('OK',`+${p}`,'success'); }); }
 
-        function updateAdminNotifications() {
-            let hasNewOrders = orders.some(o => o.isNew);
-            let hasNewDeps = deposits.some(d => d.isNew);
-            let hasNewWiths = withdraws.some(w => w.isNew);
+        /* ROULETTE */
+        let rlAct=false, rlCol='red';
+        function oRoul(){ sRl('red'); $('rl-track').style.transition='none'; $('rl-track').style.transform='translateX(0)'; $('rl-track').innerHTML=gRlT(); showSec('roulette-page'); }
+        function sRl(c){ if(rlAct)return; rlCol=c;['red','green','blue'].forEach(x=>$('rl-'+x).classList.remove('active')); $('rl-'+c).classList.add('active'); }
+        function gRlT(w=''){ let h=''; for(let i=0;i<40;i++){ let r=Math.random(), c=r<0.45?'red':(r<0.9?'green':'blue'); if(w&&i===35) c=w; let bg=c==='red'?'#e74c3c':(c==='green'?'#2ecc71':'#3498db'), txt=c==='blue'?'14x':'2x'; h+=`<div class="rl-tile" style="background:${bg}">${txt}</div>`; } return h; }
+        function pRl(){ if(rlAct)return; let a=parseInt($('rl-bet-input').value); if(a<1000||a>uBal())return Swal.fire('Xato','','error'); users[aUid].balance-=a; sav(); rlAct=true; $('rl-btn').className='av-btn-disabled'; $('rl-btn').innerText='AYLANMOQDA'; let isW=Math.random()<(wR.roulette/100), res=isW?rlCol:['red','green','blue'].filter(x=>x!==rlCol)[Math.floor(Math.random()*2)]; $('rl-track').innerHTML=gRlT(res); $('rl-track').style.transition='none'; $('rl-track').style.transform='translateX(0)'; setTimeout(()=>{ $('rl-track').style.transition='transform 4s cubic-bezier(0.1, 0.9, 0.2, 1)'; $('rl-track').style.transform=`translateX(-${35*86 - 150 + Math.floor(Math.random()*40-20)}px)`; },50); setTimeout(()=>{ if(isW){ let w=a*(res==='blue'?14:2); users[aUid].balance+=w; sav(); Swal.fire('Yutdingiz',`+${w}`,'success'); $('rl-status').innerText=`Yutdingiz +${w}`; }else $('rl-status').innerText='Yutqazdingiz'; rlAct=false; $('rl-btn').className='av-btn-green'; $('rl-btn').innerText='TIKISH'; $('u-balance').innerText=uBal(); }, 4200); }
 
-            document.getElementById('btn-admin-orders').classList.toggle('btn-blink-green', hasNewOrders);
-            document.getElementById('btn-admin-deps').classList.toggle('btn-blink-green', hasNewDeps);
-            document.getElementById('btn-admin-withs').classList.toggle('btn-blink-green', hasNewWiths);
-            
-            if(!hasNewOrders && !hasNewDeps && !hasNewWiths) {
-                newAlert = false;
-                save();
-            }
-        }
+        /* COIN FLIP */
+        let cfAct=false, cfCol='yellow', cfRots=0;
+        function oCoin(){ sCf('yellow'); showSec('coinflip-page'); }
+        function sCf(c){ if(cfAct)return; cfCol=c; ['yellow','gray'].forEach(x=>$('cf-'+x).classList.remove('active')); $('cf-'+c).classList.add('active'); }
+        function pCf(){ if(cfAct)return; let a=parseInt($('cf-bet-input').value); if(a<1000||a>uBal())return Swal.fire('Xato','','error'); users[aUid].balance-=a; sav(); cfAct=true; $('cf-btn').className='av-btn-disabled'; $('cf-btn').innerText='AYLANMOQDA'; let isW=Math.random()<(wR.coinflip/100), res=isW?cfCol:(cfCol==='yellow'?'gray':'yellow'); cfRots+=1800; if(res==='gray') cfRots+=180; else if(cfRots%360!==0) cfRots+=180; $('cf-coin').style.transform=`rotateY(${cfRots}deg)`; setTimeout(()=>{ if(isW){ let w=a*2; users[aUid].balance+=w; sav(); Swal.fire('Yutdingiz',`+${w}`,'success'); $('cf-status').innerText=`Yutdingiz +${w}`; }else $('cf-status').innerText='Yutqazdingiz'; cfAct=false; $('cf-btn').className='av-btn-green'; $('cf-btn').innerText='TIKISH'; $('u-balance').innerText=uBal(); }, 3100); }
 
-        function showSection(id) {
-            document.querySelectorAll('.container > div').forEach(d => { if(d.id !== 'main-title') d.classList.add('hidden'); });
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'buy-list') renderCoins('buy');
-            if(id === 'sell-list') renderCoins('sell');
-            if(id === 'admin-coins') { renderAdminCoinList(); toggleMemo(); }
-            if(id === 'admin-panel') updateAdminNotifications(); 
-        }
+        /* AVIATOR */
+        let avS='idle', avB=1000, avM=1.0, avI=null, avC=1.0, avH=[1.1, 2.4, 1.0, 5.4, 1.2];
+        function oAv(){ $('av-mult').style.color='white'; $('av-mult').innerText='1.00x'; $('av-curve').style.width='0px'; $('av-curve').style.height='0px'; $('av-plane').style.transform='translate(0,0)'; $('av-status').classList.add('hidden'); $('av-btn').className='av-btn-green'; rAvH(); showSec('aviator-page'); }
+        function pAv(){ let a=parseInt($('av-bet-input').value); if(avS==='idle'){ if(a<1000||a>uBal()) return Swal.fire('Xato','','error'); users[aUid].balance-=a; sav(); avB=a; avS='fly'; avM=1.0; avC=Math.random()<(wR.aviator/100)?(2+Math.random()*8):(Math.random()<0.3?1.0:(1.01+Math.random()*0.8)); $('av-btn').className='av-btn-orange'; $('av-btn').innerText='OLISH'; $('av-status').classList.add('hidden'); if(avC===1.0){ crAv(); return; } let t=0; avI=setInterval(()=>{ t++; avM+=0.005+(avM*0.002); if(avM>=avC){avM=avC;crAv();}else{ $('av-mult').innerText=avM.toFixed(2)+'x'; let w=Math.min(220,t*2.5),h=Math.min(180,t*2); $('av-curve').style.width=w+'px'; $('av-curve').style.height=h+'px'; $('av-plane').style.transform=`translate(${w}px,-${h}px)`; } },50); } else if(avS==='fly'){ clearInterval(avI); avS='idle'; let w=Math.floor(avB*avM); users[aUid].balance+=w; sav(); avH.unshift(avM); if(avH.length>10)avH.pop(); rAvH(); $('av-mult').style.color='var(--success)'; Swal.fire('Yutdingiz',`+${w}`,'success').then(()=>oAv()); } }
+        function crAv(){ clearInterval(avI); avS='idle'; $('av-mult').innerText=avC.toFixed(2)+'x'; $('av-mult').style.color='#e74c3c'; $('av-status').classList.remove('hidden'); $('av-btn').className='av-btn-disabled'; $('av-btn').innerText='UCHDI'; avH.unshift(avC); if(avH.length>10)avH.pop(); rAvH(); setTimeout(()=>oAv(),2000); }
+        function rAvH(){ $('av-history').innerHTML=avH.map(m=>`<span style="color:${m<2?'#e74c3c':(m<5?'#9b59b6':'#2ecc71')}; background:#222; padding:3px 8px; border-radius:8px;">${m.toFixed(2)}x</span>`).join(''); }
 
-        // --- BUY / SELL ---
-        function toggleMemo() {
-            let t = document.getElementById('adm-coin-type').value;
-            document.getElementById('adm-coin-memo').style.display = (t === 'sell') ? 'block' : 'none';
-        }
+        /* SKULL */
+        let skA=false, skP=0, skI=[0,1,2], skPz=[0,100,200];
+        function oSkull() { $('sk-info').innerText="Tikish: 0"; [0,1,2].forEach(i=>{ $('sk-'+i).innerHTML='💀'; $('sk-'+i).style.left=skPz[i]+'px'; }); $('sk-btn').className='av-btn-green'; $('sk-btn').innerText='TIKISH'; showSec('skull-page'); }
+        function startSk() { if(skA)return; let a=parseInt($('sk-bet-input').value); if(a<1000||a>uBal()) return Swal.fire('Xato','','error'); users[aUid].balance-=a; sav(); skA=false; $('sk-info').innerText=`Tikish: ${a}`; $('sk-btn').className='av-btn-disabled'; $('sk-btn').innerText='O\'YINDA'; skI=[0,1,2]; [0,1,2].forEach(i=>{ $('sk-'+i).innerHTML='💀'; $('sk-'+i).style.left=skPz[i]+'px'; }); skP=Math.floor(Math.random()*3); $('sk-'+skP).innerHTML='💀<div style="position:absolute;bottom:-10px;left:30%;font-size:1.5rem;">🔴</div>'; setTimeout(()=>{ [0,1,2].forEach(i=>$('sk-'+i).innerHTML='💀'); let s=0, int=setInterval(()=>{ let a=Math.floor(Math.random()*3),b=Math.floor(Math.random()*3); while(a===b)b=Math.floor(Math.random()*3); let t=skI[a];skI[a]=skI[b];skI[b]=t; $('sk-'+a).style.left=skPz[skI[a]]+'px'; $('sk-'+b).style.left=skPz[skI[b]]+'px'; s++; if(s>8){clearInterval(int); setTimeout(()=>{skA=true;},400);} },400); }, 1000); }
+        function pSk(idx) { if(!skA)return; skA=false; let a=parseInt($('sk-bet-input').value), w=Math.random()<(wR.skull/100); if(!w) skP=[0,1,2].filter(x=>x!==idx)[Math.floor(Math.random()*2)]; else skP=idx; $('sk-'+skP).innerHTML='💀<div style="position:absolute;bottom:-10px;left:30%;font-size:1.5rem;">🔴</div>'; $('sk-btn').className='av-btn-green'; $('sk-btn').innerText='TIKISH'; if(idx===skP){ let win=a*5; users[aUid].balance+=win; sav(); Swal.fire('Topdingiz',`+${win}`,'success'); }else Swal.fire('Yutqazdingiz','','error'); }
 
-        function renderCoins(type) {
-            const cont = document.getElementById(type === 'buy' ? 'bl-cont' : 'sl-cont');
-            cont.innerHTML = '';
-            const list = type === 'buy' ? buyCoins : sellCoins;
-            list.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'neon-card';
-                div.innerHTML = `<div class="inner-content">${c.name}</div>`;
-                div.onclick = () => {
-                    curMode = type; curCoin = c;
-                    document.getElementById('f-title').innerText = c.name;
-                    document.getElementById('f-rate').innerText = `1 ${c.name} = ${c.price.toLocaleString()} so'm`;
-                    document.getElementById('f-amount').value = '';
-                    document.getElementById('f-total-text').innerText = 'Jami: 0 so\'m';
-                    
-                    document.getElementById('f-file').value = '';
-                    document.getElementById('f-file-name').innerText = '';
+        /* CHICKEN */
+        let crA=false, crS=0, crM=[1.3,2,2.5,3.5,5,7,10,15,20,30], crB=1000;
+        function oChik(){ $('cr-chicken').innerText='🐔'; $('cr-chicken').style.left='10px'; $('cr-bubble').classList.add('hidden'); $('cr-setup').classList.remove('hidden'); $('cr-active').classList.add('hidden'); uCr(); showSec('chicken-page'); }
+        function adjCr(a){ if(crA)return; crB=Math.max(1000, crB+a); uCr(); }
+        function multCr(f){ if(crA)return; crB=Math.max(1000, Math.floor(crB*f)); uCr(); }
+        function setCr(t){ if(crA)return; crB=t==='min'?1000:Math.max(1000, uBal()); uCr(); }
+        function uCr(){ $('cr-bet-val').innerText=crB; $('cr-curr-bet').innerText=crB; $('cr-bal-val').innerText=uBal(); $('cr-win-val').innerText=crS===0?0:Math.floor(crB*crM[crS-1]); }
+        function startCr(){ if(crB>uBal())return Swal.fire('Xato','','error'); users[aUid].balance-=crB; sav(); crA=true; crS=0; $('cr-setup').classList.add('hidden'); $('cr-active').classList.remove('hidden'); $('cr-chicken').innerText='🐔'; $('cr-chicken').style.left='10px'; $('cr-bubble').classList.remove('hidden'); $('cr-bubble').innerText=crM[0]+'X'; uCr(); }
+        function goCr(){ if(!crA)return; if(Math.random()<(1-(wR.chicken/100))){ $('cr-chicken').innerText='🍗'; $('cr-bubble').classList.add('hidden'); crA=false; $('cr-active').classList.add('hidden'); setTimeout(()=>{$('cr-setup').classList.remove('hidden'); uCr();},1500); sav(); }else{ crS++; $('cr-chicken').style.left=Math.min(80, 10+(crS*15))+'%'; $('cr-bubble').innerText=(crM[crS]||(crM[crM.length-1]+(crS-9)))+'X'; uCr(); } }
+        function cashCr(){ if(!crA)return; let w=crS>0?Math.floor(crB*crM[crS-1]):crB; users[aUid].balance+=w; sav(); crA=false; $('cr-bubble').classList.add('hidden'); $('cr-active').classList.add('hidden'); $('cr-setup').classList.remove('hidden'); uCr(); }
 
-                    if(type === 'buy') {
-                        document.getElementById('f-info').classList.remove('hidden');
-                        document.getElementById('f-info').value = '';
-                        document.getElementById('f-info').placeholder = "Hamyon manzilingizni kiriting";
+        /* MINES */
+        let mBmb=3, mBet=2500, mAct=false, mSt=0, mG=[];
+        function oMines(){ mAct=false; mSt=0; $('m1w-bet').value=mBet; sMb(mBmb); rMG(false); uMUI(); showSec('mines-page'); }
+        function closeMines(){ if(mAct) Swal.fire({title:'O\'yindasiz!',showCancelButton:true}).then(r=>{if(r.isConfirmed){mAct=false;renderMenu();}}); else renderMenu(); }
+        function sMb(n){ if(mAct)return; mBmb=n; document.querySelectorAll('#m1w-bsel button').forEach(b=>{b.classList.remove('active');if(parseInt(b.innerText)===n)b.classList.add('active');}); uMUI(); }
+        function gMM(b,s){ let m=0.97; for(let i=0;i<s;i++)m*=(25-i)/(25-b-i); return m.toFixed(2); }
+        function uMUI(){ $('m1w-bal-text').innerText=uBal(); $('m1w-safe').innerText=25-mBmb-mSt; $('m1w-bomb').innerText=mBmb; let h='', ss=mSt===0?1:mSt; for(let i=ss;i<ss+6;i++){ if(i>(25-mBmb))break; h+=`<div class="m1w-mult-box ${mSt>=i?'active':''}"><div style="font-size:0.75rem;color:#8892a0;">${i} ⭐</div><div style="font-weight:bold;">x${gMM(mBmb,i)}</div></div>`; } $('m1w-mults').innerHTML=h; }
+        function rMG(r){ $('m1w-grid').innerHTML=''; for(let i=0;i<25;i++){ let c=document.createElement('div'); c.className='m1w-cell'; c.innerText='1w'; if(r){ if(mG[i]==='bomb'){c.classList.add('bomb');c.innerText='💣';}else if(mG[i]==='star'||mG[i]==='opened'){c.classList.add('star');c.innerText='⭐';} }else c.onclick=()=>cMC(i,c); $('m1w-grid').appendChild(c); } }
+        function playM(){ if(mAct){ let w=Math.floor(mBet*gMM(mBmb,mSt)); users[aUid].balance+=w; mAct=false; sav(); Swal.fire({title:'Yutdingiz',text:`+${w}`,icon:'success',timer:1500}); rMG(true); $('m1w-btn').classList.remove('cashout'); $('m1w-btn').style.background='#0088ff'; $('m1w-btn').innerText='Stavka ⭐'; uMUI(); return; } let a=parseInt($('m1w-bet').value); if(a<100||a>uBal())return Swal.fire('Xato','','error'); mBet=a; users[aUid].balance-=a; sav(); mAct=true; mSt=0; mG=Array(mBmb).fill('bomb').concat(Array(25-mBmb).fill('star')).sort(()=>Math.random()-0.5); $('m1w-btn').classList.add('cashout'); $('m1w-btn').innerText="Katak tanlang"; rMG(false); uMUI(); }
+        function cMC(i,c){ if(!mAct||c.classList.contains('star')||c.classList.contains('bomb'))return; if(mSt===0&&Math.random()<(1-(wR.mines/100))){ if(mG[i]!=='bomb'){mG[mG.indexOf('bomb')]='star'; mG[i]='bomb';} } if(mG[i]==='bomb'){ c.classList.add('bomb'); c.innerText='💣'; mAct=false; $('m1w-btn').style.background='#e74c3c'; $('m1w-btn').innerText='Yutqazdingiz'; setTimeout(()=>{rMG(true);$('m1w-btn').classList.remove('cashout');$('m1w-btn').style.background='#0088ff';$('m1w-btn').innerText='Stavka ⭐';uMUI();},1000); sav(); }else{ c.classList.add('star'); c.innerText='⭐'; mG[i]='opened'; mSt++; $('m1w-btn').innerText=`Olish ${Math.floor(mBet*gMM(mBmb,mSt))}`; uMUI(); if(mSt===(25-mBmb)) playM(); } }
 
-                        document.getElementById('f-pay-label').innerText = "To'lov kartasi:";
-                        document.getElementById('f-pay-address').innerText = adminCard;
-                        document.getElementById('f-memo-wrap').classList.add('hidden');
-                    } else {
-                        document.getElementById('f-info').classList.remove('hidden');
-                        document.getElementById('f-info').value = '';
-                        document.getElementById('f-info').placeholder = "Karta raqamingiz (Pul tushishi uchun)";
-
-                        document.getElementById('f-pay-label').innerText = "Hamyon manzilimiz:";
-                        document.getElementById('f-pay-address').innerText = c.addr;
-                        if(c.memo) { 
-                            document.getElementById('f-memo-wrap').classList.remove('hidden'); 
-                            document.getElementById('f-pay-memo').innerText = c.memo; 
-                        } else {
-                            document.getElementById('f-memo-wrap').classList.add('hidden');
-                        }
-                    }
-                    showSection('order-form');
-                };
-                cont.appendChild(div);
-            });
-        }
-
-        function updateFileName() {
-            const fileInput = document.getElementById('f-file');
-            const fileNameDisplay = document.getElementById('f-file-name');
-            if(fileInput.files.length > 0) {
-                fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
-            } else {
-                fileNameDisplay.innerText = "";
-            }
-        }
-
-        function updateOrderTotal() {
-            let q = document.getElementById('f-amount').value;
-            document.getElementById('f-total-text').innerText = `Jami: ${(q * curCoin.price).toLocaleString()} so'm`;
-        }
-
-        function copyPayInfo() {
-            let txt = document.getElementById('f-pay-address').innerText;
-            if(!document.getElementById('f-memo-wrap').classList.contains('hidden')) txt += "\nMemo: " + document.getElementById('f-pay-memo').innerText;
-            const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            Swal.fire({title:'Nusxalandi', icon:'success', timer:800, showConfirmButton:false});
-        }
-
-        function submitOrder() {
-            const amt = document.getElementById('f-amount').value;
-            const info = document.getElementById('f-info').value;
-            const file = document.getElementById('f-file').files[0];
-            
-            if(!amt || !file || !info) return Swal.fire('Xato','Barcha maydonlarni to\'ldiring','error');
-            
-            const reader = new FileReader(); reader.readAsDataURL(file);
-            reader.onload = () => {
-                const dObj = new Date();
-                const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
-                const opType = curMode === 'buy' ? 'SOTIB OLISH' : 'SOTISH';
-
-                orders.push({ 
-                    id: 'ID' + Math.floor(Math.random()*99999), 
-                    typeText: opType, type: curMode, name: curCoin.name, qty: amt, 
-                    sum: amt*curCoin.price, user: info, img: reader.result, 
-                    date: formattedDate, isNew: true 
-                });
-                newAlert = true; save(); Swal.fire('Muvaffaqiyatli','Adminga yuborildi','success').then(() => showSection('main-menu'));
-            };
-        }
-
-        // --- GAME MENU / REGISTRATION ---
-        function openGameMenu() {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                renderGameMenu();
-            } else {
-                if (!activeUid || !users[activeUid]) {
-                    Swal.fire({ title: 'Ismingizni kiriting', input: 'text', allowOutsideClick: false }).then(r => {
-                        if(r.value) {
-                            let id = Math.floor(100000 + Math.random() * 900000).toString();
-                            users[id] = { name: r.value, id: id, balance: 0, completedTasks:[] };
-                            activeUid = id; save(); renderGameMenu(); 
-                        }
-                    });
-                } else {
-                    renderGameMenu(); 
-                }
-            }
-        }
-
-        function renderGameMenu() {
-            let u = users[activeUid];
-            if(!u) return; 
-            if(!u.completedTasks) u.completedTasks =[]; 
-            document.getElementById('u-name').innerText = "Ism: " + u.name;
-            document.getElementById('u-id').innerText = u.id;
-            document.getElementById('u-balance').innerText = (u.balance || 0).toLocaleString() + " so'm";
-            showSection('game-menu');
-        }
-
-        // --- DEPOSIT (PUL TO'LDIRISH) ---
-        function openDeposit() {
-            document.getElementById('d-admin-card').innerText = adminCard;
-            document.getElementById('d-amount').value = '';
-            document.getElementById('d-file').value = '';
-            document.getElementById('d-file-name').innerText = '';
-            showSection('deposit-form');
-        }
-
-        function copyDepositCard() {
-            let txt = document.getElementById('d-admin-card').innerText;
-            const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            Swal.fire({title:'Nusxalandi', icon:'success', timer:800, showConfirmButton:false});
-        }
-
-        function updateDepositFileName() {
-            const fileInput = document.getElementById('d-file');
-            const fileNameDisplay = document.getElementById('d-file-name');
-            if(fileInput.files.length > 0) fileNameDisplay.innerText = "Tanlandi: " + fileInput.files[0].name;
-            else fileNameDisplay.innerText = "";
-        }
-
-        function submitDeposit() {
-            const amt = document.getElementById('d-amount').value;
-            const file = document.getElementById('d-file').files[0];
-            if(!amt || !file) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring', 'error');
-
-            const reader = new FileReader(); reader.readAsDataURL(file);
-            reader.onload = () => {
-                const dObj = new Date();
-                const formattedDate = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}, ${String(dObj.getHours()).padStart(2, '0')}:${String(dObj.getMinutes()).padStart(2, '0')}`;
-                deposits.push({ uid:activeUid, amount:amt, img:reader.result, time:formattedDate, isNew: true });
-                newAlert = true; save(); 
-                Swal.fire('Yuborildi', 'Chek adminga yuborildi, 1 soat ichida ko\'rib chiqiladi', 'success').then(() => renderGameMenu());
-            };
-        }
-
-        function openWithdraw() {
-            Swal.fire({ 
-                title: 'Miqdor?', text: `Minimal yechish: ${minWithdrawAmount.toLocaleString()} so'm`, input: 'number' 
-            }).then(res => {
-                if(res.value) {
-                    let a = parseInt(res.value);
-                    if(a < minWithdrawAmount) return Swal.fire('Xato', `Minimal yechish ${minWithdrawAmount.toLocaleString()} so'm bo'lishi kerak!`, 'error');
-                    if(users[activeUid].balance < a) return Swal.fire('Xato', 'Balansingizda yetarli mablag\' yo\'q', 'error');
-                    
-                    Swal.fire({ title: 'Karta raqamingizni kiriting?', input: 'text' }).then(c => {
-                        if(c.value) {
-                            users[activeUid].balance -= a;
-                            withdraws.push({ uid:activeUid, amount:a, card:c.value, isNew: true });
-                            newAlert = true; save(); renderGameMenu(); 
-                            Swal.fire('OK', 'So\'rov adminga yuborildi, tez orada tushirib beriladi', 'success');
-                        }
-                    });
-                }
-            });
-        }
-
-        function openTasks() {
-            showSection('tasks-page');
-            const list = document.getElementById('tasks-list');
-            list.innerHTML = '';
-            let u = users[activeUid];
-            let count = 0;
-            tasks.forEach((t, i) => {
-                if(u.completedTasks && u.completedTasks.includes(i)) return; 
-                count++;
-                list.innerHTML += `
-                    <div class="card">
-                        <h4>${t.name}</h4>
-                        <p style="color:var(--warning)">Mukofot: ${t.price} so'm</p>
-                        <button class="btn-glow" style="padding:10px" onclick="doTask(${i}, '${t.link}', ${t.price})">Bajarish</button>
-                    </div>
-                `;
-            });
-            if(count === 0) list.innerHTML = '<p>Hozircha vazifalar yo\'q yoki hammasini bajargansiz.</p>';
-        }
-
-        function doTask(i, link, price) {
-            window.open(link, '_blank');
-            Swal.fire({ title: 'Kuting...', text: 'Vazifa tekshirilmoqda', timer: 3000, showConfirmButton: false }).then(() => {
-                users[activeUid].completedTasks.push(i);
-                users[activeUid].balance += parseInt(price);
-                save(); openTasks();
-                Swal.fire('Tabriklaymiz!', `${price} so'm hisobingizga qo'shildi`, 'success');
-            });
-        }
-
-        let mActive = false, mGrid =[], mBet = 0, mStep = 0;
-        const mMults =[1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 15.0, 20.0, 30.0];
-        
-        function startMines() {
-            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(res => {
-                let a = parseInt(res.value);
-                if(a >= 1000 && users[activeUid].balance >= a) {
-                    users[activeUid].balance -= a; mBet = a; mStep = 0; mActive = true;
-                    mGrid = Array(6).fill('bomb').concat(Array(14).fill('gem')).sort(()=>Math.random()-0.5);
-                    save(); renderMines(); showSection('mines-page');
-                    document.getElementById('m-cash').classList.add('hidden');
-                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
-            });
-        }
-        function renderMines() {
-            const g = document.getElementById('m-grid'); g.innerHTML = '';
-            for(let i=0; i<20; i++) {
-                let c = document.createElement('div'); c.className = 'mine-cell';
-                c.onclick = () => {
-                    if(!mActive || c.innerText) return;
-                    if(mStep === 0) {
-                        if(Math.random() < 0.58) mGrid[i] = 'bomb'; 
-                        else if(mGrid[i] === 'bomb') mGrid[i] = 'gem'; 
-                    }
-                    if(mGrid[i] === 'bomb') {
-                        c.innerText = '💣'; c.classList.add('bomb'); mActive = false;
-                        document.getElementById('m-cash').classList.add('hidden');
-                        Swal.fire('Yutqazdingiz','Bombaga duch keldingiz','error').then(renderGameMenu);
-                    } else {
-                        c.innerText = '💎'; c.classList.add('open'); mStep++;
-                        document.getElementById('m-cash').classList.remove('hidden');
-                        document.getElementById('m-cash').innerText = `OLISH: ${Math.floor(mBet * (mMults[mStep-1] || 100))} so'm`;
-                    }
-                };
-                g.appendChild(c);
-            }
-            document.getElementById('m-info').innerText = `Tikish: ${mBet}`;
-        }
-        function minesCashout() {
-            if(!mActive || mStep === 0) return;
-            let win = Math.floor(mBet * mMults[mStep-1]);
-            users[activeUid].balance += win; mActive = false; save(); renderGameMenu();
-        }
-
-        let avActive = false, avMult = 1.0, avInterval, avCrash;
-        function openAviator() { 
-            document.getElementById('av-mult').style.color = 'var(--success)';
-            document.getElementById('av-mult').innerText = '1.00x';
-            document.getElementById('av-plane').style.transform = 'none';
-            document.getElementById('av-bet-btn').classList.remove('hidden');
-            document.getElementById('av-cash-btn').classList.add('hidden');
-            showSection('aviator-page'); 
-        }
-        
-        function startAviator() {
-            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(res => {
-                let a = parseInt(res.value);
-                if(a >= 1000 && users[activeUid].balance >= a) {
-                    users[activeUid].balance -= a; mBet = a; avActive = true; avMult = 1.0;
-                    save();
-                    if(Math.random() < 0.40) avCrash = 1.00 + (Math.random() * 0.20);
-                    else avCrash = 1.20 + (Math.random() * 10.8);
-
-                    document.getElementById('av-bet-btn').classList.add('hidden');
-                    document.getElementById('av-cash-btn').classList.remove('hidden');
-                    document.getElementById('av-mult').style.color = 'var(--success)';
-                    
-                    avInterval = setInterval(() => {
-                        avMult += 0.03; 
-                        document.getElementById('av-mult').innerText = avMult.toFixed(2) + 'x';
-                        document.getElementById('av-plane').style.transform = `translate(${avMult*6}px, -${avMult*6}px)`;
-                        
-                        if(avMult >= avCrash) {
-                            clearInterval(avInterval); avActive = false;
-                            document.getElementById('av-mult').style.color = 'red';
-                            setTimeout(() => {
-                                document.getElementById('av-bet-btn').classList.remove('hidden');
-                                document.getElementById('av-cash-btn').classList.add('hidden');
-                                document.getElementById('av-mult').style.color = 'var(--success)';
-                                document.getElementById('av-mult').innerText = '1.00x';
-                                document.getElementById('av-plane').style.transform = 'none';
-                            }, 2000);
-                        }
-                    }, 100);
-                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
-            });
-        }
-        
-        function aviatorCashout() {
-            if(!avActive) return;
-            clearInterval(avInterval); avActive = false;
-            let win = Math.floor(mBet * avMult); users[activeUid].balance += win;
-            save(); 
-            document.getElementById('av-mult').style.color = 'var(--success)';
-            Swal.fire('Yutdingiz!', win+' so\'m','success').then(() => {
-                document.getElementById('av-bet-btn').classList.remove('hidden');
-                document.getElementById('av-cash-btn').classList.add('hidden');
-                document.getElementById('av-mult').innerText = '1.00x';
-                document.getElementById('av-plane').style.transform = 'none';
-            });
-        }
-
-        let skBet = 0, skActive = false, skPos = 0;
-        let skPositions =[0, 100, 200]; 
-        let skCurrentIds =[0, 1, 2]; 
-
-        function openSkullGame() {
-            document.getElementById('sk-info').innerText = "Tikish: 0 so'm";
-            skCurrentIds =[0, 1, 2];
-            for(let i=0; i<3; i++) {
-                let skull = document.getElementById('sk-'+i);
-                skull.innerHTML = '💀'; skull.style.left = skPositions[i] + 'px';
-            }
-            document.getElementById('sk-start-btn').classList.remove('hidden');
-            showSection('skull-page');
-        }
-
-        function startSkullGame() {
-            Swal.fire({title:'Tikish miqdori?', input:'number'}).then(r => {
-                let a = parseInt(r.value);
-                if(a >= 1000 && users[activeUid].balance >= a) {
-                    users[activeUid].balance -= a; save(); skBet = a; skActive = false;
-                    document.getElementById('sk-info').innerText = `Tikish: ${a} so'm`;
-                    document.getElementById('sk-start-btn').classList.add('hidden');
-                    
-                    skCurrentIds =[0, 1, 2];
-                    for(let i=0; i<3; i++) {
-                        let skull = document.getElementById('sk-'+i);
-                        skull.innerHTML = '💀'; skull.style.left = skPositions[i] + 'px';
-                    }
-
-                    skPos = Math.floor(Math.random() * 3); 
-                    let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
-                    document.getElementById('sk-'+skPos).innerHTML = ballHTML;
-                    
-                    setTimeout(() => {
-                        for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
-                        let swaps = 0;
-                        let shuffleInt = setInterval(() => {
-                            let aIdx = Math.floor(Math.random()*3);
-                            let bIdx = Math.floor(Math.random()*3);
-                            while(aIdx === bIdx) bIdx = Math.floor(Math.random()*3);
-
-                            let temp = skCurrentIds[aIdx];
-                            skCurrentIds[aIdx] = skCurrentIds[bIdx];
-                            skCurrentIds[bIdx] = temp;
-
-                            document.getElementById('sk-'+aIdx).style.left = skPositions[skCurrentIds[aIdx]] + 'px';
-                            document.getElementById('sk-'+bIdx).style.left = skPositions[skCurrentIds[bIdx]] + 'px';
-
-                            swaps++;
-                            if(swaps >= 8) { 
-                                clearInterval(shuffleInt);
-                                setTimeout(() => { skActive = true; Swal.fire({title:'Toping!', text:'Koptok qayerda yashirindi? Birini tanlang', timer:1500, showConfirmButton:false}); }, 400);
-                            }
-                        }, 400); 
-                    }, 1500);
-                } else Swal.fire('Xato','Mablag\' yetarli emas (Min: 1000)','error');
-            });
-        }
-
-        function pickSkull(idx) {
-            if(!skActive) return;
-            skActive = false;
-            for(let i=0; i<3; i++) document.getElementById('sk-'+i).innerHTML = '💀';
-            let ballHTML = '💀<div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:1.8rem;">🔴</div>';
-            document.getElementById('sk-'+skPos).innerHTML = ballHTML;
-
-            if(idx === skPos) {
-                let win = skBet * 5;
-                users[activeUid].balance += win; save();
-                Swal.fire('Ajoyib!', `Siz topdingiz, ${win} so'm yutdingiz!`, 'success').then(() => {
-                    document.getElementById('sk-start-btn').classList.remove('hidden');
-                });
-            } else {
-                Swal.fire('Yutqazdingiz', 'Koptok boshqa joyda edi.', 'error').then(() => {
-                    document.getElementById('sk-start-btn').classList.remove('hidden');
-                });
-            }
-        }
-
-        // --- ADMIN PANEL ---
-        function adminLogin() {
-            if(Date.now() < adminLockUntil) {
-                let left = Math.ceil((adminLockUntil - Date.now())/1000);
-                return Swal.fire('Bloklangan', `Iltimos, ${left} soniya kuting.`, 'error');
-            }
-            Swal.fire({title:'Parol', input:'password'}).then(r => { 
-                if(!r.isConfirmed) return;
-                if(r.value === 'Azizbek1$') {
-                    showSection('admin-panel'); 
-                } else {
-                    adminLockUntil = Date.now() + 30000; save();
-                    Swal.fire('Xato', 'Parol noto\'g\'ri! 30 soniyaga bloklandingiz.', 'error');
-                }
-            });
-        }
-
-        function saveAdminCard() {
-            const v = document.getElementById('adm-card-val').value;
-            if(v) { adminCard = v; save(); Swal.fire('Saqlandi'); }
-        }
-
-        function addCoin() {
-            let t = document.getElementById('adm-coin-type').value;
-            let n = document.getElementById('adm-coin-name').value;
-            let p = document.getElementById('adm-coin-price').value;
-            let a = document.getElementById('adm-coin-addr').value;
-            let m = document.getElementById('adm-coin-memo').value;
-
-            if(!n || !p) return Swal.fire('Xato','Nomi va narxini kiritish shart','error');
-            if(t === 'buy') buyCoins.push({name:n, price:parseFloat(p)});
-            else {
-                if(!a) return Swal.fire('Xato','Sotish uchun manzil kiritish shart','error');
-                sellCoins.push({name:n, price:parseFloat(p), addr:a, memo:m});
-            }
-
-            document.getElementById('adm-coin-name').value = '';
-            document.getElementById('adm-coin-price').value = '';
-            document.getElementById('adm-coin-addr').value = '';
-            document.getElementById('adm-coin-memo').value = '';
-
-            save(); renderAdminCoinList();
-            Swal.fire('Muvaffaqiyatli','Valyuta qo\'shildi','success');
-        }
-
-        function renderAdminCoinList() {
-            const d = document.getElementById('admin-coin-list-display'); d.innerHTML = '<h5>Ro\'yxat:</h5>';
-            buyCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotib: ${c.name}</span> <button onclick="buyCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
-            sellCoins.forEach((c, i) => d.innerHTML += `<div style="display:flex; justify-content:space-between; margin:5px 0; background:#000; padding:10px; border-radius:5px;"><span>Sotish: ${c.name}</span> <button onclick="sellCoins.splice(${i},1); save(); renderAdminCoinList();" style="color:red; background:none; border:none; cursor:pointer;">X</button></div>`);
-        }
-
-        function renderAdminOrders() {
-            orders.forEach(o => o.isNew = false);
-            save(); updateAdminNotifications(); 
-
-            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>BUYURTMALAR</h4>';
-            if(orders.length===0) l.innerHTML += '<p>Buyurtmalar yo\'q.</p>';
-            orders.slice().reverse().forEach((o,i) => {
-                let oType = o.typeText || (o.type === 'buy' ? 'SOTIB OLISH' : 'SOTISH');
-                l.innerHTML += `<div class="admin-order">
-                    <b>[${oType}] ${o.qty} ${o.name}</b><br>
-                    <small style="color:var(--success)"><b>Vaqt:</b> ${o.date || 'Noma\'lum'}</small><br>
-                    Sum: ${o.sum} so'm<br>
-                    Info (Karta/Hamyon): ${o.user}<br>
-                    <img src="${o.img}" style="width:100%; border-radius:10px; margin-top: 8px;"><br>
-                    <button class="btn-glow" style="background:red; padding:5px; margin-top:8px;" onclick="orders.splice(${orders.length-1-i},1); save(); renderAdminOrders();">O'chirish</button>
-                </div>`;
-            });
-        }
-
-        function renderAdminDeposits() {
-            deposits.forEach(d => d.isNew = false);
-            save(); updateAdminNotifications(); 
-
-            const l = document.getElementById('admin-list-container'); l.innerHTML = '<h4>TO\'LDIRISHLAR</h4>';
-            if(deposits.length===0) l.innerHTML += '<p>To\'ldirishlar yo\'q.</p>';
-            deposits.forEach((d, i) => l.innerHTML += `<div class="admin-order">ID: ${d.uid} | Sum: ${d.amount}<br>Vaqt: ${d.time}<br><img src="${d.img}" style="width:100%; border-radius:10px; margin-top:10px;"><br><div style="display:flex;gap:5px;margin-top:10px;"><button class="btn-glow" style="background:green; margin:0;" onclick="approveDep(${i})">Tasdiqlash</button><button class="btn-glow" style="background:red; margin:0;" onclick="deposits.splice(${i},1); save(); renderAdminDeposits();">Rad etish</button></div></div>`);
-        }
-
-        function approveDep(i) {
-            let d = deposits[i]; if(users[d.uid]) users[d.uid].balance += parseInt(d.amount);
-            deposits.splice(i,1); save(); renderAdminDeposits(); Swal.fire('OK','Pul tushirildi','success');
-        }
-
-        function renderAdminWithdraws() {
-            withdraws.forEach(w => w.isNew = false);
-            save(); updateAdminNotifications(); 
-
-            const l = document.getElementById('admin-list-container'); 
-            l.innerHTML = `
-                <h4>YECHISHLAR</h4>
-                <div class="card" style="margin-bottom:15px; padding:15px; background:#1c2431">
-                    <p style="margin:0 0 10px 0;">Min Yechish Limit: <b>${minWithdrawAmount.toLocaleString()} so'm</b></p>
-                    <input type="number" id="admin-min-with" placeholder="Yangi minimal summani kiriting">
-                    <button class="btn-glow" style="padding:10px; font-size:1rem;" onclick="saveMinWithdraw()">Saqlash</button>
-                </div>
-            `;
-            if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
-            withdraws.forEach((w, i) => l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="withdraws.splice(${i},1); save(); renderAdminWithdraws();">Bajarildi (O'chirish)</button></div>`);
-        }
-
-        function saveMinWithdraw() {
-            let val = document.getElementById('admin-min-with').value;
-            if(val) {
-                minWithdrawAmount = parseInt(val);
-                save(); renderAdminWithdraws();
-                Swal.fire('Saqlandi', 'Minimal yechish summasi yangilandi', 'success');
-            }
-        }
-
-        function renderAdminTasks() {
-            const l = document.getElementById('admin-list-container'); 
-            l.innerHTML = `
-                <h4>YANGI VAZIFA</h4>
-                <input type="text" id="t-name" placeholder="Vazifa nomi (Masalan: Kanalga obuna)">
-                <input type="number" id="t-price" placeholder="Narxi (so'm)">
-                <input type="text" id="t-link" placeholder="Havola (Link)">
-                <button class="btn-glow" style="background:#27ae60" onclick="addTask()">QO'SHISH</button>
-                <hr style="border:0.5px solid #333; margin:20px 0;">
-                <h4>QO'SHILGAN VAZIFALAR</h4>
-            `;
-            tasks.forEach((t, i) => {
-                l.innerHTML += `<div class="admin-order"><b>${t.name}</b> - ${t.price} so'm<br><small style="color:#aaa">${t.link}</small><br><button class="btn-glow" style="background:red; padding:5px; margin-top:5px;" onclick="tasks.splice(${i},1); save(); renderAdminTasks();">O'chirish</button></div>`;
-            });
-        }
-
-        function addTask() {
-            let n = document.getElementById('t-name').value;
-            let p = document.getElementById('t-price').value;
-            let l = document.getElementById('t-link').value;
-            if(!n || !p || !l) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring', 'error');
-            tasks.push({name:n, price:parseInt(p), link:l});
-            save(); renderAdminTasks();
-            Swal.fire('OK', 'Vazifa qo\'shildi', 'success');
-        }
+        /* ADMIN */
+        function adminLogin() { if(!loaded)return; if(Date.now()<aLck)return Swal.fire('Blok',`Kuting`,'error'); Swal.fire({title:'Parol',input:'password'}).then(r=>{if(r.value==='Azizbek1$')showSec('admin-panel'); else {aLck=Date.now()+30000; sav(); Swal.fire('Xato','','error');} }); }
+        function svCard(){ let v=$('adm-c-v').value; if(v){admCard=v; sav(); Swal.fire('Saqlandi');} }
+        function adC(){ let t=$('adm-c-t').value, n=$('adm-c-n').value, p=$('adm-c-p').value, a=$('adm-c-a').value; if(!n||!p)return; if(t==='buy')bC.push({name:n,price:parseFloat(p)}); else {if(!a)return; sC.push({name:n,price:parseFloat(p),addr:a});} $('adm-c-n').value=''; $('adm-c-p').value=''; $('adm-c-a').value=''; sav(); rAdC(); Swal.fire('OK','','success'); }
+        function rAdC(){ $('adm-c-list').innerHTML='<h5>Ro\'yxat</h5>'+bC.map((c,i)=>`<div>Sotib: ${c.name} <button onclick="bC.splice(${i},1);sav();rAdC()">X</button></div>`).join('')+sC.map((c,i)=>`<div>Sotish: ${c.name} <button onclick="sC.splice(${i},1);sav();rAdC()">X</button></div>`).join(''); }
+        function rAdO(){ ords.forEach(o=>o.nw=false); sav(); uAdN(); $('admin-list').innerHTML=ords.slice().reverse().map((o,i)=>`<div class="admin-order"><b>${o.t} ${o.q} ${o.n}</b><br>Sum: ${o.s}<br>Info: ${o.u}<br><img src="${o.img}" style="width:100%;"><button onclick="ords.splice(${ords.length-1-i},1);sav();rAdO()">O'chirish</button></div>`).join('')||'Yoq'; }
+        function rAdD(){ deps.forEach(d=>d.nw=false); sav(); uAdN(); $('admin-list').innerHTML=deps.map((d,i)=>`<div class="admin-order">ID: ${d.uid} | Sum: ${d.a}<br><img src="${d.img}" style="width:100%;"><button onclick="if(users['${d.uid}'])users['${d.uid}'].balance+=parseInt(${d.a}); deps.splice(${i},1);sav();rAdD();">Tasdiqlash</button><button onclick="deps.splice(${i},1);sav();rAdD()">Rad</button></div>`).join('')||'Yoq'; }
+        function rAdW(){ withs.forEach(w=>w.nw=false); sav(); uAdN(); $('admin-list').innerHTML=`<div class="card"><input id="m-w-i" placeholder="Min yechish"><button onclick="mWith=parseInt($('m-w-i').value);sav();Swal.fire('OK')">Saqlash</button></div>` + withs.map((w,i)=>`<div class="admin-order">ID: ${w.uid} | ${w.c} | Sum: ${w.a}<br><button onclick="withs.splice(${i},1);sav();rAdW()">O'chirish</button></div>`).join(''); }
+        function rAdT(){ $('admin-list').innerHTML=`<input id="t-n" placeholder="Nomi"><input id="t-p" type="number" placeholder="Narxi"><input id="t-l" placeholder="Link"><button onclick="tasks.push({name:$('t-n').value,price:parseInt($('t-p').value),link:$('t-l').value});sav();rAdT()">Qo'shish</button>` + tasks.map((t,i)=>`<div class="admin-order">${t.name} - ${t.price}<button onclick="tasks.splice(${i},1);sav();rAdT()">O'ch</button></div>`).join(''); }
+        function rAdS(){ $('admin-list').innerHTML=`<div class="card">`+['chicken','mines','skull','aviator','roulette','coinflip'].map(g=>`<label>${g} Yutish %:</label><input type="number" id="w-${g}" value="${wR[g]}">`).join('')+`<button onclick="svWR()">Saqlash</button></div>`; }
+        function svWR(){ ['chicken','mines','skull','aviator','roulette','coinflip'].forEach(g=>{wR[g]=Math.min(100,Math.max(0,parseInt($('w-'+g).value)||40));}); sav(); rAdS(); Swal.fire('Saqlandi','','success'); }
+        function rAdB(){ $('admin-list').innerHTML=`<div class="card"><input id="a-id" placeholder="ID" oninput="cIdB()"><div id="a-i-inf" style="color:var(--success);margin:5px 0;"></div><input id="a-amt" type="number" placeholder="Summa (+ yoki -)"><button onclick="adAB()">Qo'shish/Ayirish</button></div>`; }
+        function cIdB(){ let id=$('a-id').value.trim(); if(id&&users[id])$('a-i-inf').innerText=`Ism: ${users[id].name} | Balans: ${users[id].balance}`; else $('a-i-inf').innerText=id?'Topilmadi':''; }
+        function adAB(){ let id=$('a-id').value.trim(), a=parseInt($('a-amt').value); if(id&&users[id]&&!isNaN(a)){ users[id].balance+=a; sav(); $('a-amt').value=''; cIdB(); Swal.fire('OK',`Yangi balans: ${users[id].balance}`,'success'); }else Swal.fire('Xato','','error'); }
     </script>
 </body>
 </html>
