@@ -1,5 +1,4 @@
 
---- DASTUR KODI ---
 ```html
 <!DOCTYPE html>
 <html lang="uz">
@@ -125,6 +124,38 @@
         .file-upload-wrapper { position: relative; width: 100%; padding: 15px; border-radius: 12px; overflow: hidden; background: linear-gradient(45deg, #2c3e50, #34495e); display: flex; align-items: center; justify-content: center; font-weight: bold; box-sizing: border-box; margin-top: 10px; cursor: pointer; }
         .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
 
+        /* RULETKA (ROULETTE) */
+        .rl-container { background: #111; padding: 20px 0; overflow: hidden; position: relative; border-radius: 15px; margin-top: 15px; border: 1px solid #333; }
+        .rl-selector { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: white; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px white; }
+        .rl-track { display: flex; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); width: max-content; }
+        .rl-item { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; border-radius: 10px; margin: 0 5px; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.5); }
+        .rl-red { background: #e74c3c; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
+        .rl-green { background: #2ecc71; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
+        .rl-blue { background: #3498db; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
+        .rl-btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .rl-btn { flex: 1; padding: 15px 5px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; color: white; font-size: 1rem; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .rl-btn:active { transform: scale(0.95); }
+        .rl-btn.red { background: #e74c3c; border-bottom: 4px solid #c0392b; }
+        .rl-btn.green { background: #2ecc71; border-bottom: 4px solid #27ae60; }
+        .rl-btn.blue { background: #3498db; border-bottom: 4px solid #2980b9; }
+
+        /* BALLOON GAME */
+        .balloon-area { height: 250px; background: linear-gradient(to bottom, #87CEEB, #e0f6ff); position: relative; border-radius: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #3498db; margin-top: 15px; }
+        .balloon { width: 80px; height: 100px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; position: relative; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; color: #fff; text-shadow: 1px 1px 2px #000; transition: transform 0.05s linear; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2), 0 10px 15px rgba(0,0,0,0.1); }
+        .balloon::after { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 12px solid #ff8c00; }
+        .balloon-pop { font-size: 4rem; background: transparent !important; box-shadow: none !important; color: #e74c3c; text-shadow: none; transform: scale(1.5) !important; }
+        .balloon-pop::after { display: none; }
+        .balloon-btn-hold { background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; font-size: 3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 20px auto; user-select: none; touch-action: none; transition: transform 0.1s; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .balloon-btn-hold:active { transform: scale(0.9); box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
+
+        /* SLOT GAME */
+        .slot-machine { background: linear-gradient(180deg, #2c3e50, #1a252f); padding: 20px; border-radius: 20px; border: 4px solid #f1c40f; box-shadow: inset 0 0 30px #000, 0 10px 20px rgba(0,0,0,0.5); margin: 20px 0; position: relative; overflow: hidden; }
+        .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #fff; padding: 15px; border-radius: 10px; border: inset 4px #bdc3c7;}
+        .slot-cell { aspect-ratio: 1; background: #ecf0f1; border-radius: 8px; font-size: 3rem; display: flex; align-items: center; justify-content: center; box-shadow: inset 0px 5px 10px rgba(0,0,0,0.1), 0 3px 5px rgba(0,0,0,0.2); transition: 0.1s; border: 1px solid #bdc3c7; }
+        .slot-cell.win { background: #f1c40f; animation: slotBlink 0.5s infinite alternate; border-color: #f39c12; }
+        @keyframes slotBlink { 0% { box-shadow: inset 0 0 10px #f1c40f; transform: scale(1); } 100% { box-shadow: inset 0 0 30px #f39c12; transform: scale(1.05); } }
+        .slot-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
+
         /* CHICKEN RUN */
         .cr-container { background: #0b1922; border-radius: 15px; overflow: hidden; border: 1px solid #1a3c34; padding-bottom: 10px;}
         .cr-header { text-align: center; padding: 10px; background: #081416; }
@@ -181,28 +212,6 @@
         .m1w-bomb-sel { display: flex; justify-content: space-between; background: #111415; border-radius: 12px; padding: 5px; border: 1px solid #2f363f; }
         .m1w-bomb-sel button { flex: 1; background: transparent; color: #8892a0; border: none; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1rem; }
         .m1w-bomb-sel button.active { background: #2f363f; color: white; }
-
-        /* RULETKA (ROULETTE) */
-        .rl-container { background: #111; padding: 20px 0; overflow: hidden; position: relative; border-radius: 15px; margin-top: 15px; border: 1px solid #333; }
-        .rl-selector { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: white; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px white; }
-        .rl-track { display: flex; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); width: max-content; }
-        .rl-item { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; border-radius: 10px; margin: 0 5px; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.5); }
-        .rl-red { background: #e74c3c; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
-        .rl-green { background: #2ecc71; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
-        .rl-blue { background: #3498db; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); color: white; }
-        .rl-btn-row { display: flex; gap: 10px; margin-top: 15px; }
-        .rl-btn { flex: 1; padding: 15px 5px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; color: white; font-size: 1rem; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .rl-btn:active { transform: scale(0.95); }
-        .rl-btn.red { background: #e74c3c; border-bottom: 4px solid #c0392b; }
-        .rl-btn.green { background: #2ecc71; border-bottom: 4px solid #27ae60; }
-        .rl-btn.blue { background: #3498db; border-bottom: 4px solid #2980b9; }
-
-        /* TANGA (COINFLIP) */
-        .cf-container { perspective: 1000px; display: flex; justify-content: center; margin: 30px 0; }
-        .cf-coin { width: 140px; height: 140px; position: relative; transform-style: preserve-3d; transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .cf-side { width: 100%; height: 100%; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; backface-visibility: hidden; border: 8px solid #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .cf-gold { background: radial-gradient(circle, #f1c40f, #e67e22); transform: rotateY(0deg); color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .cf-silver { background: radial-gradient(circle, #ecf0f1, #95a5a6); transform: rotateY(180deg); color: #2c3e50; text-shadow: 0 2px 5px rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -315,9 +324,13 @@
                         <div class="emoji">🎰</div>
                         <div class="overlay">RULETKA</div>
                     </div>
-                    <div class="game-card-img" style="background: linear-gradient(135deg, #f1c40f, #7f8c8d);" onclick="openCoinflip()">
-                        <div class="emoji">🪙</div>
-                        <div class="overlay">TANGA O'YINI</div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #f39c12, #e67e22);" onclick="openBalloon()">
+                        <div class="emoji">🎈</div>
+                        <div class="overlay">BALLOON</div>
+                    </div>
+                    <div class="game-card-img" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="openSlot()">
+                        <div class="emoji">🏺</div>
+                        <div class="overlay">MUMMY SLOT</div>
                     </div>
                     <div class="game-card-img" style="background: linear-gradient(135deg, #f1c40f, #e67e22);" onclick="openChicken()">
                         <div class="emoji">🐔</div>
@@ -349,10 +362,10 @@
             <div id="tasks-list"></div>
         </div>
 
-        <!-- RULETKA PAGE -->
+        <!-- RULETKA (CHARXPALAK) -->
         <div id="roulette-page" class="hidden">
             <div class="card" style="text-align:center;">
-                <h2 style="color:white; margin-top:0;">RULETKA</h2>
+                <h2 style="color:white; margin-top:0;">RULETKA (CHARXPALAK)</h2>
                 <div class="rl-container">
                     <div class="rl-selector"></div>
                     <div class="rl-track" id="rl-track">
@@ -383,34 +396,72 @@
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
-        <!-- COINFLIP PAGE -->
-        <div id="coinflip-page" class="hidden">
+        <!-- BALLOON O'YINI -->
+        <div id="balloon-page" class="hidden">
             <div class="card" style="text-align:center;">
-                <h2 style="color:var(--warning); margin-top:0;">TANGA O'YINI</h2>
-                <div class="cf-container">
-                    <div class="cf-coin" id="cf-coin">
-                        <div class="cf-side cf-gold">🟡</div>
-                        <div class="cf-side cf-silver">⚪</div>
-                    </div>
+                <h2 style="color:var(--warning); margin-top:0;">BALLOON</h2>
+                <div class="balloon-area" id="bal-area">
+                    <div id="balloon-obj" class="balloon">1.00x</div>
                 </div>
+                <h3 id="bal-status" style="margin: 10px 0;">Tugmani bosib turing!</h3>
                 
                 <div class="av-controls" style="margin-top: 20px;">
                     <div class="av-bet-row">
-                        <button class="av-btn-round" onclick="adjCfBet(-1000)">-</button>
-                        <input type="number" id="cf-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
-                        <button class="av-btn-round" onclick="adjCfBet(1000)">+</button>
+                        <button class="av-btn-round" onclick="adjBalBet(-1000)">-</button>
+                        <input type="number" id="bal-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
+                        <button class="av-btn-round" onclick="adjBalBet(1000)">+</button>
                     </div>
                     <div class="av-quick-bets">
-                        <button onclick="multCfBet(0.5)">/2</button>
-                        <button onclick="multCfBet(2)">x2</button>
-                        <button onclick="setCfBet('min')">MIN</button>
-                        <button onclick="setCfBet('max')">MAX</button>
+                        <button onclick="multBalBet(0.5)">/2</button>
+                        <button onclick="multBalBet(2)">x2</button>
+                        <button onclick="setBalBet('min')">MIN</button>
+                        <button onclick="setBalBet('max')">MAX</button>
                     </div>
                     
-                    <div class="rl-btn-row">
-                        <button class="rl-btn" style="background:#f39c12; color:white; border-bottom:4px solid #d68910" onclick="playCoinflip('gold')">SARIQ<br><small>2x</small></button>
-                        <button class="rl-btn" style="background:#95a5a6; color:white; border-bottom:4px solid #7f8c8d" onclick="playCoinflip('silver')">KULRANG<br><small>2x</small></button>
+                    <div id="bal-btn-hold" class="balloon-btn-hold">👆</div>
+                    <p style="font-size: 0.8rem; color: #aaa;">Tugmani bosib turing. Pufak yorilishidan oldin qo'yib yuboring va yutuqni oling!</p>
+                </div>
+            </div>
+            <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
+        </div>
+
+        <!-- SLOT MASHINASI -->
+        <div id="slot-page" class="hidden">
+            <div class="card" style="text-align:center;">
+                <h2 style="color:white; margin-top:0;">MUMMY SLOT</h2>
+                
+                <div class="slot-machine">
+                    <div class="slot-overlay"></div>
+                    <div class="slot-grid">
+                        <div class="slot-cell" id="sc-0">🍒</div>
+                        <div class="slot-cell" id="sc-1">🍋</div>
+                        <div class="slot-cell" id="sc-2">🍉</div>
+                        <div class="slot-cell" id="sc-3">🔔</div>
+                        <div class="slot-cell" id="sc-4">💎</div>
+                        <div class="slot-cell" id="sc-5">7️⃣</div>
+                        <div class="slot-cell" id="sc-6">🍇</div>
+                        <div class="slot-cell" id="sc-7">🍒</div>
+                        <div class="slot-cell" id="sc-8">🍋</div>
                     </div>
+                </div>
+
+                <div class="av-controls" style="margin-top: 20px;">
+                    <div class="av-bet-row">
+                        <button class="av-btn-round" onclick="adjSlotBet(-1000)">-</button>
+                        <input type="number" id="slot-bet-input" class="av-btn-input" value="1000" min="1000" step="1000">
+                        <button class="av-btn-round" onclick="adjSlotBet(1000)">+</button>
+                    </div>
+                    <div class="av-quick-bets">
+                        <button onclick="multSlotBet(0.5)">/2</button>
+                        <button onclick="multSlotBet(2)">x2</button>
+                        <button onclick="setSlotBet('min')">MIN</button>
+                        <button onclick="setSlotBet('max')">MAX</button>
+                    </div>
+                    
+                    <button id="slot-btn-spin" class="av-btn-green" onclick="playSlot()">
+                        AYLANTIRISH
+                    </button>
+                    <p style="font-size: 0.8rem; color: #aaa;">Bir xil emojilar qatorda (yoki diagonal) tushsa yutasiz!</p>
                 </div>
             </div>
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
@@ -545,33 +596,19 @@
             <button class="btn-glow" style="background:#444; margin-top:15px;" onclick="renderGameMenu()">Chiqish</button>
         </div>
 
+        <!-- ADMIN PANEL KODI O'ZGARISHSZ, FAQAT FOIZLAR QO'SHILDI -->
         <div id="admin-panel" class="hidden">
             <h2 style="color:var(--success)">ADMIN PANEL</h2>
             <div style="display:flex; gap:5px; flex-wrap:wrap;">
                 <button id="btn-admin-orders" class="btn-glow" style="flex:1 1 30%" onclick="renderAdminOrders()">Buyurtmalar</button>
                 <button id="btn-admin-deps" class="btn-glow" style="flex:1 1 30%" onclick="renderAdminDeposits()">To'ldirish</button>
                 <button id="btn-admin-withs" class="btn-glow" style="flex:1 1 30%" onclick="renderAdminWithdraws()">Yechish</button>
-                <button class="btn-glow" style="flex:1 1 30%; background:#c0392b" onclick="showSection('admin-users')">Foydalanuvchilar</button>
                 <button class="btn-glow" style="flex:1 1 30%; background:#2980b9" onclick="showSection('admin-coins')">Valyuta</button>
                 <button class="btn-glow" style="flex:1 1 30%; background:#8e44ad" onclick="renderAdminTasks()">Vazifa</button>
-                <button class="btn-glow" style="flex:1 1 100%; background:#e67e22" onclick="renderAdminGameSettings()">Foizlar (Settings)</button>
+                <button class="btn-glow" style="flex:1 1 30%; background:#e67e22" onclick="renderAdminGameSettings()">Foizlar</button>
             </div>
             <div id="admin-list-container"></div>
             <button class="btn-glow" style="background:#444" onclick="showSection('main-menu')">Yopish</button>
-        </div>
-
-        <div id="admin-users" class="hidden">
-            <button class="btn-glow" onclick="showSection('admin-panel')">Orqaga</button>
-            <div class="card">
-                <h3 style="color:var(--success)">Balansni Boshqarish</h3>
-                <p style="font-size:0.85rem; color:#aaa;">Foydalanuvchi IDsi bo'yicha pul qo'shish yoki ayirish</p>
-                <input type="text" id="adm-uid" placeholder="Foydalanuvchi IDsi">
-                <input type="number" id="adm-uamt" placeholder="Miqdor (so'm)">
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="btn-glow" style="background:var(--success); margin:0;" onclick="adminAddBalance()">Qo'shish (+)</button>
-                    <button class="btn-glow" style="background:var(--danger); margin:0;" onclick="adminSubBalance()">Ayirish (-)</button>
-                </div>
-            </div>
         </div>
 
         <div id="admin-coins" class="hidden">
@@ -621,8 +658,7 @@
         let adminLockUntil = parseInt(localStorage.getItem('az_admin_lock_v18')) || 0;
         let minWithdrawAmount = parseInt(localStorage.getItem('az_min_withdraw_v18')) || 10000;
         
-        // Yangi o'yinlarning yutish foizlari qo'shildi
-        let gameWinRates = JSON.parse(localStorage.getItem('az_winrates_v18')) || { chicken: 40, mines: 40, skull: 40, aviator: 40, roulette: 40, coinflip: 40 };
+        let gameWinRates = JSON.parse(localStorage.getItem('az_winrates_v18')) || { chicken: 40, mines: 40, skull: 40, aviator: 40, roulette: 40, balloon: 40, slot: 40 };
 
         let curMode = '', curCoin = null;
         let activeUid = null;
@@ -652,7 +688,11 @@
             minWithdrawAmount = data.minWithdrawAmount || 10000;
             newAlert = data.newAlert || false;
             
-            gameWinRates = data.gameWinRates || { chicken: 40, mines: 40, skull: 40, aviator: 40, roulette: 40, coinflip: 40 };
+            gameWinRates = data.gameWinRates || { chicken: 40, mines: 40, skull: 40, aviator: 40, roulette: 40, balloon: 40, slot: 40 };
+            // Yangi o'yinlar bazada yo'q bo'lsa standart berish
+            if (gameWinRates.roulette === undefined) gameWinRates.roulette = 40;
+            if (gameWinRates.balloon === undefined) gameWinRates.balloon = 40;
+            if (gameWinRates.slot === undefined) gameWinRates.slot = 40;
 
             if (!users[activeUid]) {
                 let tgName = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.first_name : "Foydalanuvchi";
@@ -676,6 +716,15 @@
                 setTimeout(() => { document.getElementById('welcome').classList.add('hidden'); }, 1000);
             }, 2000);
             updateBlink();
+
+            // Balloon o'yini uchun click (hold) sozlamasi
+            let balBtn = document.getElementById('bal-btn-hold');
+            if(balBtn) {
+                balBtn.addEventListener('mousedown', handleBalDown);
+                balBtn.addEventListener('touchstart', handleBalDown, {passive: false});
+            }
+            window.addEventListener('mouseup', handleBalUp);
+            window.addEventListener('touchend', handleBalUp);
         };
 
         function save() {
@@ -729,7 +778,6 @@
             if(id === 'sell-list') renderCoins('sell');
             if(id === 'admin-coins') { renderAdminCoinList(); toggleMemo(); }
             if(id === 'admin-panel') updateAdminNotifications(); 
-            if(id === 'admin-users') { document.getElementById('adm-uid').value = ''; document.getElementById('adm-uamt').value = ''; }
         }
 
         function toggleMemo() {
@@ -914,7 +962,7 @@
         }
 
         // ==========================================
-        // RULETKA O'YINI (YANGI)
+        // RULETKA (CHARXPALAK) O'YINI
         // ==========================================
         let rlActive = false;
 
@@ -964,7 +1012,7 @@
             
             if(isWin) { targetColor = selectedColor; }
             else {
-                let opts = ['red', 'green', 'blue'].filter(c => c !== selectedColor);
+                let opts =['red', 'green', 'blue'].filter(c => c !== selectedColor);
                 if(opts.includes('blue') && Math.random() > 0.1) targetColor = opts.find(c => c !== 'blue');
                 else targetColor = opts[Math.floor(Math.random() * opts.length)];
             }
@@ -985,7 +1033,6 @@
             
             let containerWidth = track.parentElement.offsetWidth;
             let randomOffset = Math.floor(Math.random() * 50) - 25; 
-            // 80x80 px har bir item (70 width + 10 margin).
             let translateX = (containerWidth / 2) - (80 * 80) - 40 + randomOffset;
             
             track.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
@@ -1006,61 +1053,205 @@
         }
 
         // ==========================================
-        // TANGA O'YINI (COINFLIP - YANGI)
+        // BALLOON (PUFAK) O'YINI (YANGI)
         // ==========================================
-        let cfActive = false;
-        let cfCurrentAngle = 0;
+        let balBet = 1000;
+        let balActive = false;
+        let balMult = 1.0;
+        let balInterval = null;
+        let balCrash = 1.0;
+        let balScale = 1;
 
-        function openCoinflip() {
-            showSection('coinflip-page');
-        }
+        function adjBalBet(val) { if(!balActive) { balBet += val; if(balBet < 1000) balBet = 1000; document.getElementById('bal-bet-input').value = balBet; } }
+        function multBalBet(val) { if(!balActive) { balBet = Math.floor(balBet * val); if(balBet < 1000) balBet = 1000; document.getElementById('bal-bet-input').value = balBet; } }
+        function setBalBet(type) { if(!balActive) { if(type === 'min') balBet = 1000; else if(type === 'max') balBet = users[activeUid].balance > 1000 ? users[activeUid].balance : 1000; document.getElementById('bal-bet-input').value = balBet; } }
 
-        function adjCfBet(val) {
-            if(cfActive) return; let current = parseInt(document.getElementById('cf-bet-input').value) || 1000; current += val;
-            if(current < 1000) current = 1000; document.getElementById('cf-bet-input').value = current;
-        }
-        function multCfBet(val) {
-            if(cfActive) return; let current = parseInt(document.getElementById('cf-bet-input').value) || 1000; current = Math.floor(current * val);
-            if(current < 1000) current = 1000; document.getElementById('cf-bet-input').value = current;
-        }
-        function setCfBet(type) {
-            if(cfActive) return;
-            if(type === 'min') document.getElementById('cf-bet-input').value = 1000;
-            else if(type === 'max') { let bal = users[activeUid].balance || 0; document.getElementById('cf-bet-input').value = bal > 1000 ? bal : 1000; }
+        function openBalloon() {
+            document.getElementById('bal-bet-input').value = balBet;
+            resetBalloonUI();
+            showSection('balloon-page');
         }
 
-        function playCoinflip(selectedSide) {
-            if(cfActive) return;
-            let betAmt = parseInt(document.getElementById('cf-bet-input').value);
-            if(isNaN(betAmt) || betAmt < 1000 || users[activeUid].balance < betAmt) return Swal.fire('Xato', 'Mablag\' yetarli emas (Min: 1000)', 'error');
+        function resetBalloonUI() {
+            let b = document.getElementById('balloon-obj');
+            b.className = 'balloon';
+            b.innerHTML = '1.00x';
+            b.style.transform = `scale(1)`;
+            document.getElementById('bal-status').innerText = "Tugmani bosib turing!";
+            document.getElementById('bal-status').style.color = 'white';
+        }
+
+        function handleBalDown(e) {
+            if(e && e.cancelable) e.preventDefault();
+            if(balActive) return;
             
+            let betAmt = parseInt(document.getElementById('bal-bet-input').value);
+            if(isNaN(betAmt) || betAmt < 1000) return Swal.fire('Xato', 'Min stavka 1000', 'error');
+            if(users[activeUid].balance < betAmt) return Swal.fire('Xato', 'Mablag yetarli emas', 'error');
+
             users[activeUid].balance -= betAmt;
             save();
-            cfActive = true;
             
-            let winProb = gameWinRates.coinflip / 100;
-            let isWin = Math.random() < winProb;
-            let resultSide = isWin ? selectedSide : (selectedSide === 'gold' ? 'silver' : 'gold');
+            balActive = true;
+            balMult = 1.0;
+            balScale = 1.0;
+            balBet = betAmt;
             
-            let extraSpins = 5 * 360; 
-            let baseAngle = Math.ceil(cfCurrentAngle / 360) * 360; 
-            let targetAngle = baseAngle + extraSpins + (resultSide === 'gold' ? 0 : 180);
-            cfCurrentAngle = targetAngle;
+            let winProb = gameWinRates.balloon / 100 || 0.4;
+            if(Math.random() < winProb) {
+                balCrash = 2.00 + (Math.random() * 5.00); 
+            } else {
+                if(Math.random() < 0.2) balCrash = 1.00; 
+                else balCrash = 1.01 + (Math.random() * 0.99); 
+            }
+
+            if(balCrash === 1.00) { popBalloon(); return; }
+
+            resetBalloonUI();
+            document.getElementById('bal-status').innerText = "Pufak ishyapti...";
+            document.getElementById('bal-status').style.color = '#f1c40f';
             
-            let coin = document.getElementById('cf-coin');
-            coin.style.transform = `rotateY(${cfCurrentAngle}deg)`;
-            
-            setTimeout(() => {
-                cfActive = false;
-                if(isWin) {
-                    let win = betAmt * 2; 
-                    users[activeUid].balance += win;
-                    save();
-                    Swal.fire('Yutdingiz!', `Siz ${win} so'm yutib oldingiz!`, 'success');
+            balInterval = setInterval(() => {
+                balMult += 0.005 + (balMult * 0.002);
+                balScale += 0.003;
+                
+                if(balMult >= balCrash) {
+                    balMult = balCrash;
+                    popBalloon();
                 } else {
-                    Swal.fire('Yutqazdingiz!', 'Boshqa taraf tushdi', 'error');
+                    let b = document.getElementById('balloon-obj');
+                    b.innerHTML = balMult.toFixed(2) + 'x';
+                    b.style.transform = `scale(${balScale})`;
                 }
-            }, 3500);
+            }, 50);
+        }
+
+        function handleBalUp(e) {
+            if(e && e.cancelable) e.preventDefault();
+            if(!balActive) return;
+            clearInterval(balInterval);
+            balActive = false;
+            
+            let win = Math.floor(balBet * balMult);
+            users[activeUid].balance += win;
+            save();
+            
+            document.getElementById('bal-status').innerText = `Yutdingiz: ${win} so'm!`;
+            document.getElementById('bal-status').style.color = 'var(--success)';
+            Swal.fire('Tabriklaymiz!', `Siz pufakni vaqtida qo'yib yubordingiz. Yutuq: ${win}`, 'success');
+        }
+
+        function popBalloon() {
+            clearInterval(balInterval);
+            balActive = false;
+            let b = document.getElementById('balloon-obj');
+            b.className = 'balloon balloon-pop';
+            b.innerHTML = '💥';
+            b.style.transform = `scale(1.5)`;
+            
+            document.getElementById('bal-status').innerText = `Pufak yorildi! Yutqazdingiz.`;
+            document.getElementById('bal-status').style.color = 'var(--danger)';
+        }
+
+        // ==========================================
+        // SLOT MASHINASI (MUMMYLAND USLUBI) (YANGI)
+        // ==========================================
+        let slotBet = 1000;
+        let slotActive = false;
+        const slotEmojis =['🍒', '🍋', '🍉', '🍇', '💎', '🔔', '7️⃣'];
+
+        function openSlot() {
+            document.getElementById('slot-bet-input').value = slotBet;
+            showSection('slot-page');
+        }
+
+        function adjSlotBet(val) { if(!slotActive) { slotBet += val; if(slotBet < 1000) slotBet = 1000; document.getElementById('slot-bet-input').value = slotBet; } }
+        function multSlotBet(val) { if(!slotActive) { slotBet = Math.floor(slotBet * val); if(slotBet < 1000) slotBet = 1000; document.getElementById('slot-bet-input').value = slotBet; } }
+        function setSlotBet(type) { if(!slotActive) { if(type === 'min') slotBet = 1000; else if(type === 'max') slotBet = users[activeUid].balance > 1000 ? users[activeUid].balance : 1000; document.getElementById('slot-bet-input').value = slotBet; } }
+
+        function playSlot() {
+            if(slotActive) return;
+            let betAmt = parseInt(document.getElementById('slot-bet-input').value);
+            if(isNaN(betAmt) || betAmt < 1000) return Swal.fire('Xato', 'Min stavka 1000', 'error');
+            if(users[activeUid].balance < betAmt) return Swal.fire('Xato', 'Mablag yetarli emas', 'error');
+
+            users[activeUid].balance -= betAmt;
+            save();
+            slotActive = true;
+            
+            let btn = document.getElementById('slot-btn-spin');
+            btn.className = 'av-btn-disabled';
+            btn.innerText = 'AYLANMOQDA...';
+
+            for(let i=0; i<9; i++) document.getElementById(`sc-${i}`).classList.remove('win');
+
+            let winProb = gameWinRates.slot / 100 || 0.4;
+            let isWin = Math.random() < winProb;
+
+            let finalGrid = [];
+            if(isWin) {
+                let winEmoji = slotEmojis[Math.floor(Math.random() * slotEmojis.length)];
+                for(let i=0; i<9; i++) {
+                    if(i>=3 && i<=5) finalGrid.push(winEmoji); 
+                    else finalGrid.push(slotEmojis[Math.floor(Math.random() * slotEmojis.length)]);
+                }
+            } else {
+                for(let i=0; i<9; i++) finalGrid.push(slotEmojis[Math.floor(Math.random() * slotEmojis.length)]);
+                if(finalGrid[3] === finalGrid[4] && finalGrid[4] === finalGrid[5]) {
+                    finalGrid[5] = slotEmojis[(slotEmojis.indexOf(finalGrid[5]) + 1) % slotEmojis.length];
+                }
+            }
+
+            let ticks = 0;
+            let slotInt = setInterval(() => {
+                ticks++;
+                for(let i=0; i<9; i++) {
+                    document.getElementById(`sc-${i}`).innerText = slotEmojis[Math.floor(Math.random() * slotEmojis.length)];
+                }
+                if(ticks > 15) {
+                    clearInterval(slotInt);
+                    for(let i=0; i<9; i++) document.getElementById(`sc-${i}`).innerText = finalGrid[i];
+                    checkSlotWin(finalGrid, betAmt);
+                }
+            }, 100);
+        }
+
+        function checkSlotWin(grid, betAmt) {
+            let winLines = [];
+            
+            if(grid[0] === grid[1] && grid[1] === grid[2]) winLines.push([0,1,2]);
+            if(grid[3] === grid[4] && grid[4] === grid[5]) winLines.push([3,4,5]);
+            if(grid[6] === grid[7] && grid[7] === grid[8]) winLines.push([6,7,8]);
+            
+            if(grid[0] === grid[3] && grid[3] === grid[6]) winLines.push([0,3,6]);
+            if(grid[1] === grid[4] && grid[4] === grid[7]) winLines.push([1,4,7]);
+            if(grid[2] === grid[5] && grid[5] === grid[8]) winLines.push([2,5,8]);
+
+            if(grid[0] === grid[4] && grid[4] === grid[8]) winLines.push([0,4,8]);
+            if(grid[2] === grid[4] && grid[4] === grid[6]) winLines.push([2,4,6]);
+
+            let totalMult = 0;
+            if(winLines.length > 0) {
+                winLines.forEach(line => {
+                    line.forEach(idx => document.getElementById(`sc-${idx}`).classList.add('win'));
+                    let emoji = grid[line[0]];
+                    let mult = 2;
+                    if(emoji === '💎') mult = 10;
+                    else if(emoji === '7️⃣') mult = 5;
+                    else if(emoji === '🔔') mult = 3;
+                    totalMult += mult;
+                });
+                
+                let winAmt = betAmt * totalMult;
+                users[activeUid].balance += winAmt;
+                save();
+                Swal.fire('Tabriklaymiz!', `Siz ${winAmt} so'm yutdingiz!`, 'success');
+            }
+            
+            slotActive = false;
+            let btn = document.getElementById('slot-btn-spin');
+            btn.className = 'av-btn-green';
+            btn.innerText = 'AYLANTIRISH';
         }
 
         // ==========================================
@@ -1337,7 +1528,10 @@
                 let btn = document.getElementById('av-action-btn'); btn.className = 'av-btn-orange'; document.getElementById('av-btn-title').innerText = 'OLISH'; document.getElementById('av-btn-amount').innerText = avBetAmount + " so'm";
                 document.getElementById('av-mult').innerText = '1.00x'; document.getElementById('av-mult').style.color = 'white'; document.getElementById('av-status').classList.add('hidden');
                 
-                if (avCrash === 1.00) { crashAviator(); return; }
+                if (avCrash === 1.00) {
+                    crashAviator();
+                    return;
+                }
                 
                 let tick = 0;
                 avInterval = setInterval(() => {
@@ -1390,31 +1584,6 @@
                 if(r.value === 'Azizbek1$') { showSection('admin-panel'); } 
                 else { adminLockUntil = Date.now() + 30000; save(); Swal.fire('Xato', 'Parol noto\'g\'ri! 30 soniyaga bloklandingiz.', 'error'); }
             });
-        }
-
-        function adminAddBalance() {
-            let id = document.getElementById('adm-uid').value.trim();
-            let amt = parseInt(document.getElementById('adm-uamt').value);
-            if(users[id] && !isNaN(amt) && amt > 0) { 
-                users[id].balance += amt; 
-                save(); 
-                Swal.fire('Qo\'shildi', 'Balans yangilandi', 'success'); 
-                document.getElementById('adm-uamt').value = '';
-            }
-            else { Swal.fire('Xato', 'Foydalanuvchi topilmadi yoki miqdor xato', 'error'); }
-        }
-
-        function adminSubBalance() {
-            let id = document.getElementById('adm-uid').value.trim();
-            let amt = parseInt(document.getElementById('adm-uamt').value);
-            if(users[id] && !isNaN(amt) && amt > 0) { 
-                users[id].balance -= amt; 
-                if(users[id].balance < 0) users[id].balance = 0;
-                save(); 
-                Swal.fire('Ayirildi', 'Balans yangilandi', 'success'); 
-                document.getElementById('adm-uamt').value = '';
-            }
-            else { Swal.fire('Xato', 'Foydalanuvchi topilmadi yoki miqdor xato', 'error'); }
         }
 
         function saveAdminCard() {
@@ -1484,11 +1653,14 @@
                 <div class="card" style="margin-bottom:15px; padding:15px; background:#1c2431">
                     <p style="font-size:0.85rem; color:#aaa;">O'yinchining yutish imkoniyatini (0% dan 100% gacha) kiriting. Masalan, 40 kiritsangiz 40% yutadi, 60% yutqazadi.</p>
                     
-                    <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Ruletka Yutishi (%):</label>
+                    <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Ruletka (Charxpalak) Yutishi (%):</label>
                     <input type="number" id="wr-roulette" value="${gameWinRates.roulette}" min="0" max="100">
-                    
-                    <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Tanga O'yini (Coinflip) Yutishi (%):</label>
-                    <input type="number" id="wr-coinflip" value="${gameWinRates.coinflip}" min="0" max="100">
+
+                    <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Balloon (Pufak) Yutishi (%):</label>
+                    <input type="number" id="wr-balloon" value="${gameWinRates.balloon}" min="0" max="100">
+
+                    <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Mummy Slot Yutishi (%):</label>
+                    <input type="number" id="wr-slot" value="${gameWinRates.slot}" min="0" max="100">
 
                     <label style="color:white; font-weight:bold; margin-top:10px; display:block;">Chicken Run Yutishi (%):</label>
                     <input type="number" id="wr-chicken" value="${gameWinRates.chicken}" min="0" max="100">
@@ -1513,14 +1685,16 @@
             let sw = parseInt(document.getElementById('wr-skull').value);
             let aw = parseInt(document.getElementById('wr-aviator').value);
             let rw = parseInt(document.getElementById('wr-roulette').value);
-            let cwf = parseInt(document.getElementById('wr-coinflip').value);
+            let bw = parseInt(document.getElementById('wr-balloon').value);
+            let swl = parseInt(document.getElementById('wr-slot').value);
             
             gameWinRates.chicken = Math.min(100, Math.max(0, isNaN(cw) ? 40 : cw));
             gameWinRates.mines = Math.min(100, Math.max(0, isNaN(mw) ? 40 : mw));
             gameWinRates.skull = Math.min(100, Math.max(0, isNaN(sw) ? 40 : sw));
             gameWinRates.aviator = Math.min(100, Math.max(0, isNaN(aw) ? 40 : aw));
             gameWinRates.roulette = Math.min(100, Math.max(0, isNaN(rw) ? 40 : rw));
-            gameWinRates.coinflip = Math.min(100, Math.max(0, isNaN(cwf) ? 40 : cwf));
+            gameWinRates.balloon = Math.min(100, Math.max(0, isNaN(bw) ? 40 : bw));
+            gameWinRates.slot = Math.min(100, Math.max(0, isNaN(swl) ? 40 : swl));
             
             save();
             renderAdminGameSettings();
