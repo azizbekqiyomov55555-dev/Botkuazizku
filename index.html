@@ -1,3 +1,11 @@
+
+
+
+Mana, so'ralgan o'zgarishlar kiritilgan to'liq kod. Endi pul yechish oynasini ochganda, ism yozish qutisi bo'sh bo'ladi va ichida faqat "Ismingiz" degan yozuv (placeholder) ko'rinib turadi. Foydalanuvchi ismini o'zi qo'lda kiritishi kerak bo'ladi.
+
+To'liq kodni nusxalab oling:
+
+```html
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -926,7 +934,8 @@
         // YANGILANGAN YECHISH FUNKSIYASI VA FORMASI
         // ==========================================
         function openWithdraw() {
-            document.getElementById('w-name').value = users[activeUid].name || '';
+            // Shu joy o'zgartirildi: Foydalanuvchining ismini avtomatik yozmaydi, qutini bo'sh qoldiradi.
+            document.getElementById('w-name').value = ''; 
             document.getElementById('w-phone').value = '';
             document.getElementById('w-amount').value = '';
             document.getElementById('w-min-text').innerText = minWithdrawAmount.toLocaleString();
@@ -1883,3 +1892,4 @@
     </script>
 </body>
 </html>
+```
