@@ -101,10 +101,22 @@
         .cf-mult-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .cf-mult-box { background: #222; padding: 10px 15px; border-radius: 8px; font-weight: bold; color: #888; border: 1px solid #444; transition: 0.3s; }
         .cf-mult-box.active { background: #27ae60; color: white; border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.6); }
+        
+        /* COINFLIP TANGANING SAKRASH ANIMATSIYASI */
         .coin-container { perspective: 1000px; width: 150px; height: 150px; margin: 20px auto; }
-        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 2s ease-out; }
-        .coin.spin-burgut { transform: rotateY(1800deg); }
-        .coin.spin-dum { transform: rotateY(1980deg); }
+        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+        .coin.spin-burgut { animation: toss-burgut 2s ease-out forwards; }
+        .coin.spin-dum { animation: toss-dum 2s ease-out forwards; }
+        @keyframes toss-burgut {
+            0% { transform: translateY(0) rotateY(0deg) scale(1); }
+            50% { transform: translateY(-120px) rotateY(900deg) scale(1.3); }
+            100% { transform: translateY(0) rotateY(1800deg) scale(1); }
+        }
+        @keyframes toss-dum {
+            0% { transform: translateY(0) rotateY(0deg) scale(1); }
+            50% { transform: translateY(-120px) rotateY(990deg) scale(1.3); }
+            100% { transform: translateY(0) rotateY(1980deg) scale(1); }
+        }
         .coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 4rem; border: 8px solid #f39c12; background: linear-gradient(45deg, #f1c40f, #f39c12); color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 15px #f1c40f; }
         .coin-back { transform: rotateY(180deg); border-color: #7f8c8d; background: linear-gradient(45deg, #bdc3c7, #95a5a6); box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 15px #bdc3c7; }
 
@@ -266,6 +278,21 @@
                 </div>
                 <div id="d-file-name" style="font-size: 0.85rem; color: var(--success); margin-bottom: 10px; min-height: 15px; margin-top: 5px;"></div>
                 <button class="btn-glow" style="background:var(--success)" onclick="submitDeposit()">YUBORISH</button>
+            </div>
+        </div>
+
+        <!-- PUL YECHISH UCHUN YANGI FORMA -->
+        <div id="withdraw-form" class="hidden">
+            <button class="btn-glow" onclick="renderGameMenu()">Orqaga</button>
+            <h2 style="color:var(--danger)">PUL YECHISH</h2>
+            <div class="card">
+                <p style="color:var(--warning); text-align:center; font-weight:bold; margin-top:0;">
+                    Minimal yechish: <span id="w-min-text">10000</span> so'm
+                </p>
+                <input type="text" id="w-name" placeholder="Ismingiz">
+                <input type="tel" id="w-phone" placeholder="Telefon raqamingiz (+998...)">
+                <input type="number" id="w-amount" placeholder="Yechish summasi (so'm)">
+                <button class="btn-glow" style="background:var(--danger); margin-top: 15px;" onclick="submitWithdraw()">YUBORISH</button>
             </div>
         </div>
 
@@ -895,16 +922,42 @@
             });
         }
 
+        // ==========================================
+        // YANGILANGAN YECHISH FUNKSIYASI VA FORMASI
+        // ==========================================
         function openWithdraw() {
-            Swal.fire({ title: 'Miqdor?', text: `Minimal yechish: ${minWithdrawAmount.toLocaleString()} so'm`, input: 'number' }).then(res => {
-                if(res.value) {
-                    let a = parseInt(res.value);
-                    if(a < minWithdrawAmount) return Swal.fire('Xato', `Minimal yechish ${minWithdrawAmount.toLocaleString()} so'm bo'lishi kerak!`, 'error');
-                    if(users[activeUid].balance < a) return Swal.fire('Xato', 'Balansingizda yetarli mablag\' yo\'q', 'error');
-                    Swal.fire({ title: 'Karta raqamingizni kiriting?', input: 'text' }).then(c => {
-                        if(c.value) { users[activeUid].balance -= a; withdraws.push({ id: Date.now() + Math.floor(Math.random()*1000), uid:activeUid, amount:a, card:c.value, isNew: true }); newAlert = true; save(); renderGameMenu(); Swal.fire('OK', 'So\'rov adminga yuborildi, tez orada tushirib beriladi', 'success'); }
-                    });
-                }
+            document.getElementById('w-name').value = users[activeUid].name || '';
+            document.getElementById('w-phone').value = '';
+            document.getElementById('w-amount').value = '';
+            document.getElementById('w-min-text').innerText = minWithdrawAmount.toLocaleString();
+            showSection('withdraw-form');
+        }
+
+        function submitWithdraw() {
+            let nameVal = document.getElementById('w-name').value.trim();
+            let phoneVal = document.getElementById('w-phone').value.trim();
+            let amountVal = parseInt(document.getElementById('w-amount').value);
+
+            if(!nameVal || !phoneVal || !amountVal) return Swal.fire('Xato', 'Barcha maydonlarni to\'ldiring!', 'error');
+            if(amountVal < minWithdrawAmount) return Swal.fire('Xato', `Minimal yechish ${minWithdrawAmount.toLocaleString()} so'm bo'lishi kerak!`, 'error');
+            if(users[activeUid].balance < amountVal) return Swal.fire('Xato', 'Balansingizda yetarli mablag\' yo\'q', 'error');
+
+            users[activeUid].balance -= amountVal; 
+            
+            withdraws.push({ 
+                id: Date.now() + Math.floor(Math.random()*1000), 
+                uid: activeUid, 
+                name: nameVal,
+                phone: phoneVal,
+                amount: amountVal, 
+                isNew: true 
+            }); 
+            
+            newAlert = true; 
+            save(); 
+            
+            Swal.fire('OK', 'So\'rov adminga yuborildi, tez orada tushirib beriladi', 'success').then(() => {
+                renderGameMenu();
             });
         }
 
@@ -1259,8 +1312,12 @@
             document.getElementById('cf-bet-input').disabled = false;
             document.getElementById('cf-cashout-btn').classList.add('hidden');
             document.getElementById('cf-result-text').innerText = "Stavka kiriting va tanlang";
+            
             let coin = document.getElementById('cf-coin');
-            coin.style.transition = 'none'; coin.classList.remove('spin-burgut', 'spin-dum'); coin.style.transform = 'rotateY(0deg)';
+            coin.style.animation = 'none'; 
+            coin.classList.remove('spin-burgut', 'spin-dum'); 
+            coin.style.transform = 'rotateY(0deg)';
+            
             updateCfUI();
         }
 
@@ -1291,11 +1348,14 @@
             let resultSide = isWin ? choice : (choice === 'burgut' ? 'dum' : 'burgut');
 
             let coin = document.getElementById('cf-coin');
-            coin.style.transition = 'none'; coin.classList.remove('spin-burgut', 'spin-dum'); coin.style.transform = 'rotateY(0deg)';
+            // Qayta tiklash va animatsiyani ishga tushirish
+            coin.style.animation = 'none'; 
+            coin.classList.remove('spin-burgut', 'spin-dum'); 
+            coin.style.transform = 'rotateY(0deg)';
             
-            void coin.offsetWidth;
+            void coin.offsetWidth; // Reflow for CSS animation restart
 
-            coin.style.transition = 'transform 2s ease-out';
+            coin.style.animation = ''; // Inline aniani yechamiz klass aniq ishlashi uchun
             coin.classList.add(resultSide === 'burgut' ? 'spin-burgut' : 'spin-dum');
 
             setTimeout(() => {
@@ -1760,7 +1820,7 @@
             if(withdraws.length===0) l.innerHTML += '<p>Yechishlar yo\'q.</p>';
             withdraws.forEach((w, i) => {
                 let did = w.id ? w.id : i;
-                l.innerHTML += `<div class="admin-order">ID: ${w.uid} | Karta: ${w.card} | Sum: ${w.amount}<br><button class="btn-glow" onclick="completeWithdraw(${did})">Bajarildi (O'chirish)</button></div>`;
+                l.innerHTML += `<div class="admin-order">ID: ${w.uid}<br>Ism: ${w.name || 'Noma\'lum'} | Tel: ${w.phone || w.card || 'Noma\'lum'}<br>Summa: <b>${w.amount} so'm</b><br><button class="btn-glow" onclick="completeWithdraw(${did})">Bajarildi (O'chirish)</button></div>`;
             });
         }
 
