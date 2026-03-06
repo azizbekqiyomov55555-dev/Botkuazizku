@@ -12,8 +12,8 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 import os
 
 # ==================== CONFIG ====================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
-ADMIN_IDS  = [int(x) for x in os.getenv("ADMIN_IDS", "123456789").split(",")]
+BOT_TOKEN = ("8745440078:AAFBIYJw_BplZeK0jYRjJkwM0oTVyHrJ99o")
+ADMIN_IDS  = [int(x) for x in ("ADMIN_IDS", "8537782289").split(",")]
 # ================================================
 
 logging.basicConfig(level=logging.INFO)
