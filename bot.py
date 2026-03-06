@@ -13,8 +13,8 @@ from datetime import datetime
 # ========================
 # SOZLAMALAR
 # ========================
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"  # @BotFather dan olingan token
-ADMIN_ID = 123456789  # Admin Telegram ID
+BOT_TOKEN = "8745440078:AAFBIYJw_BplZeK0jYRjJkwM0oTVyHrJ99o"  # @BotFather dan olingan token
+ADMIN_ID = 8537782289  # Admin Telegram ID
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
