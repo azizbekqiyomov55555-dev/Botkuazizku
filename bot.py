@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 # ─── CONFIG ───────────────────────────────────────────────────
 BOT_TOKEN = os.getenv("BOT_TOKEN", "TOKEN_BU_YERGA")
-ADMIN_IDS  = [int(x) for x in os.getenv("ADMIN_IDS", "123456789").split(",")]
+ADMIN_IDS  = [int(x) for x in os.getenv("ADMIN_IDS", "8537782289").split(",")]
 # ─────────────────────────────────────────────────────────────
 
 logging.basicConfig(level=logging.INFO)
