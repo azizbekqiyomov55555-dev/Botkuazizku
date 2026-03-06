@@ -13,8 +13,8 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 # ========================
 # SOZLAMALAR
 # ========================
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"   # @BotFather dan oling
-ADMIN_ID  = 123456789                # Sizning Telegram ID
+BOT_TOKEN = "8745440078:AAFBIYJw_BplZeK0jYRjJkwM0oTVyHrJ99o"   # @BotFather dan oling
+ADMIN_ID  = 8537782289                # Sizning Telegram ID
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
