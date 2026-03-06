@@ -13,7 +13,7 @@ import os
 
 # ==================== CONFIG ====================
 BOT_TOKEN = ("8745440078:AAFBIYJw_BplZeK0jYRjJkwM0oTVyHrJ99o")
-ADMIN_IDS  = [int(x) for x in ("ADMIN_IDS", "8537782289").split(",")]
+ADMIN_IDS  = [int(x) for x in ("8537782289", "8537782289").split(",")]
 # ================================================
 
 logging.basicConfig(level=logging.INFO)
