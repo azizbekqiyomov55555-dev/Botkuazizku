@@ -1,1808 +1,5213 @@
-"""
-SMM Bot — To'liq kod
-"""
-import asyncio, logging, sqlite3, os
-import aiohttp
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import CommandStart
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+<?php
+define('API_KEY',"Token");  
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "TOKEN_BU_YERGA")
-ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "123456789").split(",")]
+$admin = "TgID";
 
-logging.basicConfig(level=logging.INFO)
-bot = Bot(token=BOT_TOKEN)
-dp  = Dispatcher(storage=MemoryStorage())
+function bot($method,$datas=[]){
+$url = "https://api.telegram.org/bot".API_KEY."/".$method;
+$ch = curl_init();
+curl_setopt($ch,CURLOPT_URL,$url);
+curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+curl_setopt($ch,CURLOPT_POSTFIELDS,$datas);
+$res = curl_exec($ch);
+if(curl_error($ch)){
+var_dump(curl_error($ch));
+}else{
+return json_decode($res);
+}}
 
-def db():
-    c = sqlite3.connect("bot.db")
-    c.row_factory = sqlite3.Row
-    return c
-
-def init_db():
-    c = db()
-    c.executescript("""
-    CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY, username TEXT DEFAULT '',
-        name TEXT DEFAULT '', balance INTEGER DEFAULT 0,
-        deposited INTEGER DEFAULT 0, ref_id INTEGER,
-        banned INTEGER DEFAULT 0, joined TEXT DEFAULT CURRENT_TIMESTAMP
-    );
-    CREATE TABLE IF NOT EXISTS networks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE);
-    CREATE TABLE IF NOT EXISTS sections(id INTEGER PRIMARY KEY AUTOINCREMENT, net_id INTEGER, name TEXT);
-    CREATE TABLE IF NOT EXISTS services(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, sec_id INTEGER,
-        api_id TEXT DEFAULT '', name TEXT DEFAULT '',
-        price INTEGER DEFAULT 0, min_q INTEGER DEFAULT 10,
-        max_q INTEGER DEFAULT 100000, info TEXT DEFAULT ''
-    );
-    CREATE TABLE IF NOT EXISTS orders(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER,
-        srv_id INTEGER, link TEXT, qty INTEGER, price INTEGER,
-        status TEXT DEFAULT 'Jarayonda', at TEXT DEFAULT CURRENT_TIMESTAMP
-    );
-    CREATE TABLE IF NOT EXISTS channels(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cid TEXT, title TEXT, url TEXT, type TEXT DEFAULT 'public'
-    );
-    CREATE TABLE IF NOT EXISTS pay_methods(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, details TEXT);
-    CREATE TABLE IF NOT EXISTS cfg(k TEXT PRIMARY KEY, v TEXT);
-    CREATE TABLE IF NOT EXISTS apis(id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, key TEXT, price INTEGER DEFAULT 0);
-    CREATE TABLE IF NOT EXISTS faqs(id INTEGER PRIMARY KEY AUTOINCREMENT, q TEXT, a TEXT);
-    INSERT OR IGNORE INTO cfg VALUES('ref_bonus','500');
-    INSERT OR IGNORE INTO cfg VALUES('min_dep','1000');
-    INSERT OR IGNORE INTO cfg VALUES('currency','Som');
-    INSERT OR IGNORE INTO cfg VALUES('start_text','Botga xush kelibsiz!');
-    INSERT OR IGNORE INTO cfg VALUES('start_photo','');
-    """)
-    c.commit(); c.close()
-
-def gcfg(k):
-    c = db(); r = c.execute("SELECT v FROM cfg WHERE k=?", (k,)).fetchone()
-    c.close(); return r[0] if r else ""
-
-def scfg(k, v):
-    c = db(); c.execute("INSERT OR REPLACE INTO cfg VALUES(?,?)", (k, v))
-    c.commit(); c.close()
-
-def get_user(uid):
-    c = db(); r = c.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone(); c.close(); return r
-
-def ensure_user(uid, username="", name="", ref_id=None):
-    c = db()
-    c.execute("INSERT OR IGNORE INTO users(id,username,name,ref_id) VALUES(?,?,?,?)", (uid, username, name, ref_id))
-    c.commit(); c.close()
-
-def get_nets():
-    c = db(); r = c.execute("SELECT * FROM networks ORDER BY id").fetchall(); c.close(); return r
-
-def get_secs(net_id):
-    c = db(); r = c.execute("SELECT * FROM sections WHERE net_id=?", (net_id,)).fetchall(); c.close(); return r
-
-def get_srvs(sec_id):
-    c = db(); r = c.execute("SELECT * FROM services WHERE sec_id=?", (sec_id,)).fetchall(); c.close(); return r
-
-def get_srv(sid):
-    c = db(); r = c.execute("SELECT * FROM services WHERE id=?", (sid,)).fetchone(); c.close(); return r
-
-def get_sec_info(sec_id):
-    c = db()
-    r = c.execute("SELECT s.name, n.name, n.id FROM sections s JOIN networks n ON s.net_id=n.id WHERE s.id=?", (sec_id,)).fetchone()
-    c.close(); return r
-
-def get_apis():
-    c = db(); r = c.execute("SELECT * FROM apis").fetchall(); c.close(); return r
-
-def get_channels():
-    c = db(); r = c.execute("SELECT * FROM channels").fetchall(); c.close(); return r
-
-def get_pays():
-    c = db(); r = c.execute("SELECT * FROM pay_methods").fetchall(); c.close(); return r
-
-def get_faqs():
-    c = db(); r = c.execute("SELECT * FROM faqs").fetchall(); c.close(); return r
-
-def create_order(uid, srv_id, link, qty, price):
-    c = db()
-    c.execute("INSERT INTO orders(uid,srv_id,link,qty,price) VALUES(?,?,?,?,?)", (uid, srv_id, link, qty, price))
-    oid = c.lastrowid
-    c.execute("UPDATE users SET balance=balance-? WHERE id=?", (price, uid))
-    c.commit(); c.close(); return oid
-
-NET_ICONS = {"Telegram":"✈️","Instagram":"📷","TikTok":"🎵","YouTube":"▶️","Facebook":"👥","Twitter":"🐦","VK":"💙"}
-
-NET_KEYWORDS = {
-    "Telegram":  ["telegram"],
-    "Instagram": ["instagram"],
-    "TikTok":    ["tiktok","tik tok","tik-tok"],
-    "YouTube":   ["youtube","you tube"],
-    "Facebook":  ["facebook"],
-    "Twitter":   ["twitter"],
-    "VK":        ["vkontakte"," vk "],
+function hisob(){
+$text = "🏆 TOP10 = Hisoblar\n\n";
+$daten = [];
+$rev = [];
+$fayllar = glob("foydalanuvchi/hisob/*.*");
+foreach($fayllar as $file){
+if(mb_stripos($file,".txt")!==false){
+$value = file_get_contents($file);
+$id = str_replace(["foydalanuvchi/hisob/",".txt"],["",""],$file);
+$daten[$value] = $id;
+$rev[$id] = $value;
+}
+echo $file;
+}
+asort($rev);
+$reversed = array_reverse($rev);
+for($i=0;$i<10;$i+=1){
+$order = $i+1;
+$id = $daten["$reversed[$i]"];
+$text.= "<b>{$order}</b>. <a href='tg://user?id={$id}'>{$id}</a> - "."<code>".$reversed[$i]."</code>"." <b>so'm</b>"."\n";
+}
+return $text;
 }
 
-# ══════ STATES ══════
-class OrdS(StatesGroup):
-    qty     = State()
-    link    = State()
-    confirm = State()
-
-class AdmS(StatesGroup):
-    net_name      = State()
-    sec_name      = State()
-    srv_api       = State()
-    srv_price     = State()
-    srv_info      = State()
-    ch_cid        = State()
-    ch_title      = State()
-    ch_url        = State()
-    pay_name      = State()
-    pay_det       = State()
-    api_url       = State()
-    api_key       = State()
-    api_price     = State()
-    api_new_key   = State()
-    broadcast     = State()
-    add_bal       = State()
-    sub_bal       = State()
-    add_bal_uid   = State()
-    sub_bal_uid   = State()
-    faq_q         = State()
-    faq_a         = State()
-    start_msg     = State()
-    start_photo_st = State()
-    net_edit      = State()
-    sec_edit      = State()
-    srv_edit_name = State()
-    srv_edit_price= State()
-
-# ══════ KEYBOARDS ══════
-def kb_main(is_adm=False):
-    b = ReplyKeyboardBuilder()
-    b.button(text="🛍 Buyurtma berish")
-    b.button(text="📋 Buyurtmalar")
-    b.button(text="👤 Hisobim")
-    b.button(text="💳 Hisob to'ldirish")
-    b.button(text="💰 Pul ishlash")
-    b.button(text="❓ Qo'llanma")
-    b.button(text="📞 Murojaat")
-    if is_adm:
-        b.button(text="🖥 Boshqaruv")
-    b.adjust(1, 2, 2, 2, 1)
-    return b.as_markup(resize_keyboard=True)
-
-def kb_back():
-    b = ReplyKeyboardBuilder()
-    b.button(text="Orqaga")
-    return b.as_markup(resize_keyboard=True)
-
-def kb_admin():
-    b = ReplyKeyboardBuilder()
-    b.button(text="📊 Statistika")
-    b.button(text="👥 Foydalanuvchilar")
-    b.button(text="🌐 Tarmoqlar")
-    b.button(text="📢 Majburiy obuna")
-    b.button(text="💳 To'lov tizimlari")
-    b.button(text="🔑 API")
-    b.button(text="📨 Xabar yuborish")
-    b.button(text="❓ FAQ")
-    b.button(text="✉️ Start xabar")
-    b.button(text="◀️ Orqaga")
-    b.adjust(2, 2, 2, 2, 1, 1)
-    return b.as_markup(resize_keyboard=True)
-
-# ══════ OBUNA TEKSHIRISH ══════
-async def check_sub(uid):
-    chans = get_channels()
-    not_joined = []
-    for ch in chans:
-        if ch['type'] in ('link', 'private'):
-            not_joined.append(ch); continue
-        try:
-            m = await bot.get_chat_member(ch['cid'], uid)
-            if m.status in ("left", "kicked", "banned"):
-                not_joined.append(ch)
-        except:
-            not_joined.append(ch)
-    real = [c for c in not_joined if c['type'] not in ('link', 'private')]
-    return len(real) == 0, not_joined
-
-def kb_sub(nj):
-    b = InlineKeyboardBuilder()
-    for ch in nj:
-        b.button(text=f"📢 {ch['title']}", url=ch['url'])
-    b.button(text="✅ Tekshirish", callback_data="chk_sub")
-    b.adjust(1)
-    return b.as_markup()
-
-# ══════ API YUKLASH ══════
-async def api_fetch_all():
-    apis = get_apis()
-    if not apis: return []
-    api = apis[0]
-    try:
-        async with aiohttp.ClientSession() as s:
-            async with s.post(api['url'], data={"key": api['key'], "action": "services"},
-                              timeout=aiohttp.ClientTimeout(total=30)) as r:
-                data = await r.json(content_type=None)
-                return data if isinstance(data, list) else []
-    except Exception as e:
-        logging.error(f"API xato: {e}"); return []
-
-async def sync_network_from_api(net_name):
-    all_srvs = await api_fetch_all()
-    if not all_srvs: return 0, 0
-    keywords = NET_KEYWORDS.get(net_name, [net_name.lower()])
-    cats = {}
-    for s in all_srvs:
-        cat = str(s.get("category", "Boshqa"))
-        nm  = str(s.get("name", "")).lower()
-        if any(kw in cat.lower() or kw in nm for kw in keywords):
-            cats.setdefault(cat, []).append(s)
-    if not cats: return 0, 0
-    c = db()
-    net = c.execute("SELECT id FROM networks WHERE name=?", (net_name,)).fetchone()
-    if not net:
-        c.execute("INSERT INTO networks(name) VALUES(?)", (net_name,)); net_id = c.lastrowid
-    else:
-        net_id = net[0]
-    for sec in c.execute("SELECT id FROM sections WHERE net_id=?", (net_id,)).fetchall():
-        c.execute("DELETE FROM services WHERE sec_id=?", (sec[0],))
-    c.execute("DELETE FROM sections WHERE net_id=?", (net_id,))
-    secs_n = srvs_n = 0
-    for cat_name, srvs in cats.items():
-        c.execute("INSERT INTO sections(net_id,name) VALUES(?,?)", (net_id, cat_name))
-        sec_id = c.lastrowid; secs_n += 1
-        for s in srvs:
-            try: rate = float(s.get("rate", 0))
-            except: rate = 0.0
-            price = max(1, int(rate * 12700))
-            try: min_q = int(float(s.get("min", 10)))
-            except: min_q = 10
-            try: max_q = int(float(s.get("max", 100000)))
-            except: max_q = 100000
-            c.execute("INSERT INTO services(sec_id,api_id,name,price,min_q,max_q,info) VALUES(?,?,?,?,?,?,?)",
-                      (sec_id, str(s.get("service","")), str(s.get("name","")), price, min_q, max_q, str(s.get("type",""))))
-            srvs_n += 1
-    c.commit(); c.close()
-    return secs_n, srvs_n
-
-async def auto_load_all_networks():
-    all_srvs = await api_fetch_all()
-    if not all_srvs: return {}
-    results = {}
-    c = db()
-    for net_name, keywords in NET_KEYWORDS.items():
-        cats = {}
-        for s in all_srvs:
-            cat = str(s.get("category", "Boshqa"))
-            nm  = str(s.get("name", "")).lower()
-            if any(kw in cat.lower() or kw in nm for kw in keywords):
-                cats.setdefault(cat, []).append(s)
-        if not cats: continue
-        net = c.execute("SELECT id FROM networks WHERE name=?", (net_name,)).fetchone()
-        if not net:
-            c.execute("INSERT INTO networks(name) VALUES(?)", (net_name,)); net_id = c.lastrowid
-        else:
-            net_id = net[0]
-        for sec in c.execute("SELECT id FROM sections WHERE net_id=?", (net_id,)).fetchall():
-            c.execute("DELETE FROM services WHERE sec_id=?", (sec[0],))
-        c.execute("DELETE FROM sections WHERE net_id=?", (net_id,))
-        secs_n = srvs_n = 0
-        for cat_name, srvs in cats.items():
-            c.execute("INSERT INTO sections(net_id,name) VALUES(?,?)", (net_id, cat_name))
-            sec_id = c.lastrowid; secs_n += 1
-            for s in srvs:
-                try: rate = float(s.get("rate", 0))
-                except: rate = 0.0
-                price = max(1, int(rate * 12700))
-                try: min_q = int(float(s.get("min", 10)))
-                except: min_q = 10
-                try: max_q = int(float(s.get("max", 100000)))
-                except: max_q = 100000
-                c.execute("INSERT INTO services(sec_id,api_id,name,price,min_q,max_q,info) VALUES(?,?,?,?,?,?,?)",
-                          (sec_id, str(s.get("service","")), str(s.get("name","")), price, min_q, max_q, str(s.get("type",""))))
-                srvs_n += 1
-        c.commit()
-        results[net_name] = (secs_n, srvs_n)
-    c.close()
-    return results
-
-# ══════ /start ══════
-@dp.message(CommandStart())
-async def cmd_start(msg: types.Message, state: FSMContext):
-    await state.clear()
-    uid  = msg.from_user.id
-    args = msg.text.split()
-    ref_id = int(args[1]) if len(args) > 1 and args[1].isdigit() and int(args[1]) != uid else None
-    ensure_user(uid, msg.from_user.username or "", msg.from_user.full_name, ref_id)
-    if ref_id:
-        bonus = int(gcfg("ref_bonus") or 500)
-        c = db()
-        already = c.execute("SELECT ref_id FROM users WHERE id=?", (uid,)).fetchone()
-        if already and already[0]:
-            c.execute("UPDATE users SET balance=balance+? WHERE id=?", (bonus, ref_id))
-            c.commit()
-        c.close()
-    ok, nj = await check_sub(uid)
-    txt   = gcfg("start_text") or "Botga xush kelibsiz!"
-    photo = gcfg("start_photo")
-    if not ok:
-        if photo:
-            await msg.answer_photo(photo, caption=txt, parse_mode="HTML")
-        else:
-            await msg.answer(txt, parse_mode="HTML")
-        await msg.answer("Quyidagi kanallarga obuna bo'ling:", reply_markup=kb_sub(nj)); return
-    is_adm = uid in ADMIN_IDS
-    if photo:
-        await msg.answer_photo(photo, caption=txt, parse_mode="HTML", reply_markup=kb_main(is_adm))
-    else:
-        await msg.answer(txt, parse_mode="HTML", reply_markup=kb_main(is_adm))
-
-@dp.callback_query(F.data == "chk_sub")
-async def cb_chk_sub(call: types.CallbackQuery, state: FSMContext):
-    ok, nj = await check_sub(call.from_user.id)
-    if not ok:
-        await call.answer("Hali obuna bo'lmadingiz!", show_alert=True); return
-    await call.message.delete()
-    is_adm = call.from_user.id in ADMIN_IDS
-    txt = gcfg("start_text") or "Asosiy menyu"
-    await call.message.answer(txt, parse_mode="HTML", reply_markup=kb_main(is_adm))
-
-# ══════ ASOSIY MENU ══════
-@dp.message(F.text == "◀️ Orqaga")
-async def h_back_admin(msg: types.Message, state: FSMContext):
-    await state.clear()
-    await msg.answer("Asosiy menyu:", reply_markup=kb_main(msg.from_user.id in ADMIN_IDS))
-
-@dp.message(F.text == "Orqaga")
-async def h_back(msg: types.Message, state: FSMContext):
-    cur = await state.get_state()
-    if cur:
-        await state.clear()
-        is_adm = msg.from_user.id in ADMIN_IDS
-        if is_adm:
-            await msg.answer("Admin panel:", reply_markup=kb_admin())
-        else:
-            await msg.answer("Asosiy menyu:", reply_markup=kb_main(False))
-    else:
-        await msg.answer("Asosiy menyu:", reply_markup=kb_main(msg.from_user.id in ADMIN_IDS))
-
-# ══════ BUYURTMA BERISH ══════
-@dp.message(F.text == "🛍 Buyurtma berish")
-async def h_buyurtma(msg: types.Message, state: FSMContext):
-    await state.clear()
-    ok, nj = await check_sub(msg.from_user.id)
-    if not ok:
-        await msg.answer("Avval kanallarga obuna bo'ling:", reply_markup=kb_sub(nj)); return
-    nets   = get_nets()
-    is_adm = msg.from_user.id in ADMIN_IDS
-    if not nets:
-        if is_adm:
-            b = InlineKeyboardBuilder()
-            b.button(text="➕ Tarmoq qo'shish", callback_data="NET:add")
-            await msg.answer("Hali tarmoqlar yo'q.\nQo'shish uchun bosing:", reply_markup=b.as_markup())
-        else:
-            await msg.answer("Hozircha xizmatlar mavjud emas.")
-        return
-    b = InlineKeyboardBuilder()
-    for n in nets:
-        icon = NET_ICONS.get(n['name'], "🌐")
-        b.button(text=f"{icon} {n['name']}", callback_data=f"NET:{n['id']}")
-    if is_adm:
-        b.button(text="➕ Tarmoq qo'shish", callback_data="NET:add")
-    b.adjust(2)
-    await msg.answer("Ijtimoiy tarmoqni tanlang:", reply_markup=b.as_markup())
-
-async def show_nets_inline(obj, is_adm):
-    nets = get_nets()
-    b = InlineKeyboardBuilder()
-    for n in nets:
-        icon = NET_ICONS.get(n['name'], "🌐")
-        b.button(text=f"{icon} {n['name']}", callback_data=f"NET:{n['id']}")
-    if is_adm:
-        b.button(text="➕ Tarmoq qo'shish", callback_data="NET:add")
-    b.adjust(2)
-    if hasattr(obj, 'edit_text'):
-        await obj.edit_text("Ijtimoiy tarmoqni tanlang:", reply_markup=b.as_markup())
-    else:
-        await obj.answer("Ijtimoiy tarmoqni tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "NET_BACK")
-async def cb_net_back(call: types.CallbackQuery):
-    await show_nets_inline(call.message, call.from_user.id in ADMIN_IDS)
-
-@dp.callback_query(F.data.startswith("NET:"))
-async def cb_net(call: types.CallbackQuery, state: FSMContext):
-    val = call.data[4:]
-    if val == "add":
-        if call.from_user.id not in ADMIN_IDS: return
-        await call.message.answer("Tarmoq nomini kiriting\n(masalan: Telegram, Instagram):", reply_markup=kb_back())
-        await state.set_state(AdmS.net_name); return
-    net_id   = int(val)
-    is_adm   = call.from_user.id in ADMIN_IDS
-    c = db()
-    net_row  = c.execute("SELECT name FROM networks WHERE id=?", (net_id,)).fetchone()
-    c.close()
-    net_name = net_row[0] if net_row else ""
-    icon     = NET_ICONS.get(net_name, "🌐")
-    secs     = get_secs(net_id)
-    if not secs and get_apis():
-        await call.message.edit_text(f"{icon} {net_name} yuklanmoqda...")
-        await sync_network_from_api(net_name)
-        secs = get_secs(net_id)
-    if not secs:
-        b = InlineKeyboardBuilder()
-        if is_adm:
-            b.button(text="➕ Bo'lim qo'shish",   callback_data=f"SEC_ADD:{net_id}")
-            b.button(text="🔄 API dan yuklash",    callback_data=f"NET_SYNC:{net_id}")
-            b.button(text="📝 Nomini o'zgartirish",callback_data=f"NET_EDIT:{net_id}")
-            b.button(text="🗑 O'chirish",          callback_data=f"NET_DEL:{net_id}")
-        b.button(text="◀️ Orqaga", callback_data="NET_BACK")
-        b.adjust(1)
-        try:
-            await call.message.edit_text(f"{icon} {net_name}\n\nXizmatlar yo'q.", reply_markup=b.as_markup())
-        except:
-            await call.message.answer(f"{icon} {net_name}\n\nXizmatlar yo'q.", reply_markup=b.as_markup())
-        return
-    b = InlineKeyboardBuilder()
-    for s in secs:
-        b.button(text=s['name'], callback_data=f"SEC:{s['id']}")
-    if is_adm:
-        b.button(text="➕ Bo'lim qo'shish",    callback_data=f"SEC_ADD:{net_id}")
-        b.button(text="🔄 API dan yangilash",   callback_data=f"NET_SYNC:{net_id}")
-        b.button(text="📝 Nomini o'zgartirish", callback_data=f"NET_EDIT:{net_id}")
-        b.button(text="🗑 Tarmoqni o'chirish",  callback_data=f"NET_DEL:{net_id}")
-    b.button(text="◀️ Orqaga", callback_data="NET_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{icon} {net_name} — bo'limni tanlang:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{icon} {net_name} — bo'limni tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("NET_SYNC:"))
-async def cb_net_sync(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    net_id   = int(call.data[9:])
-    c = db()
-    net_row  = c.execute("SELECT name FROM networks WHERE id=?", (net_id,)).fetchone()
-    c.close()
-    net_name = net_row[0] if net_row else ""
-    icon     = NET_ICONS.get(net_name, "🌐")
-    try:
-        await call.message.edit_text(f"{icon} {net_name} yuklanmoqda...")
-    except: pass
-    secs_c, srvs_c = await sync_network_from_api(net_name)
-    secs = get_secs(net_id)
-    b = InlineKeyboardBuilder()
-    for s in secs:
-        b.button(text=s['name'], callback_data=f"SEC:{s['id']}")
-    b.button(text="➕ Bo'lim qo'shish",    callback_data=f"SEC_ADD:{net_id}")
-    b.button(text="🔄 API dan yangilash",   callback_data=f"NET_SYNC:{net_id}")
-    b.button(text="◀️ Orqaga", callback_data="NET_BACK")
-    b.adjust(1)
-    txt = f"✅ {secs_c} bo'lim, {srvs_c} xizmat yuklandi!\n{icon} {net_name}:" if srvs_c else f"{icon} {net_name}: API da topilmadi."
-    try:
-        await call.message.edit_text(txt, reply_markup=b.as_markup())
-    except:
-        await call.message.answer(txt, reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("NET_DEL:"))
-async def cb_net_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    net_id = int(call.data[8:])
-    c = db()
-    net_row  = c.execute("SELECT name FROM networks WHERE id=?", (net_id,)).fetchone()
-    net_name = net_row[0] if net_row else ""
-    for sec in c.execute("SELECT id FROM sections WHERE net_id=?", (net_id,)).fetchall():
-        c.execute("DELETE FROM services WHERE sec_id=?", (sec[0],))
-    c.execute("DELETE FROM sections WHERE net_id=?", (net_id,))
-    c.execute("DELETE FROM networks WHERE id=?", (net_id,))
-    c.commit(); c.close()
-    await call.answer(f"{net_name} o'chirildi!", show_alert=True)
-    await show_nets_inline(call.message, True)
-
-@dp.callback_query(F.data.startswith("NET_EDIT:"))
-async def cb_net_edit(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    net_id = int(call.data[9:])
-    await state.update_data(edit_net_id=net_id)
-    await call.message.answer("Yangi tarmoq nomini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.net_edit)
-
-@dp.message(AdmS.net_edit)
-async def adm_net_edit(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("UPDATE networks SET name=? WHERE id=?", (msg.text.strip(), data.get("edit_net_id"))); c.commit(); c.close()
-    await msg.answer("✅ Tarmoq nomi yangilandi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("SEC:"))
-async def cb_sec(call: types.CallbackQuery):
-    sec_id = int(call.data[4:])
-    srvs   = get_srvs(sec_id)
-    info   = get_sec_info(sec_id)
-    net_id = info[2] if info else 0
-    is_adm = call.from_user.id in ADMIN_IDS
-    sec_name = info[0] if info else ""
-    net_name = info[1] if info else ""
-    icon = NET_ICONS.get(net_name, "🌐")
-    if not srvs:
-        b = InlineKeyboardBuilder()
-        if is_adm:
-            b.button(text="➕ Xizmat qo'shish",    callback_data=f"SRV_ADD:{sec_id}")
-            b.button(text="📝 Bo'lim nomi",         callback_data=f"SEC_EDIT:{sec_id}")
-            b.button(text="🗑 Bo'limni o'chirish",  callback_data=f"SEC_DEL:{sec_id}")
-        b.button(text="◀️ Orqaga", callback_data=f"NET:{net_id}")
-        b.adjust(1)
-        try:
-            await call.message.edit_text(f"{icon} {net_name} › {sec_name}\n\nXizmatlar yo'q.", reply_markup=b.as_markup())
-        except:
-            await call.message.answer(f"{icon} {net_name} › {sec_name}\n\nXizmatlar yo'q.", reply_markup=b.as_markup())
-        return
-    b = InlineKeyboardBuilder()
-    for s in srvs:
-        b.button(text=s['name'], callback_data=f"SRV:{s['id']}")
-    if is_adm:
-        b.button(text="➕ Xizmat qo'shish",    callback_data=f"SRV_ADD:{sec_id}")
-        b.button(text="📝 Bo'lim nomi",         callback_data=f"SEC_EDIT:{sec_id}")
-        b.button(text="🗑 Bo'limni o'chirish",  callback_data=f"SEC_DEL:{sec_id}")
-    b.button(text="◀️ Orqaga", callback_data=f"NET:{net_id}")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{icon} {net_name} › {sec_name}\n\nXizmatni tanlang:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{icon} {net_name} › {sec_name}\n\nXizmatni tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("SEC_EDIT:"))
-async def cb_sec_edit(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    sec_id = int(call.data[9:])
-    await state.update_data(edit_sec_id=sec_id)
-    await call.message.answer("Yangi bo'lim nomini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.sec_edit)
-
-@dp.message(AdmS.sec_edit)
-async def adm_sec_edit(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("UPDATE sections SET name=? WHERE id=?", (msg.text.strip(), data.get("edit_sec_id"))); c.commit(); c.close()
-    await msg.answer("✅ Bo'lim nomi yangilandi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("SEC_DEL:"))
-async def cb_sec_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    sec_id = int(call.data[8:])
-    info   = get_sec_info(sec_id)
-    net_id = info[2] if info else 0
-    c = db()
-    c.execute("DELETE FROM services WHERE sec_id=?", (sec_id,))
-    c.execute("DELETE FROM sections WHERE id=?", (sec_id,))
-    c.commit(); c.close()
-    await call.answer("Bo'lim o'chirildi!", show_alert=True)
-    # Net sahifasini qayta ko'rsat
-    net_row = db().execute("SELECT name FROM networks WHERE id=?", (net_id,)).fetchone()
-    net_name = net_row[0] if net_row else ""
-    icon = NET_ICONS.get(net_name, "🌐")
-    secs = get_secs(net_id)
-    b = InlineKeyboardBuilder()
-    for s in secs:
-        b.button(text=s['name'], callback_data=f"SEC:{s['id']}")
-    b.button(text="➕ Bo'lim qo'shish", callback_data=f"SEC_ADD:{net_id}")
-    b.button(text="◀️ Orqaga", callback_data="NET_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{icon} {net_name}:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{icon} {net_name}:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("SRV:"))
-async def cb_srv(call: types.CallbackQuery, state: FSMContext):
-    srv_id = int(call.data[4:])
-    s      = get_srv(srv_id)
-    if not s: await call.answer("Topilmadi!"); return
-    await state.update_data(srv_id=srv_id)
-    info    = get_sec_info(s['sec_id'])
-    sec_nm  = info[0] if info else ""
-    net_nm  = info[1] if info else ""
-    icon    = NET_ICONS.get(net_nm, "🌐")
-    is_adm  = call.from_user.id in ADMIN_IDS
-    b = InlineKeyboardBuilder()
-    b.button(text="✅ Buyurtma berish", callback_data=f"BUY:{srv_id}")
-    if is_adm:
-        b.button(text="📝 Tahrirlash",     callback_data=f"SRV_EDIT:{srv_id}")
-        b.button(text="🗑 O'chirish",      callback_data=f"SRV_DEL:{srv_id}")
-    b.button(text="◀️ Orqaga", callback_data=f"SEC:{s['sec_id']}")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(
-            f"{icon} {net_nm} › {sec_nm}\n\n"
-            f"📌 {s['name']}\n\n"
-            f"🔑 Xizmat IDsi: {s['api_id']}\n"
-            f"💵 Narxi (1000x): {s['price']:,} So'm\n"
-            f"⬇️ Min: {s['min_q']} ta\n"
-            f"⬆️ Max: {s['max_q']} ta",
-            reply_markup=b.as_markup())
-    except:
-        await call.message.answer(
-            f"{icon} {net_nm} › {sec_nm}\n\n"
-            f"📌 {s['name']}\n\n"
-            f"🔑 Xizmat IDsi: {s['api_id']}\n"
-            f"💵 Narxi (1000x): {s['price']:,} So'm\n"
-            f"⬇️ Min: {s['min_q']} ta\n"
-            f"⬆️ Max: {s['max_q']} ta",
-            reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("SRV_EDIT:"))
-async def cb_srv_edit(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    srv_id = int(call.data[9:])
-    await state.update_data(edit_srv_id=srv_id)
-    b = InlineKeyboardBuilder()
-    b.button(text="📌 Nomini o'zgartirish",  callback_data=f"SRVCHG:name:{srv_id}")
-    b.button(text="💰 Narxini o'zgartirish", callback_data=f"SRVCHG:price:{srv_id}")
-    b.button(text="◀️ Orqaga",              callback_data=f"SRV:{srv_id}")
-    b.adjust(1)
-    await call.message.edit_reply_markup(reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("SRVCHG:"))
-async def cb_srvchg(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    parts = call.data.split(":")
-    field, srv_id = parts[1], int(parts[2])
-    await state.update_data(edit_srv_id=srv_id, edit_srv_field=field)
-    if field == "name":
-        await call.message.answer("Yangi xizmat nomini kiriting:", reply_markup=kb_back())
-        await state.set_state(AdmS.srv_edit_name)
-    else:
-        await call.message.answer("Yangi narxni kiriting (1000 tasi uchun So'm):", reply_markup=kb_back())
-        await state.set_state(AdmS.srv_edit_price)
-
-@dp.message(AdmS.srv_edit_name)
-async def adm_srv_edit_name(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("UPDATE services SET name=? WHERE id=?", (msg.text.strip(), data["edit_srv_id"])); c.commit(); c.close()
-    await msg.answer("✅ Xizmat nomi yangilandi!", reply_markup=kb_admin())
-
-@dp.message(AdmS.srv_edit_price)
-async def adm_srv_edit_price(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    try: price = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri raqam!"); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("UPDATE services SET price=? WHERE id=?", (price, data["edit_srv_id"])); c.commit(); c.close()
-    await msg.answer("✅ Xizmat narxi yangilandi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("SRV_DEL:"))
-async def cb_srv_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    srv_id = int(call.data[8:])
-    s      = get_srv(srv_id)
-    sec_id = s['sec_id'] if s else 0
-    c = db(); c.execute("DELETE FROM services WHERE id=?", (srv_id,)); c.commit(); c.close()
-    await call.answer("Xizmat o'chirildi!", show_alert=True)
-    # Bo'lim sahifasiga qayt
-    srvs = get_srvs(sec_id)
-    info = get_sec_info(sec_id)
-    net_id = info[2] if info else 0
-    sec_name = info[0] if info else ""
-    net_name = info[1] if info else ""
-    icon = NET_ICONS.get(net_name, "🌐")
-    b = InlineKeyboardBuilder()
-    for sv in srvs:
-        b.button(text=sv['name'], callback_data=f"SRV:{sv['id']}")
-    b.button(text="➕ Xizmat qo'shish", callback_data=f"SRV_ADD:{sec_id}")
-    b.button(text="◀️ Orqaga", callback_data=f"NET:{net_id}")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{icon} {net_name} › {sec_name}:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{icon} {net_name} › {sec_name}:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("BUY:"))
-async def cb_buy(call: types.CallbackQuery, state: FSMContext):
-    srv_id = int(call.data[4:])
-    s = get_srv(srv_id)
-    if not s: await call.answer("Topilmadi!"); return
-    await state.clear()
-    await state.update_data(srv_id=srv_id)
-    await call.answer()
-    await call.message.answer(
-        f"Buyurtma miqdorini kiriting:\n\n"
-        f"Ruxsat etiladi {s['min_q']} - dan {s['max_q']} - gacha",
-        reply_markup=kb_back())
-    await state.set_state(OrdS.qty)
-
-@dp.message(OrdS.qty)
-async def h_qty(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear()
-        await msg.answer("Asosiy menyu:", reply_markup=kb_main(msg.from_user.id in ADMIN_IDS)); return
-    try: qty = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri son!"); return
-    data   = await state.get_data()
-    srv_id = data.get("srv_id")
-    s = get_srv(srv_id)
-    if not s:
-        await state.clear(); await msg.answer("Xizmat topilmadi!", reply_markup=kb_main(msg.from_user.id in ADMIN_IDS)); return
-    if qty < s['min_q'] or qty > s['max_q']:
-        await msg.answer(f"{s['min_q']} dan {s['max_q']} gacha bo'lishi kerak!"); return
-    price = int(qty * s['price'] / 1000)
-    bal   = get_user(msg.from_user.id)['balance']
-    await state.update_data(qty=qty, price=price)
-    if bal < price:
-        pays = get_pays()
-        b = InlineKeyboardBuilder()
-        for p in pays:
-            b.button(text=p['name'], callback_data=f"PAYM_ORD:{p['id']}")
-        b.adjust(2)
-        await msg.answer(
-            f"Balans yetarli emas!\n\nKerak: {price:,} So'm\nBalans: {bal:,} So'm\n\nTo'lov tizimini tanlang:",
-            reply_markup=b.as_markup()); return
-    await msg.answer(
-        f"Buyurtma havolasini kiriting\n(masalan: https://instagram.com/username):",
-        reply_markup=kb_back())
-    await state.set_state(OrdS.link)
-
-@dp.callback_query(F.data.startswith("PAYM_ORD:"))
-async def cb_paym_ord(call: types.CallbackQuery, state: FSMContext):
-    pid = int(call.data[9:])
-    p   = db().execute("SELECT * FROM pay_methods WHERE id=?", (pid,)).fetchone()
-    if not p: await call.answer("Topilmadi!"); return
-    await state.update_data(pay_for_order=True)
-    min_d = gcfg("min_dep") or "1000"
-    await call.message.edit_text(
-        f"💳 {p['name']}\n\n{p['details']}\n\nTo'lov chekini yuboring (minimum {min_d} So'm):")
-    await state.set_state(AdmS.pay_name)
-
-@dp.message(OrdS.link)
-async def h_link(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear()
-        await msg.answer("Asosiy menyu:", reply_markup=kb_main(msg.from_user.id in ADMIN_IDS)); return
-    link  = msg.text.strip()
-    data  = await state.get_data()
-    s     = get_srv(data["srv_id"])
-    price = data["price"]
-    qty   = data["qty"]
-    await state.update_data(link=link)
-    b = InlineKeyboardBuilder()
-    b.button(text="✅ Tasdiqlash", callback_data="ORD_CONFIRM")
-    await msg.answer(
-        f"Malumotlarni o'qib chiqing:\n\n"
-        f"💵 Buyurtma narxi: {price:,} so'm\n"
-        f"🔗 Manzil: {link}\n"
-        f"🔢 Miqdor: {qty} ta\n\n"
-        f"Tasdiqlash tugmasini bosing — hisobingizdan {price:,} so'm yechib olinadi!",
-        reply_markup=b.as_markup())
-    await state.set_state(OrdS.confirm)
-
-@dp.callback_query(F.data == "ORD_CONFIRM", OrdS.confirm)
-async def cb_ord_confirm(call: types.CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    uid  = call.from_user.id
-    u    = get_user(uid)
-    if u['balance'] < data["price"]:
-        await call.answer("Balans yetarli emas!", show_alert=True); return
-    oid = create_order(uid, data["srv_id"], data["link"], data["qty"], data["price"])
-    await state.clear()
-    try:
-        await call.message.edit_text(
-            f"✅ Buyurtma muvaffaqiyatli ro'yxatdan o'tkazildi\n\n"
-            f"Buyurtma ID raqami: {oid}")
-    except:
-        await call.message.answer(f"✅ Buyurtma {oid} qabul qilindi!")
-    for aid in ADMIN_IDS:
-        try:
-            s = get_srv(data["srv_id"])
-            await bot.send_message(aid,
-                f"Yangi buyurtma #{oid}\n"
-                f"👤 {uid}\n"
-                f"📌 {s['name'] if s else '?'}\n"
-                f"🔗 {data['link']}\n"
-                f"📊 {data['qty']} ta | 💰 {data['price']:,} So'm")
-        except: pass
-
-# ══════ BUYURTMALAR ══════
-@dp.message(F.text == "📋 Buyurtmalar")
-async def h_buyurtmalar(msg: types.Message):
-    uid  = msg.from_user.id
-    ords = db().execute("SELECT * FROM orders WHERE uid=? ORDER BY id DESC LIMIT 15", (uid,)).fetchall()
-    if not ords:
-        await msg.answer("Sizda hali buyurtmalar yo'q."); return
-    text = "Oxirgi buyurtmalar:\n\n"
-    for o in ords:
-        s  = get_srv(o['srv_id'])
-        nm = s['name'] if s else "?"
-        text += f"#{o['id']} | {nm}\n💰 {o['price']:,} So'm | {o['qty']} ta | {o['status']}\n\n"
-    await msg.answer(text)
-
-# ══════ HISOBIM ══════
-@dp.message(F.text == "👤 Hisobim")
-async def h_hisobim(msg: types.Message):
-    uid = msg.from_user.id
-    ensure_user(uid)
-    u   = get_user(uid)
-    ords_c = db().execute("SELECT COUNT(*) FROM orders WHERE uid=?", (uid,)).fetchone()[0]
-    refs_c = db().execute("SELECT COUNT(*) FROM users WHERE ref_id=?", (uid,)).fetchone()[0]
-    me = await bot.get_me()
-    await msg.answer(
-        f"👤 Profil\n\n"
-        f"🆔 ID: {uid}\n"
-        f"💰 Balans: {u['balance']:,} So'm\n"
-        f"📦 Buyurtmalar: {ords_c} ta\n"
-        f"👥 Referallar: {refs_c} ta\n\n"
-        f"Referal havola:\nhttps://t.me/{me.username}?start={uid}")
-
-# ══════ HISOB TO'LDIRISH ══════
-@dp.message(F.text == "💳 Hisob to'ldirish")
-async def h_topdirish(msg: types.Message):
-    pays = get_pays()
-    if not pays:
-        await msg.answer("Hozircha to'lov tizimlari yo'q."); return
-    b = InlineKeyboardBuilder()
-    for p in pays:
-        b.button(text=p['name'], callback_data=f"PAY:{p['id']}")
-    b.adjust(2)
-    await msg.answer("To'lov tizimini tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("PAY:"))
-async def cb_pay(call: types.CallbackQuery, state: FSMContext):
-    pid = int(call.data[4:])
-    p   = db().execute("SELECT * FROM pay_methods WHERE id=?", (pid,)).fetchone()
-    if not p: await call.answer("Topilmadi!"); return
-    min_d = gcfg("min_dep") or "1000"
-    await state.update_data(pay_id=pid, pay_for_order=False)
-    try:
-        await call.message.edit_text(
-            f"💳 {p['name']}\n\n{p['details']}\n\nTo'lov chekini yuboring (minimum {min_d} So'm):")
-    except:
-        await call.message.answer(
-            f"💳 {p['name']}\n\n{p['details']}\n\nTo'lov chekini yuboring (minimum {min_d} So'm):")
-    await state.set_state(AdmS.pay_name)
-
-@dp.message(AdmS.pay_name)
-async def adm_pay_name(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data()
-    if data.get("pay_for_order") or data.get("pay_id"):
-        # Bu chek yuborish
-        uid = msg.from_user.id
-        u   = get_user(uid)
-        for aid in ADMIN_IDS:
-            try:
-                b = InlineKeyboardBuilder()
-                b.button(text="✅ Tasdiqlash", callback_data=f"APYES:{uid}")
-                b.button(text="❌ Rad etish",  callback_data=f"APNO:{uid}")
-                b.adjust(2)
-                if msg.photo:
-                    await bot.send_photo(aid, msg.photo[-1].file_id,
-                        caption=f"To'lov so'rovi\n👤 {uid} | @{msg.from_user.username or '-'}\n💰 Balans: {u['balance']:,} So'm",
-                        reply_markup=b.as_markup())
-                else:
-                    await bot.send_message(aid,
-                        f"To'lov so'rovi\n👤 {uid} | @{msg.from_user.username or '-'}\n💰 Balans: {u['balance']:,} So'm\n\n{msg.text}",
-                        reply_markup=b.as_markup())
-            except: pass
-        await msg.answer("✅ To'lovingiz adminga yuborildi. Tasdiqlashni kuting.", reply_markup=kb_main(uid in ADMIN_IDS))
-        await state.clear(); return
-    # Admin to'lov tizimi qo'shyapti
-    await state.update_data(pay_name_new=msg.text.strip())
-    await msg.answer("To'lov ma'lumotlarini kiriting (karta raqam, telefon):", reply_markup=kb_back())
-    await state.set_state(AdmS.pay_det)
-
-@dp.message(AdmS.pay_det)
-async def adm_pay_det(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db()
-    c.execute("INSERT INTO pay_methods(name,details) VALUES(?,?)", (data["pay_name_new"], msg.text.strip()))
-    c.commit(); c.close()
-    await msg.answer(f"✅ {data['pay_name_new']} to'lov tizimi qo'shildi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("APYES:"))
-async def cb_apyes(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    uid = int(call.data.split(":")[1])
-    b = InlineKeyboardBuilder()
-    amounts = [1000, 5000, 10000, 25000, 50000, 100000, 200000, 500000]
-    for a in amounts:
-        b.button(text=f"{a:,}", callback_data=f"ADDBAL:{uid}:{a}")
-    b.adjust(4)
-    if call.message.caption:
-        await call.message.edit_caption(caption=f"✅ {uid} — summani tanlang:", reply_markup=b.as_markup())
-    else:
-        try:
-            await call.message.edit_text(f"✅ {uid} — summani tanlang:", reply_markup=b.as_markup())
-        except:
-            await call.message.answer(f"✅ {uid} — summani tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("ADDBAL:"))
-async def cb_addbal(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    parts = call.data.split(":")
-    uid, amt = int(parts[1]), int(parts[2])
-    c = db()
-    c.execute("UPDATE users SET balance=balance+?, deposited=deposited+? WHERE id=?", (amt, amt, uid))
-    c.commit(); c.close()
-    if call.message.caption:
-        await call.message.edit_caption(caption=f"✅ {uid} ga {amt:,} So'm qo'shildi!")
-    else:
-        try:
-            await call.message.edit_text(f"✅ {uid} ga {amt:,} So'm qo'shildi!")
-        except:
-            await call.message.answer(f"✅ {uid} ga {amt:,} So'm qo'shildi!")
-    try: await bot.send_message(uid, f"✅ Hisobingizga {amt:,} So'm qo'shildi!")
-    except: pass
-
-@dp.callback_query(F.data.startswith("APNO:"))
-async def cb_apno(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    uid = int(call.data[5:])
-    if call.message.caption:
-        await call.message.edit_caption(caption=f"❌ {uid} rad etildi.")
-    else:
-        try:
-            await call.message.edit_text(f"❌ {uid} rad etildi.")
-        except:
-            await call.message.answer(f"❌ {uid} rad etildi.")
-    try: await bot.send_message(uid, "❌ To'lovingiz rad etildi.")
-    except: pass
-
-# ══════ PUL ISHLASH ══════
-@dp.message(F.text == "💰 Pul ishlash")
-async def h_ref(msg: types.Message):
-    uid    = msg.from_user.id
-    bonus  = gcfg("ref_bonus") or "500"
-    refs_c = db().execute("SELECT COUNT(*) FROM users WHERE ref_id=?", (uid,)).fetchone()[0]
-    me     = await bot.get_me()
-    await msg.answer(
-        f"Referal tizimi\n\n"
-        f"Har bir do'stingiz uchun {bonus} So'm bonus!\n\n"
-        f"Referallaringiz: {refs_c} ta\n\n"
-        f"Sizning havolangiz:\nhttps://t.me/{me.username}?start={uid}")
-
-# ══════ QO'LLANMA ══════
-@dp.message(F.text == "❓ Qo'llanma")
-async def h_qollanma(msg: types.Message):
-    faqs = get_faqs()
-    if not faqs:
-        await msg.answer("Hozircha qo'llanma yo'q."); return
-    b = InlineKeyboardBuilder()
-    for f in faqs:
-        b.button(text=f['q'][:40], callback_data=f"FAQ:{f['id']}")
-    b.adjust(1)
-    await msg.answer("Qo'llanma:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("FAQ:"))
-async def cb_faq(call: types.CallbackQuery):
-    fid = int(call.data[4:])
-    f   = db().execute("SELECT * FROM faqs WHERE id=?", (fid,)).fetchone()
-    if not f: return
-    b = InlineKeyboardBuilder()
-    b.button(text="◀️ Orqaga", callback_data="FAQ_BACK")
-    try:
-        await call.message.edit_text(f"{f['q']}\n\n{f['a']}", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{f['q']}\n\n{f['a']}", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "FAQ_BACK")
-async def cb_faq_back(call: types.CallbackQuery):
-    faqs = get_faqs()
-    b = InlineKeyboardBuilder()
-    for f in faqs:
-        b.button(text=f['q'][:40], callback_data=f"FAQ:{f['id']}")
-    b.adjust(1)
-    try:
-        await call.message.edit_text("Qo'llanma:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer("Qo'llanma:", reply_markup=b.as_markup())
-
-# ══════ MUROJAAT ══════
-@dp.message(F.text == "📞 Murojaat")
-async def h_murojaat(msg: types.Message):
-    await msg.answer("Admin bilan bog'lanish:\n@admin_username")
-
-# ══════ ADMIN PANEL ══════
-@dp.message(F.text == "🖥 Boshqaruv")
-async def h_boshqaruv(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    await msg.answer("Admin paneliga xush kelibsiz!", reply_markup=kb_admin())
-
-@dp.message(F.text == "📊 Statistika")
-async def h_stat(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    c   = db()
-    u   = c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-    o   = c.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
-    oa  = c.execute("SELECT COUNT(*) FROM orders WHERE status='Jarayonda'").fetchone()[0]
-    rev = c.execute("SELECT SUM(price) FROM orders").fetchone()[0] or 0
-    c.close()
-    await msg.answer(
-        f"Statistika\n\n"
-        f"Foydalanuvchilar: {u} ta\n"
-        f"Buyurtmalar: {o} ta\n"
-        f"Jarayondagi: {oa} ta\n"
-        f"Jami daromad: {rev:,} So'm")
-
-# ── Foydalanuvchilar ──
-@dp.message(F.text == "👥 Foydalanuvchilar")
-async def h_users(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    b = InlineKeyboardBuilder()
-    b.button(text="➕ Balans qo'shish", callback_data="ADM_ADDBAL")
-    b.button(text="➖ Balans ayirish",  callback_data="ADM_SUBBAL")
-    b.adjust(2)
-    c = db()
-    u = c.execute("SELECT COUNT(*) FROM users").fetchone()[0]; c.close()
-    await msg.answer(f"Jami {u} ta foydalanuvchi:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "ADM_ADDBAL")
-async def cb_adm_addbal(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    await call.message.answer("Foydalanuvchi ID sini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.add_bal_uid)
-
-@dp.message(AdmS.add_bal_uid)
-async def adm_add_bal_uid(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    if not msg.text.strip().isdigit():
-        await msg.answer("Noto'g'ri ID!"); return
-    await state.update_data(target_uid=int(msg.text.strip()))
-    await msg.answer("Qancha so'm qo'shish?:", reply_markup=kb_back())
-    await state.set_state(AdmS.add_bal)
-
-@dp.message(AdmS.add_bal)
-async def adm_add_bal(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    try: amt = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri!"); return
-    data = await state.get_data(); await state.clear()
-    uid  = data.get("target_uid")
-    c = db(); c.execute("UPDATE users SET balance=balance+? WHERE id=?", (amt, uid)); c.commit(); c.close()
-    await msg.answer(f"✅ {uid} ga {amt:,} So'm qo'shildi!", reply_markup=kb_admin())
-    try: await bot.send_message(uid, f"✅ Hisobingizga {amt:,} So'm qo'shildi!")
-    except: pass
-
-@dp.callback_query(F.data == "ADM_SUBBAL")
-async def cb_adm_subbal(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    await call.message.answer("Foydalanuvchi ID sini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.sub_bal_uid)
-
-@dp.message(AdmS.sub_bal_uid)
-async def adm_sub_bal_uid(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    if not msg.text.strip().isdigit():
-        await msg.answer("Noto'g'ri ID!"); return
-    await state.update_data(target_uid=int(msg.text.strip()))
-    await msg.answer("Qancha so'm ayirish?:", reply_markup=kb_back())
-    await state.set_state(AdmS.sub_bal)
-
-@dp.message(AdmS.sub_bal)
-async def adm_sub_bal(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    try: amt = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri!"); return
-    data = await state.get_data(); await state.clear()
-    uid  = data.get("target_uid")
-    c = db(); c.execute("UPDATE users SET balance=balance-? WHERE id=?", (amt, uid)); c.commit(); c.close()
-    await msg.answer(f"✅ {uid} dan {amt:,} So'm ayirildi!", reply_markup=kb_admin())
-
-# ── Tarmoqlar (Admin) ──
-@dp.message(F.text == "🌐 Tarmoqlar")
-async def h_admin_nets(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    nets = get_nets()
-    b = InlineKeyboardBuilder()
-    for n in nets:
-        icon = NET_ICONS.get(n['name'], "🌐")
-        secs_c = len(get_secs(n['id']))
-        b.button(text=f"{icon} {n['name']} ({secs_c})", callback_data=f"ADNET:{n['id']}")
-    b.button(text="➕ Yangi tarmoq", callback_data="NET:add")
-    b.adjust(2, 1)
-    await msg.answer(f"Tarmoqlar ({len(nets)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("ADNET:"))
-async def cb_adnet(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    net_id   = int(call.data[6:])
-    c = db()
-    net_row  = c.execute("SELECT name FROM networks WHERE id=?", (net_id,)).fetchone()
-    c.close()
-    net_name = net_row[0] if net_row else ""
-    icon     = NET_ICONS.get(net_name, "🌐")
-    secs     = get_secs(net_id)
-    total_srvs = sum(len(get_srvs(s['id'])) for s in secs)
-    b = InlineKeyboardBuilder()
-    b.button(text="➕ Bo'lim qo'shish",    callback_data=f"SEC_ADD:{net_id}")
-    b.button(text="🔄 API dan yuklash",    callback_data=f"NET_SYNC:{net_id}")
-    b.button(text="📝 Nomini o'zgartirish",callback_data=f"NET_EDIT:{net_id}")
-    b.button(text="🗑 O'chirish",          callback_data=f"NET_DEL:{net_id}")
-    b.button(text="◀️ Orqaga",            callback_data="ADNET_BACK")
-    b.adjust(2, 2, 1)
-    try:
-        await call.message.edit_text(
-            f"{icon} {net_name}\n\nBo'limlar: {len(secs)}\nXizmatlar: {total_srvs}",
-            reply_markup=b.as_markup())
-    except:
-        await call.message.answer(
-            f"{icon} {net_name}\n\nBo'limlar: {len(secs)}\nXizmatlar: {total_srvs}",
-            reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "ADNET_BACK")
-async def cb_adnet_back(call: types.CallbackQuery):
-    nets = get_nets()
-    b = InlineKeyboardBuilder()
-    for n in nets:
-        icon   = NET_ICONS.get(n['name'], "🌐")
-        secs_c = len(get_secs(n['id']))
-        b.button(text=f"{icon} {n['name']} ({secs_c})", callback_data=f"ADNET:{n['id']}")
-    b.button(text="➕ Yangi tarmoq", callback_data="NET:add")
-    b.adjust(2, 1)
-    try:
-        await call.message.edit_text(f"Tarmoqlar ({len(nets)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"Tarmoqlar ({len(nets)} ta):", reply_markup=b.as_markup())
-
-# ── Tarmoq/Bo'lim/Xizmat qo'shish ──
-@dp.callback_query(F.data.startswith("SEC_ADD:"))
-async def cb_sec_add(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    net_id = int(call.data[8:])
-    await state.update_data(sec_net_id=net_id)
-    await call.message.answer("Bo'lim nomini kiriting\n(masalan: Obunchi, Like, Ko'rish):", reply_markup=kb_back())
-    await state.set_state(AdmS.sec_name)
-
-@dp.callback_query(F.data.startswith("SRV_ADD:"))
-async def cb_srv_add(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    sec_id = int(call.data[8:])
-    await state.update_data(srv_sec_id=sec_id)
-    await call.message.answer("Xizmat API IDsini kiriting (masalan: 384):", reply_markup=kb_back())
-    await state.set_state(AdmS.srv_api)
-
-@dp.callback_query(F.data.startswith("SRV_MORE:"))
-async def cb_srv_more(call: types.CallbackQuery, state: FSMContext):
-    sec_id = int(call.data[9:])
-    await state.update_data(srv_sec_id=sec_id)
-    await call.message.answer("Xizmat API IDsini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.srv_api)
-
-@dp.callback_query(F.data.startswith("SEC_MORE:"))
-async def cb_sec_more(call: types.CallbackQuery, state: FSMContext):
-    net_id = int(call.data[9:])
-    await state.update_data(sec_net_id=net_id)
-    await call.message.answer("Yangi bo'lim nomini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.sec_name)
-
-@dp.callback_query(F.data == "NET_MORE")
-async def cb_net_more(call: types.CallbackQuery, state: FSMContext):
-    await call.message.answer("Yangi tarmoq nomini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.net_name)
-
-@dp.callback_query(F.data == "ADM_BACK")
-async def cb_adm_back(call: types.CallbackQuery, state: FSMContext):
-    await state.clear()
-    await call.message.answer("Admin paneliga xush kelibsiz!", reply_markup=kb_admin())
-
-@dp.message(AdmS.net_name)
-async def adm_net_name(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    name = msg.text.strip()
-    c    = db()
-    c.execute("INSERT OR IGNORE INTO networks(name) VALUES(?)", (name,))
-    net_id = c.execute("SELECT id FROM networks WHERE name=?", (name,)).fetchone()[0]
-    c.commit(); c.close()
-    await state.update_data(sec_net_id=net_id)
-    await msg.answer(
-        f"✅ {name} tarmoqi qo'shildi!\n\n"
-        f"Bo'lim nomini kiriting\n(masalan: Obunchi, Like, Ko'rish):",
-        reply_markup=kb_back())
-    await state.set_state(AdmS.sec_name)
-
-@dp.message(AdmS.sec_name)
-async def adm_sec_name(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    name   = msg.text.strip()
-    data   = await state.get_data()
-    net_id = data.get("sec_net_id") or data.get("net_id")
-    c = db()
-    c.execute("INSERT INTO sections(net_id,name) VALUES(?,?)", (net_id, name))
-    sec_id = c.lastrowid; c.commit(); c.close()
-    await state.update_data(srv_sec_id=sec_id)
-    await msg.answer(
-        f"✅ {name} bo'limi qo'shildi!\n\n"
-        f"Xizmat API IDsini kiriting (masalan: 384):",
-        reply_markup=kb_back())
-    await state.set_state(AdmS.srv_api)
-
-@dp.message(AdmS.srv_api)
-async def adm_srv_api(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(srv_api=msg.text.strip())
-    await msg.answer("Narxini kiriting (1000 tasi uchun So'm, masalan: 500):", reply_markup=kb_back())
-    await state.set_state(AdmS.srv_price)
-
-@dp.message(AdmS.srv_price)
-async def adm_srv_price(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    try: price = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri raqam!"); return
-    await state.update_data(srv_price=price)
-    await msg.answer("Xizmat nomini kiriting\n(masalan: Obunchi Tezkor, Like Premium):", reply_markup=kb_back())
-    await state.set_state(AdmS.srv_info)
-
-@dp.message(AdmS.srv_info)
-async def adm_srv_info(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data   = await state.get_data()
-    sec_id = data.get("srv_sec_id")
-    if not sec_id:
-        await state.clear(); await msg.answer("Bo'lim topilmadi!", reply_markup=kb_admin()); return
-    api_id   = data.get("srv_api", "")
-    price    = data.get("srv_price", 0)
-    srv_name = msg.text.strip()
-    c = db()
-    c.execute("INSERT INTO services(sec_id,api_id,name,price,min_q,max_q,info) VALUES(?,?,?,?,10,100000,?)",
-              (sec_id, api_id, srv_name, price, ""))
-    c.commit()
-    sec_row = c.execute(
-        "SELECT s.name, n.id, n.name FROM sections s JOIN networks n ON s.net_id=n.id WHERE s.id=?",
-        (sec_id,)).fetchone()
-    c.close()
-    sec_name = sec_row[0] if sec_row else ""
-    net_id   = sec_row[1] if sec_row else 0
-    net_name = sec_row[2] if sec_row else ""
-    b = InlineKeyboardBuilder()
-    b.button(text=f"➕ Yana xizmat ({sec_name}ga)",  callback_data=f"SRV_MORE:{sec_id}")
-    b.button(text=f"➕ Yangi bo'lim ({net_name}ga)",  callback_data=f"SEC_MORE:{net_id}")
-    b.button(text="➕ Boshqa tarmoq qo'shish",         callback_data="NET_MORE")
-    b.button(text="◀️ Admin panel",                    callback_data="ADM_BACK")
-    b.adjust(1)
-    await msg.answer(
-        f"✅ Xizmat qo'shildi!\n\n"
-        f"🌐 {net_name}  ›  {sec_name}\n"
-        f"📌 {srv_name}\n"
-        f"🔑 API ID: {api_id}\n"
-        f"💰 Narx: {price:,} So'm (1000 tasi)\n\n"
-        f"Keyingi qadam:",
-        reply_markup=b.as_markup())
-    await state.clear()
-
-# ── Majburiy obuna ──
-@dp.message(F.text == "📢 Majburiy obuna")
-async def h_channels(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    chans = get_channels()
-    b = InlineKeyboardBuilder()
-    for ch in chans:
-        b.button(text=f"📢 {ch['title']}", callback_data=f"CH_VIEW:{ch['id']}")
-    b.button(text="➕ Kanal qo'shish", callback_data="CH_ADD")
-    b.adjust(1)
-    await msg.answer(f"Majburiy obuna ({len(chans)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "CH_ADD")
-async def cb_ch_add(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    b = InlineKeyboardBuilder()
-    b.button(text="📢 Ommaviy (a'zolik tekshiriladi)", callback_data="CHTYPE:public")
-    b.button(text="🔒 Shaxsiy (faqat havola)",         callback_data="CHTYPE:private")
-    b.adjust(1)
-    try:
-        await call.message.edit_text("Kanal turini tanlang:", reply_markup=b.as_markup())
-    except:
-        await call.message.answer("Kanal turini tanlang:", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("CHTYPE:"))
-async def cb_chtype(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    ch_type = call.data[7:]
-    await state.update_data(ch_type=ch_type)
-    if ch_type == "public":
-        await call.message.answer("Kanal ID kiriting (@channel yoki -100123456):", reply_markup=kb_back())
-        await state.set_state(AdmS.ch_cid)
-    else:
-        await call.message.answer("Kanal nomini kiriting:", reply_markup=kb_back())
-        await state.set_state(AdmS.ch_title)
-
-@dp.message(AdmS.ch_cid)
-async def adm_ch_cid(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(ch_cid=msg.text.strip())
-    await msg.answer("Kanal nomini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.ch_title)
-
-@dp.message(AdmS.ch_title)
-async def adm_ch_title(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(ch_title=msg.text.strip())
-    await msg.answer("Kanal havolasini kiriting (https://t.me/channel):", reply_markup=kb_back())
-    await state.set_state(AdmS.ch_url)
-
-@dp.message(AdmS.ch_url)
-async def adm_ch_url(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data  = await state.get_data(); await state.clear()
-    ctype = data.get("ch_type", "public")
-    cid   = data.get("ch_cid", "link")
-    title = data.get("ch_title", "")
-    c = db()
-    c.execute("INSERT INTO channels(cid,title,url,type) VALUES(?,?,?,?)", (cid, title, msg.text.strip(), ctype))
-    c.commit(); c.close()
-    await msg.answer(f"✅ {title} kanali qo'shildi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("CH_VIEW:"))
-async def cb_ch_view(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    chid = int(call.data[8:])
-    ch   = db().execute("SELECT * FROM channels WHERE id=?", (chid,)).fetchone()
-    if not ch: return
-    b = InlineKeyboardBuilder()
-    b.button(text="🗑 O'chirish", callback_data=f"CH_DEL:{chid}")
-    b.button(text="◀️ Orqaga",   callback_data="CH_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(
-            f"📢 {ch['title']}\n🔗 {ch['url']}\nTur: {ch['type']}",
-            reply_markup=b.as_markup())
-    except:
-        await call.message.answer(
-            f"📢 {ch['title']}\n🔗 {ch['url']}\nTur: {ch['type']}",
-            reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("CH_DEL:"))
-async def cb_ch_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    chid = int(call.data[7:])
-    c = db(); c.execute("DELETE FROM channels WHERE id=?", (chid,)); c.commit(); c.close()
-    await call.answer("Kanal o'chirildi!", show_alert=True)
-    chans = get_channels()
-    b = InlineKeyboardBuilder()
-    for ch in chans:
-        b.button(text=f"📢 {ch['title']}", callback_data=f"CH_VIEW:{ch['id']}")
-    b.button(text="➕ Kanal qo'shish", callback_data="CH_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"Majburiy obuna ({len(chans)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"Majburiy obuna ({len(chans)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "CH_BACK")
-async def cb_ch_back(call: types.CallbackQuery):
-    chans = get_channels()
-    b = InlineKeyboardBuilder()
-    for ch in chans:
-        b.button(text=f"📢 {ch['title']}", callback_data=f"CH_VIEW:{ch['id']}")
-    b.button(text="➕ Kanal qo'shish", callback_data="CH_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"Majburiy obuna ({len(chans)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"Majburiy obuna ({len(chans)} ta):", reply_markup=b.as_markup())
-
-# ── To'lov tizimlari ──
-@dp.message(F.text == "💳 To'lov tizimlari")
-async def h_pays(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    pays = get_pays()
-    b = InlineKeyboardBuilder()
-    for p in pays:
-        b.button(text=p['name'], callback_data=f"PAYV:{p['id']}")
-    b.button(text="➕ Qo'shish", callback_data="PAY_ADD_ADM")
-    b.adjust(2, 1)
-    await msg.answer(f"To'lov tizimlari ({len(pays)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "PAY_ADD_ADM")
-async def cb_pay_add_adm(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    await call.message.answer("To'lov tizimi nomi (masalan: Click, Payme):", reply_markup=kb_back())
-    await state.set_state(AdmS.pay_name)
-
-@dp.callback_query(F.data.startswith("PAYV:"))
-async def cb_payv(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    pid = int(call.data[5:])
-    p   = db().execute("SELECT * FROM pay_methods WHERE id=?", (pid,)).fetchone()
-    if not p: return
-    b = InlineKeyboardBuilder()
-    b.button(text="🗑 O'chirish", callback_data=f"PAY_DEL:{pid}")
-    b.button(text="◀️ Orqaga",   callback_data="PAY_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{p['name']}\n\n{p['details']}", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{p['name']}\n\n{p['details']}", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("PAY_DEL:"))
-async def cb_pay_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    pid = int(call.data[8:])
-    c = db(); c.execute("DELETE FROM pay_methods WHERE id=?", (pid,)); c.commit(); c.close()
-    await call.answer("O'chirildi!", show_alert=True)
-    pays = get_pays()
-    b = InlineKeyboardBuilder()
-    for p in pays:
-        b.button(text=p['name'], callback_data=f"PAYV:{p['id']}")
-    b.button(text="➕ Qo'shish", callback_data="PAY_ADD_ADM")
-    b.adjust(2, 1)
-    try:
-        await call.message.edit_text(f"To'lov tizimlari ({len(pays)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"To'lov tizimlari ({len(pays)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "PAY_BACK")
-async def cb_pay_back(call: types.CallbackQuery):
-    pays = get_pays()
-    b = InlineKeyboardBuilder()
-    for p in pays:
-        b.button(text=p['name'], callback_data=f"PAYV:{p['id']}")
-    b.button(text="➕ Qo'shish", callback_data="PAY_ADD_ADM")
-    b.adjust(2, 1)
-    try:
-        await call.message.edit_text(f"To'lov tizimlari ({len(pays)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"To'lov tizimlari ({len(pays)} ta):", reply_markup=b.as_markup())
-
-# ── API ──
-@dp.message(F.text == "🔑 API")
-async def h_api(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    apis = get_apis()
-    b = InlineKeyboardBuilder()
-    for i, a in enumerate(apis, 1):
-        domain = a['url'].replace("https://","").replace("http://","").split("/")[0]
-        b.button(text=f"{i}. {domain}", callback_data=f"APIVIEW:{a['id']}")
-    b.button(text="➕ API qo'shish", callback_data="API_ADD")
-    b.adjust(1)
-    txt = f"API'lar ({len(apis)} ta)"
-    if apis:
-        txt += ":\n"
-        for i, a in enumerate(apis, 1):
-            domain = a['url'].replace("https://","").replace("http://","").split("/")[0]
-            txt += f"\n{i}. {domain} — {a['price']} UZS"
-    await msg.answer(txt, reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "API_ADD")
-async def cb_api_add(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    await call.message.answer("API URL kiriting (masalan: https://saleseen.uz/api/v2):", reply_markup=kb_back())
-    await state.set_state(AdmS.api_url)
-
-@dp.message(AdmS.api_url)
-async def adm_api_url(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(api_url=msg.text.strip())
-    await msg.answer("API kalitini kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.api_key)
-
-@dp.message(AdmS.api_key)
-async def adm_api_key(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(api_key=msg.text.strip())
-    await msg.answer("API narxini kiriting (UZS, masalan: 1430):", reply_markup=kb_back())
-    await state.set_state(AdmS.api_price)
-
-@dp.message(AdmS.api_price)
-async def adm_api_price(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    try: price = int(msg.text.strip())
-    except: await msg.answer("Noto'g'ri son!"); return
-    data = await state.get_data(); await state.clear()
-    c = db()
-    c.execute("INSERT INTO apis(url,key,price) VALUES(?,?,?)", (data["api_url"], data["api_key"], price))
-    c.commit(); c.close()
-    domain = data["api_url"].replace("https://","").replace("http://","").split("/")[0]
-    await msg.answer(f"✅ {domain} API qo'shildi!\n\nXizmatlar yuklanmoqda...", reply_markup=kb_admin())
-    try:
-        results = await auto_load_all_networks()
-        if results:
-            icons = {"Telegram":"✈️","Instagram":"📷","TikTok":"🎵","YouTube":"▶️","Facebook":"👥","Twitter":"🐦"}
-            lines = ["✅ Xizmatlar yuklandi:\n"]
-            total = 0
-            for net_name, (secs_c, srvs_c) in results.items():
-                icon = icons.get(net_name, "🌐")
-                lines.append(f"{icon} {net_name}: {secs_c} bo'lim, {srvs_c} xizmat")
-                total += srvs_c
-            lines.append(f"\nJami: {total} ta xizmat")
-            await msg.answer("\n".join(lines))
-        else:
-            await msg.answer("API dan xizmatlar yuklanmadi.\nURL va kalitni tekshiring.")
-    except Exception as e:
-        await msg.answer(f"Xato: {e}")
-
-@dp.callback_query(F.data.startswith("APIVIEW:"))
-async def cb_api_view(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    aid = int(call.data[8:])
-    a   = db().execute("SELECT * FROM apis WHERE id=?", (aid,)).fetchone()
-    if not a: return
-    domain = a['url'].replace("https://","").replace("http://","").split("/")[0]
-    b = InlineKeyboardBuilder()
-    b.button(text="🔄 Kalitni o'zgartirish", callback_data=f"API_CHKEY:{aid}")
-    b.button(text="🗑 O'chirish",             callback_data=f"API_DEL:{aid}")
-    b.button(text="◀️ Orqaga",               callback_data="API_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(
-            f"{domain}\n\nURL: {a['url']}\nKalit: <code>{a['key']}</code>\nNarx: {a['price']} UZS",
-            reply_markup=b.as_markup(), parse_mode="HTML")
-    except:
-        await call.message.answer(
-            f"{domain}\n\nURL: {a['url']}\nKalit: <code>{a['key']}</code>\nNarx: {a['price']} UZS",
-            reply_markup=b.as_markup(), parse_mode="HTML")
-
-@dp.callback_query(F.data == "API_BACK")
-async def cb_api_back(call: types.CallbackQuery):
-    apis = get_apis()
-    b = InlineKeyboardBuilder()
-    for i, a in enumerate(apis, 1):
-        domain = a['url'].replace("https://","").replace("http://","").split("/")[0]
-        b.button(text=f"{i}. {domain}", callback_data=f"APIVIEW:{a['id']}")
-    b.button(text="➕ API qo'shish", callback_data="API_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"API'lar ({len(apis)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"API'lar ({len(apis)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("API_DEL:"))
-async def cb_api_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    aid = int(call.data[8:])
-    c = db(); c.execute("DELETE FROM apis WHERE id=?", (aid,)); c.commit(); c.close()
-    await call.answer("API o'chirildi!", show_alert=True)
-    apis = get_apis()
-    b = InlineKeyboardBuilder()
-    for i, a in enumerate(apis, 1):
-        domain = a['url'].replace("https://","").replace("http://","").split("/")[0]
-        b.button(text=f"{i}. {domain}", callback_data=f"APIVIEW:{a['id']}")
-    b.button(text="➕ API qo'shish", callback_data="API_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"API'lar ({len(apis)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"API'lar ({len(apis)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("API_CHKEY:"))
-async def cb_api_chkey(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    aid = int(call.data[10:])
-    await state.update_data(edit_api_id=aid)
-    await call.message.answer("Yangi kalitni kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.api_new_key)
-
-@dp.message(AdmS.api_new_key)
-async def adm_api_new_key(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("UPDATE apis SET key=? WHERE id=?", (msg.text.strip(), data.get("edit_api_id"))); c.commit(); c.close()
-    await msg.answer("✅ API kaliti yangilandi!", reply_markup=kb_admin())
-
-# ── Xabar yuborish ──
-@dp.message(F.text == "📨 Xabar yuborish")
-async def h_broadcast(msg: types.Message, state: FSMContext):
-    if msg.from_user.id not in ADMIN_IDS: return
-    await msg.answer("Barcha foydalanuvchilarga yuboriladigan xabarni kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.broadcast)
-
-@dp.message(AdmS.broadcast)
-async def adm_broadcast(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.clear()
-    users = db().execute("SELECT id FROM users").fetchall()
-    ok = fail = 0
-    for u in users:
-        try:
-            await bot.copy_message(u[0], msg.chat.id, msg.message_id)
-            ok += 1
-        except: fail += 1
-    await msg.answer(f"✅ Yuborildi: {ok}\n❌ Xato: {fail}", reply_markup=kb_admin())
-
-# ── FAQ ──
-@dp.message(F.text == "❓ FAQ")
-async def h_admin_faq(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    faqs = get_faqs()
-    b = InlineKeyboardBuilder()
-    for f in faqs:
-        b.button(text=f['q'][:35], callback_data=f"AFAQ:{f['id']}")
-    b.button(text="➕ Qo'shish", callback_data="FAQ_ADD")
-    b.adjust(1)
-    await msg.answer(f"FAQ ({len(faqs)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "FAQ_ADD")
-async def cb_faq_add(call: types.CallbackQuery, state: FSMContext):
-    if call.from_user.id not in ADMIN_IDS: return
-    await call.message.answer("Savol kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.faq_q)
-
-@dp.message(AdmS.faq_q)
-async def adm_faq_q(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    await state.update_data(faq_q=msg.text.strip())
-    await msg.answer("Javob kiriting:", reply_markup=kb_back())
-    await state.set_state(AdmS.faq_a)
-
-@dp.message(AdmS.faq_a)
-async def adm_faq_a(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    data = await state.get_data(); await state.clear()
-    c = db(); c.execute("INSERT INTO faqs(q,a) VALUES(?,?)", (data["faq_q"], msg.text.strip())); c.commit(); c.close()
-    await msg.answer("✅ FAQ qo'shildi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data.startswith("AFAQ:"))
-async def cb_afaq(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    fid = int(call.data[5:])
-    f   = db().execute("SELECT * FROM faqs WHERE id=?", (fid,)).fetchone()
-    if not f: return
-    b = InlineKeyboardBuilder()
-    b.button(text="🗑 O'chirish", callback_data=f"FAQ_DEL:{fid}")
-    b.button(text="◀️ Orqaga",   callback_data="AFAQ_BACK")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"{f['q']}\n\n{f['a']}", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"{f['q']}\n\n{f['a']}", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data.startswith("FAQ_DEL:"))
-async def cb_faq_del(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    fid = int(call.data[8:])
-    c = db(); c.execute("DELETE FROM faqs WHERE id=?", (fid,)); c.commit(); c.close()
-    await call.answer("O'chirildi!", show_alert=True)
-    faqs = get_faqs()
-    b = InlineKeyboardBuilder()
-    for f in faqs:
-        b.button(text=f['q'][:35], callback_data=f"AFAQ:{f['id']}")
-    b.button(text="➕ Qo'shish", callback_data="FAQ_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"FAQ ({len(faqs)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"FAQ ({len(faqs)} ta):", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "AFAQ_BACK")
-async def cb_afaq_back(call: types.CallbackQuery):
-    faqs = get_faqs()
-    b = InlineKeyboardBuilder()
-    for f in faqs:
-        b.button(text=f['q'][:35], callback_data=f"AFAQ:{f['id']}")
-    b.button(text="➕ Qo'shish", callback_data="FAQ_ADD")
-    b.adjust(1)
-    try:
-        await call.message.edit_text(f"FAQ ({len(faqs)} ta):", reply_markup=b.as_markup())
-    except:
-        await call.message.answer(f"FAQ ({len(faqs)} ta):", reply_markup=b.as_markup())
-
-# ── Start xabar ──
-@dp.message(F.text == "✉️ Start xabar")
-async def h_start_msg(msg: types.Message):
-    if msg.from_user.id not in ADMIN_IDS: return
-    b = InlineKeyboardBuilder()
-    b.button(text="📝 Matn o'zgartirish", callback_data="STMSG_TEXT")
-    b.button(text="🖼 Rasm o'zgartirish", callback_data="STMSG_PHOTO")
-    b.button(text="🗑 Rasmni o'chirish",  callback_data="STMSG_DEL_PHOTO")
-    b.button(text="👁 Ko'rish",           callback_data="STMSG_PREVIEW")
-    b.adjust(2, 2)
-    cur_text  = gcfg("start_text") or "Kiritilmagan"
-    cur_photo = "✅ Bor" if gcfg("start_photo") else "❌ Yo'q"
-    await msg.answer(f"Start xabar\n\nMatn: {cur_text[:60]}\nRasm: {cur_photo}", reply_markup=b.as_markup())
-
-@dp.callback_query(F.data == "STMSG_TEXT")
-async def cb_stmsg_text(call: types.CallbackQuery, state: FSMContext):
-    await call.message.answer("Yangi start matnini kiriting (HTML formatda):", reply_markup=kb_back())
-    await state.set_state(AdmS.start_msg)
-
-@dp.message(AdmS.start_msg)
-async def adm_start_msg(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    scfg("start_text", msg.html_text or msg.text)
-    await state.clear()
-    await msg.answer("✅ Start matni saqlandi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data == "STMSG_PHOTO")
-async def cb_stmsg_photo(call: types.CallbackQuery, state: FSMContext):
-    await call.message.answer("Rasm yuboring:", reply_markup=kb_back())
-    await state.set_state(AdmS.start_photo_st)
-
-@dp.message(AdmS.start_photo_st)
-async def adm_start_photo(msg: types.Message, state: FSMContext):
-    if msg.text == "Orqaga":
-        await state.clear(); await msg.answer("Admin panel:", reply_markup=kb_admin()); return
-    if not msg.photo:
-        await msg.answer("Rasm yuboring!"); return
-    scfg("start_photo", msg.photo[-1].file_id)
-    await state.clear()
-    await msg.answer("✅ Rasm saqlandi!", reply_markup=kb_admin())
-
-@dp.callback_query(F.data == "STMSG_DEL_PHOTO")
-async def cb_stmsg_del_photo(call: types.CallbackQuery):
-    scfg("start_photo", "")
-    await call.answer("✅ Rasm o'chirildi!", show_alert=True)
-
-@dp.callback_query(F.data == "STMSG_PREVIEW")
-async def cb_stmsg_preview(call: types.CallbackQuery):
-    txt   = gcfg("start_text") or "Botga xush kelibsiz!"
-    photo = gcfg("start_photo")
-    if photo:
-        await call.message.answer_photo(photo, caption=txt, parse_mode="HTML")
-    else:
-        await call.message.answer(txt, parse_mode="HTML")
-
-# ── Buyurtma status (admin) ──
-@dp.callback_query(F.data.startswith("ADCMP:"))
-async def cb_adcmp(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    oid = int(call.data[6:])
-    c = db()
-    row = c.execute("SELECT uid FROM orders WHERE id=?", (oid,)).fetchone()
-    c.execute("UPDATE orders SET status='Bajarildi' WHERE id=?", (oid,)); c.commit(); c.close()
-    try:
-        await call.message.edit_text(f"✅ #{oid} bajarildi!")
-    except:
-        await call.answer("✅ Bajarildi!", show_alert=True)
-    if row:
-        try: await bot.send_message(row[0], f"✅ #{oid} buyurtmangiz bajarildi!")
-        except: pass
-
-@dp.callback_query(F.data.startswith("ADCANC:"))
-async def cb_adcanc(call: types.CallbackQuery):
-    if call.from_user.id not in ADMIN_IDS: return
-    oid = int(call.data[7:])
-    c   = db()
-    row = c.execute("SELECT uid,price FROM orders WHERE id=?", (oid,)).fetchone()
-    if row:
-        c.execute("UPDATE orders SET status='Bekor qilindi' WHERE id=?", (oid,))
-        c.execute("UPDATE users SET balance=balance+? WHERE id=?", (row[1], row[0]))
-        c.commit()
-    c.close()
-    try:
-        await call.message.edit_text(f"❌ #{oid} bekor qilindi!")
-    except:
-        await call.answer("❌ Bekor qilindi!", show_alert=True)
-    if row:
-        try: await bot.send_message(row[0], f"❌ #{oid} bekor qilindi. {row[1]:,} So'm qaytarildi.")
-        except: pass
-
-# ══════════════════════════════════════════
-#  MAIN
-# ══════════════════════════════════════════
-async def main():
-    init_db()
-    logging.info("Bot ishga tushdi!")
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+function dostlar(){
+$text2 = "🏆 TOP10 = Do'stlar\n\n";
+$daten2 = [];
+$rev2 = [];
+$fayllar2 = glob("foydalanuvchi/referal/*.*");
+foreach($fayllar2 as $file2){
+if(mb_stripos($file2,".txt")!==false){
+$value2 = file_get_contents($file2);
+$id2 = str_replace(["foydalanuvchi/referal/",".txt"],["",""],$file2);
+$daten2[$value2] = $id2;
+$rev2[$id2] = $value2;
+}
+echo $file2;
+}
+asort($rev2);
+$reversed2 = array_reverse($rev2);
+for($i2=0;$i2<10;$i2+=1){
+$order2 = $i2+1;
+$id2 = $daten2["$reversed2[$i2]"];
+$text2.= "<b>{$order2}</b>. <a href='tg://user?id={$id2}'>{$id2}</a> - "."<code>".$reversed2[$i2]."</code>"." <b>ta</b>"."\n";
+}
+return $text2;
+}
+
+function deleteFolder($path){
+if(is_dir($path) === true){
+$files = array_diff(scandir($path), array('.', '..'));
+foreach ($files as $file)
+deleteFolder(realpath($path) . '/' . $file);
+return rmdir($path);
+}else if (is_file($path) === true)
+return unlink($path);
+return false;
+}
+
+function joinchat($id){
+global $mid;
+$array = array("inline_keyboard");
+$kanallar=file_get_contents("sozlamalar/kanal/ch.txt");
+$ex = explode("\n",$kanallar);
+for($i=0;$i<=count($ex) -1;$i++){
+$first_line = $ex[$i];
+$first_ex = explode("@",$first_line);
+$url = $first_ex[1];
+$ism=bot('getChat',['chat_id'=>"@".$url,])->result->title;
+$ret = bot("getChatMember",[
+"chat_id"=>"@$url",
+"user_id"=>$id,
+]);
+$stat = $ret->result->status;
+if((($stat=="creator" or $stat=="administrator" or $stat=="member"))){
+$array['inline_keyboard']["$i"][0]['text'] = "✅ ". $ism;
+$array['inline_keyboard']["$i"][0]['url'] = "https://t.me/$url";
+}else{
+$array['inline_keyboard']["$i"][0]['text'] = "❌ ". $ism;
+$array['inline_keyboard']["$i"][0]['url'] = "https://t.me/$url";
+$uns = true;
+}}
+
+if($uns == true){
+bot("sendMessage",[
+"chat_id"=>$id,
+"text"=>"<b>⚠️ Botdan foydalanish uchun quyidagi kanalimizga azo bo'ling va /start  bosing!</b>",
+"parse_mode"=>"html",
+"reply_to_message_id"=>$mid,
+"disable_web_page_preview"=>true,
+"reply_markup"=>json_encode($array),
+]);
+return false;
+}else{
+return true;
+}}
+
+$update = json_decode(file_get_contents('php://input'));
+$message = $update->message;
+$cid = $message->chat->id;
+$tx = $message->text;
+$mid = $message->message_id;
+$name = $message->from->first_name;
+$fid = $message->from->id;
+$callback = $update->callback_query;
+$data = $callback->data;
+$callid = $callback->id;
+$ccid = $callback->message->chat->id;
+$cmid = $callback->message->message_id;
+$from_id = $update->message->from->id;
+$token = $message->text;
+$text = $message->text;
+$message_id = $callback->message->message_id;
+$data = $update->callback_query->data;
+$callcid=$update->callback_query->message->chat->id;
+$doc = $update->message->document;
+$doc_id = $doc->file_id;
+$cqid = $update->callback_query->id;
+$callfrid = $update->callback_query->from->id;
+$botname = bot('getme',['FastKonsBot'])->result->username;
+#-----------------------------
+mkdir("foydalanuvchi");
+mkdir("foydalanuvchi/sarmoya/$fid");
+mkdir("foydalanuvchi/bot/$fid");
+mkdir("foydalanuvchi/sarhisob");
+mkdir("foydalanuvchi/sarmoya");
+mkdir("foydalanuvchi/referal");
+mkdir("foydalanuvchi/hisob");
+mkdir("sozlamalar/hamyon");
+mkdir("sozlamalar/kanal");
+mkdir("sozlamalar/tugma");
+mkdir("sozlamalar/xizmat");
+mkdir("sozlamalar/xizmatlar");
+mkdir("sozlamalar/bot");
+mkdir("sozlamalar/pul");
+mkdir("statistika");
+mkdir("nak/$cid");
+mkdir("nak");
+mkdir("sozlamalar");
+mkdir("otkazma");
+mkdir("botlar");
+mkdir("step");
+mkdir("baza");
+mkdir("ban");
+#-----------------------------
+
+if(!file_exists("foydalanuvchi/hisob/$fid.1.txt")){
+file_put_contents("foydalanuvchi/hisob/$fid.1.txt","0");
+}
+if(!file_exists("foydalanuvchi/hisob/$fid.1txt")){
+file_put_contents("foydalanuvchi/hisob/$fid.1txt","0");
+}
+if(!file_exists("foydalanuvchi/hisob/$fid.txt")){
+file_put_contents("foydalanuvchi/hisob/$fid.txt","0");
+}
+if(!file_exists("foydalanuvchi/sarhisob/$fid.kiritgan")){
+file_put_contents("foydalanuvchi/sarhisob/$fid.kiritgan","0");
+}
+if(!file_exists("foydalanuvchi/sarhisob/$fid.chiqargan")){
+file_put_contents("foydalanuvchi/sarhisob/$fid.chiqargan","0");
+}
+if(!file_exists("foydalanuvchi/referal/$fid.txt")){
+file_put_contents("foydalanuvchi/referal/$fid.txt","0");
+}
+if(!file_exists("foydalanuvchi/sarmoya/$fid/sarson.txt")){  
+file_put_contents("foydalanuvchi/sarmoya/$fid/sarson.txt","0");
+}
+if(!file_exists("sozlamalar/pul/referal.txt")){
+file_put_contents("sozlamalar/pul/referal.txt","100");
+}
+if(!file_exists("sozlamalar/pul/valyuta.txt")){
+file_put_contents("sozlamalar/pul/valyuta.txt","so'm");
+}
+if(!file_exists("sozlamalar/tugma/tugma1.txt")){
+file_put_contents("sozlamalar/tugma/tugma1.txt","🤖 Botlarni boshqarish");
+}
+if(!file_exists("sozlamalar/tugma/tugma2.txt")){
+file_put_contents("sozlamalar/tugma/tugma2.txt","🗄 Kabinet");
+}
+if(!file_exists("sozlamalar/tugma/tugma3.txt")){
+file_put_contents("sozlamalar/tugma/tugma3.txt","💵 Pul ishlash");
+}
+if(!file_exists("sozlamalar/tugma/tugma4.txt")){
+file_put_contents("sozlamalar/tugma/tugma4.txt","☎️ Murojaat");
+}
+if(!file_exists("sozlamalar/tugma/tugma5.txt")){
+file_put_contents("sozlamalar/tugma/tugma5.txt","🛒 Bot do'koni");
+}
+if(!file_exists("sozlamalar/tugma/tugma6.txt")){
+file_put_contents("sozlamalar/tugma/tugma6.txt","📦 Buyurtma berish");
+}
+if(!file_exists("sozlamalar/tugma/tugma7.txt")){
+file_put_contents("sozlamalar/tugma/tugma7.txt","🔗 Taklifnoma");
+}
+if(!file_exists("sozlamalar/kanal/ch.txt")){
+file_put_contents("sozlamalar/kanal/ch.txt","@Reliabledev");
+}
+if(!file_exists("otkazma/$fid.idraqam")){  
+file_put_contents("otkazma/$fid.idraqam","");
+}
+if(!file_exists("otkazma/$fid.pulraqam")){  
+file_put_contents("otkazma/$fid.pulraqam","");
+}
+if(!file_exists("statistika/hammabot.txt")){  
+file_put_contents("statistika/hammabot.txt","0");
+}
+if(!file_exists("statistika/aktivbot.txt")){  
+file_put_contents("statistika/aktivbot.txt","0");
+}
+if(file_get_contents("statistika/obunachi.txt")){
+} else{
+file_put_contents("statistika/obunachi.txt", "0");
+}
+if(!file_exists("baza/all.num")){  
+file_put_contents("baza/all.num","0");
+}
+
+$kiritgan=file_get_contents("foydalanuvchi/hisob/$fid.1.txt");
+$odam=file_get_contents("foydalanuvchi/referal/$fid.txt");
+$odamcha = file_get_contents("foydalanuvchi/referal/$fid.db");
+$asosiy=file_get_contents("foydalanuvchi/hisob/$fid.txt");
+$sar=file_get_contents("foydalanuvchi/hisob/$fid.1txt");
+$sarson = file_get_contents("foydalanuvchi/sarmoya/$fid/sarson.txt");
+$pul = file_get_contents("sozlamalar/pul/valyuta.txt");
+$taklifpul = file_get_contents("sozlamalar/pul/referal.txt");
+$tugma1 = file_get_contents("sozlamalar/tugma/tugma1.txt");
+$tugma2 = file_get_contents("sozlamalar/tugma/tugma2.txt");
+$tugma3 = file_get_contents("sozlamalar/tugma/tugma3.txt");
+$tugma4 = file_get_contents("sozlamalar/tugma/tugma4.txt");
+$tugma5 = file_get_contents("sozlamalar/tugma/tugma5.txt");
+$tugma6 = file_get_contents("sozlamalar/tugma/tugma6.txt");
+$tugma7 = file_get_contents("sozlamalar/tugma/tugma7.txt");
+$kanallar=file_get_contents("sozlamalar/kanal/ch.txt");
+#-----------------------------------#
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$royxat = file_get_contents("sozlamalar/bot/$kategoriya/royxat.txt");
+$type = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/turi.txt");
+$narx = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/narx.txt");
+$tavsif = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/tavsif.txt");
+#-----------------------------------#
+$kategoriya2 = file_get_contents("sozlamalar/hamyon/kategoriya.txt");
+$raqam = file_get_contents("sozlamalar/hamyon/$kategoriya2/raqam.txt");
+#-----------------------------------#
+
+$saved = file_get_contents("step/odam.txt");
+$num = file_get_contents("baza/all.num");
+$ban = file_get_contents("ban/$fid.txt");
+$statistika = file_get_contents("statistika/obunachi.txt");
+$aktivbot=file_get_contents("statistika/aktivbot.txt");
+$hammabot=file_get_contents("statistika/hammabot.txt");
+$soat=date("H:i",strtotime("2 hour"));
+$referalsum = file_get_contents("foydalanuvchi/hisob/$fid.txt");
+$referalid = file_get_contents("foydalanuvchi/referal/$fid.referal");
+$referalcid = file_get_contents("foydalanuvchi/referal/$ccid.referal");
+$userstep=file_get_contents("step/$fid.txt");
+$userstep1=file_get_contents("step/$fid.txt1");
+
+if(mb_stripos($text,"/start $cid")){
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"",
+'parse_mode'=>'html',
+]);
+}else{
+$idref = "foydalanuvchi/referal/$ex.db";
+$idref2 = file_get_contents($idref);
+$id = "$cid\n";
+$handle = fopen($idref, 'a+');
+fwrite($handle, $id);
+fclose($handle);
+if(mb_stripos($idref2,$cid) !== false ){
+}else{
+$pub=explode(" ",$text);
+$ex=$pub[1];
+$pulim = file_get_contents("foydalanuvchi/hisob/$ex.txt");
+$a=$pulim+$taklifpul;
+file_put_contents("foydalanuvchi/hisob/$ex.txt","$a");
+$odam = file_get_contents("foydalanuvchi/referal/$ex.txt");
+$b=$odam+1;
+file_put_contents("foydalanuvchi/referal/$ex.txt","$b");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menu,
+]);
+bot('SendMessage',[
+'chat_id'=>$ex,
+'text'=>"<b>📳 Sizda yangi <a href='tg://user?id=$cid'>taklif</a> mavjud!</b>
+
+<i>Hisobingizga $taklifpul $pul qo'shildi!</i>",
+'parse_mode'=>'html',
+]);
+}}
+
+if($tx){
+if($ban == "ban"){
+exit();
+}else{
+}}
+
+if($data){
+$ban = file_get_contents("ban/$ccid.txt");
+if($ban == "ban"){
+exit();
+}else{
+}}
+
+$main_menu = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"$tugma1"]],
+[['text'=>"$tugma2"],['text'=>"$tugma3"]],
+[['text'=>"$tugma5"],['text'=>"$tugma4"]],
+[['text'=>"🛠️ Sozlamalar"]],
+]]);
+
+$nak_menu = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"📦 Buyurtma berish"]],
+[['text'=>"$tugma2"],['text'=>"$tugma3"]],
+[['text'=>"📊 Buyurtma kuzatish"],['text'=>"$tugma4"]],
+[['text'=>"🛠️ Sozlamalar"]],
+]]);
+
+$main_menuad = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"$tugma1"]],
+[['text'=>"$tugma2"],['text'=>"$tugma3"]],
+[['text'=>"$tugma5"],['text'=>"$tugma4"]],
+[['text'=>"🛠️ Sozlamalar"]],
+[['text'=>"🗄 Boshqaruv"]],
+]]);
+
+$asosiy_soz = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"*⃣ Birlamchi sozlamalar"]],
+[['text'=>"📢 Kanallar"],['text'=>"🤖 Bot holati"]],
+[['text'=>"🔑 Api sozlamalari"]],
+[['text'=>"🤖 Botlar"],['text'=>"🛍️ Xizmatlar"]],
+[['text'=>"🗄 Boshqaruv"]],
+]]);
+
+if($tx == "⚙️ Asosiy sozlamalar"){
+if($cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗄 Boshqaruv paneliga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$asosiy_soz
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🖥 Asosiy menyudasiz</b>",
+'parse_mode'=>"html",
+]);
+}}
+
+if($text=="🔙 Orqaga" and joinchat($cid)==true){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"Menu tanlang",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📦 Nakrutka Boʻlim",'callback_data'=>"nak_menu"]],
+[['text'=>"🤖 Maker Boʻlim",'callback_data'=>"mak_menu"]],
+]])
+]);
+}
+
+
+$admin1_menu = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"⚙️ Asosiy sozlamalar"]],
+[['text'=>"🎛 Tugmalar"],['text'=>"💳 Hamyonlar"]],
+[['text'=>"🔎 Foydalanuvchini boshqarish"]],
+[['text'=>"📨 Xabarnoma"],['text'=>"📊 Statistika"]],
+[['text'=>"🔙 Orqaga"]],
+]]);
+
+if($data == "nak_menu"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🗄 Nakrutka boʻlimiga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$nak_menu,
+]);
+unlink("step/odam.txt");
+}
+
+if($data == "mak_menu"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🗄 Maker boʻlimiga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$main_menu,
+]);
+unlink("step/odam.txt");
+}
+
+if($data == "boshqaruv" and $ccid == $admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗄 Boshqaruv paneliga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("step/odam.txt");
+}
+
+$orqaga1 = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]]
+]
+]);
+if($tx == "🗄 Boshqaruv" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗄 Boshqaruv paneliga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu
+]);
+unlink("step/$cid.txt");
+unlink("miqdor.txt");
+unlink("fbsh.txt");
+}
+
+$orqamak = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔚 Orqaga"]]
+]
+]);
+if($tx == "🔚 Orqaga"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🔚 Orqaga qaytingiz</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$main_menu
+]);
+unlink("step/$cid.txt");
+unlink("miqdor.txt");
+unlink("fbsh.txt");
+}
+
+$orqanak = json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"⬅️ Orqaga"]]
+]
+]);
+if($tx == "⬅️ Orqaga"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🔚 Orqaga qaytingiz</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$nak_menu
+]);
+unlink("step/$cid.txt");
+unlink("miqdor.txt");
+unlink("fbsh.txt");
+}
+
+$oddiy_xabar = file_get_contents("oddiy.txt");
+if($data == "oddiy_xabar" and $ccid==$admin){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga yuboriladigan xabar matnini yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("oddiy.txt","oddiy");
+}
+if($oddiy_xabar=="oddiy" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("oddiy.txt");
+}else{
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot('sendmessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga xabar yuborish boshlandi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$lich = file_get_contents("statistika/obunachi.txt");
+$lichka = explode("\n",$lich);
+foreach($lichka as $lichkalar){
+$usr=bot("sendMessage",[
+'chat_id'=>$lichkalar,
+'text'=>$text,
+'parse_mode'=>'HTML'
+]);
+unlink("oddiy.txt");
+}}}
+if($usr){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot("sendmessage",[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga muvaffaqiyatli yuborildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+unlink("oddiy.txt");
+}
+
+$forward_xabar = file_get_contents("forward.txt");
+if($data =="forward_xabar" and $ccid==$admin){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga yuboriladigan xabarni forward shaklida yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("forward.txt","forward");
+}
+if($forward_xabar=="forward" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("forward.txt");
+}else{
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot('sendmessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga xabar yuborish boshlandi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$lich = file_get_contents("statistika/obunachi.txt");
+$lichka = explode("\n",$lich);
+foreach($lichka as $lichkalar){
+$fors=bot("forwardMessage",[
+'from_chat_id'=>$cid,
+'chat_id'=>$lichkalar,
+'message_id'=>$mid,
+]);
+unlink("forward.txt");
+}}}
+if($fors){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+bot("sendmessage",[
+'chat_id'=>$admin,
+'text'=>"<b>$lich ta foydalanuvchiga muvaffaqiyatli yuborildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+unlink("forward.txt");
+}
+
+if($tx=="📨 Xabarnoma" and $cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📨 Yuboriladigan xabar turini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=> json_encode([
+'inline_keyboard'=>[
+[['text'=>"Oddiy xabar",'callback_data'=>"oddiy_xabar"]],
+[['text'=>"Forward xabar",'callback_data'=>"forward_xabar"]],
+]])
+]);
+}
+
+if($tx == "🤖 Botlar" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"🤖 <b>Botlarni sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📂 Kategoriyalar",'callback_data'=>"kategoriya"]],
+[['text'=>"🤖 Botlarni sozlash",'callback_data'=>"BotSet"]],
+]])
+]);
+}
+
+if($data == "bbosh"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"🤖 <b>Botlarni sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📂 Kategoriyalar",'callback_data'=>"kategoriya"]],
+[['text'=>"🤖 Botlarni sozlash",'callback_data'=>"BotSet"]],
+]])
+]);
+}
+
+if($data == "kategoriya"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📂 <b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Kategoriya qo'shish",'callback_data'=>"AdKat"]],
+[['text'=>"📄 Kategoriyalar ro'yxati",'callback_data'=>"listKat"]],
+[['text'=>"🔙 Orqaga",'callback_data'=>"bbosh"]]
+]])
+]);
+}
+
+if($data == "BotSet"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"🤖 <b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Bot qo'shish",'callback_data'=>"AdBot"]],
+[['text'=>"📄 Botlar ro'yxati",'callback_data'=>"listBot"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]]
+]])
+]);
+}
+
+if($data == "listKat"){
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"setKat-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Kategoriyalar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "setKat-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📁 <b>Kategoriya nomi:</b> $kat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑 O'chirish",'callback_data'=>"delKat-$kat"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"listKat"]]
+]])
+]);
+}
+
+if(mb_stripos($data, "delKat-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$k = str_replace("\n".$kat."","",$kategoriya);
+file_put_contents("sozlamalar/bot/kategoriya.txt",$k);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>O'chirish yakunlandi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"kategoriya"]]
+]
+])
+]);
+deleteFolder("sozlamalar/bot/$kat");
+}
+
+if($data == "listBot"){
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title ⏩","callback_data"=>"setBot-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Kategoriyalardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "setBot-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$more = explode("\n",$royxat);
+$soni = substr_count($royxat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"⚙ $title","callback_data"=>"bset-$title-$kat"];
+$keysboard2 = array_chunk($keys, 2);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($royxat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📋 <b>Botlar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"📂 Botlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "bset-")!==false){
+$ex = explode("-",$data);
+$roy = $ex[1];
+$kat = $ex[2];
+$narx = file_get_contents("sozlamalar/bot/$kat/$roy/narx.txt");
+$tavsif = file_get_contents("sozlamalar/bot/$kat/$roy/tavsif.txt");
+$type = file_get_contents("sozlamalar/bot/$kat/$roy/turi.txt");
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🤖 $type</b>
+
+<b>💬 Bot tili:</b> O'zbekcha
+<b>💵 Narxi:</b> $narx $pul
+<b>🗓 Kunlik to'lov:</b> 200 $pul
+
+📋 <b>Qo'shimcha ma'lumot:</b> <i>$tavsif</i>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑 O'chirish",'callback_data'=>"delBot-$kat-$roy-$type"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"listBot"]]
+]])
+]);
+}
+
+if(mb_stripos($data, "delBot-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$roy = $ex[2];
+$type = $ex[3];
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$k = str_replace("\n".$roy."","",$royxat);
+file_put_contents("sozlamalar/bot/$kat/royxat.txt",$k);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>O'chirish yakunlandi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"listBot"]]
+]])
+]);
+deleteFolder("sozlamalar/bot/$kat/$roy");
+unlink("sozlamalar/bot/$type.php");
+}
+
+if($data == "AdKat"){
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi kategoriya nomini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'AdKat');
+exit();
+}
+
+if($userstep == "AdKat"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+file_put_contents("sozlamalar/bot/kategoriya.txt","$kategoriya\n$text");
+mkdir("sozlamalar/bot/$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b>nomli kategoriya qo'shildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+if($data == "AdBot"){
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title","callback_data"=>"addb-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$AdBot = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Qaysi kategoriyaga qo'shamiz?</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$AdBot,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "addb-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>✅ Kategoriya tanlandi</b>
+
+📝 Bot turini yuboring: 
+<i>Stikersiz yuboring!</i>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","turi-$kat");
+exit();
+}
+
+if(mb_stripos($userstep, "turi-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if(isset($text)){
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+file_put_contents("sozlamalar/bot/$kat/royxat.txt","$royxat\n$text");
+mkdir("sozlamalar/bot/$kat/$text");
+file_put_contents("sozlamalar/bot/$kat/$text/turi.txt",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b>nomi qabul qilindi.</b>
+
+📝 Bot uchun narx yuboring:",
+'parse_mode'=>'html',
+]);
+file_put_contents("step/$cid.txt","narxi-$kat-$text-$text");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>⚠️ Faqat harflardan foydalaning!</b>",
+'parse_mode'=>'html',
+]);
+}}}
+
+if(mb_stripos($userstep, "narxi-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+$roy = $ex[2];
+$type = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+unlink("sozlamalar/bot/$kat/$roy");
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$k = str_replace("\n".$roy."","",$royxat);
+file_put_contents("sozlamalar/bot/$kat/royxat.txt",$k);
+}else{
+if(is_numeric($text)==true){
+file_put_contents("sozlamalar/bot/$kat/$roy/narx.txt",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>$text </b>$pul narxi qabul qilindi
+
+📝 Bot haqida malumot yuboring:",
+'parse_mode'=>'html',
+]);
+file_put_contents("step/$cid.txt","tavsif-$kat-$roy-$type");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>⚠️ Faqat raqamlardan foydalaning!</b>",
+'parse_mode'=>'html',
+]);
+}}}
+
+if(mb_stripos($userstep, "tavsif-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+$roy = $ex[2];
+$type = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+unlink("sozlamalar/bot/$kat/$roy");
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$k = str_replace("\n".$roy."","",$royxat);
+file_put_contents("sozlamalar/bot/$kat/royxat.txt",$k);
+}else{
+if(isset($text)){
+file_put_contents("sozlamalar/bot/$kat/$roy/tavsif.txt",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qabul qilindi</b>
+
+🗂 Bot kodini yuboring: $type.php bo'lishi kerak!",
+'parse_mode'=>'html',
+]);
+file_put_contents("step/$cid.txt","script-$kat-$roy-$type");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>⚠️ Faqat harflardan foydalaning!</b>",
+'parse_mode'=>'html',
+]);
+}}}
+
+if(mb_stripos($userstep, "script-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+$roy = $ex[2];
+$type = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+unlink("sozlamalar/bot/$kat/$roy");
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$k = str_replace("\n".$roy."","",$royxat);
+file_put_contents("sozlamalar/bot/$kat/royxat.txt",$k);
+}else{
+if(isset($doc)){
+$url = json_decode(file_get_contents('https://api.telegram.org/bot'.API_KEY.'/getFile?file_id='.$doc_id),true);
+$path=$url['result']['file_path'];
+$file = 'https://api.telegram.org/file/bot'.API_KEY.'/'.$path;
+$ok = file_put_contents("botlar/$type.php",file_get_contents($file));
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>✅ Yangi bot qo'shildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+unlink("step/$cid.txt");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qabul qilindi</b>
+
+🗂 Bot kodini yuboring: $type.php bo'lishi kerak!",
+'parse_mode'=>'html',
+]);
+}}}
+
+$taklif=file_get_contents("taklif.txt");
+if($data=="taklif_narxi" and $ccid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📝 Yangi qiymatni yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("taklif.txt","taklif");
+}
+if($taklif == "taklif" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("taklif.txt");
+}else{
+file_put_contents("sozlamalar/pul/referal.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Muvaffaqiyatli o'zgartirildi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu
+]);
+unlink("taklif.txt");
+}}
+
+$valyuta=file_get_contents("valyuta.txt");
+if($data=="valyuta_nomi" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📝 Yangi qiymatni yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("valyuta.txt","valyuta");
+}
+if($valyuta == "valyuta" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("valyuta.txt");
+}else{
+file_put_contents("sozlamalar/pul/valyuta.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Muvaffaqiyatli o'zgartirildi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu
+]);
+unlink("valyuta.txt");
+}}
+
+$fbsh = file_get_contents("fbsh.txt");
+if($tx=="🔎 Foydalanuvchini boshqarish" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Kerakli foydalanuvchining ID raqamini yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("fbsh.txt","idraqam");
+}
+
+if($fbsh=="idraqam" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("fbsh.txt");
+}else{
+if(file_exists("ban/$tx.txt")){
+if(file_exists("foydalanuvchi/hisob/$tx.txt")){
+file_put_contents("step/odam.txt",$tx);
+$asos = file_get_contents("foydalanuvchi/hisob/$tx.txt");
+$tpul = file_get_contents("foydalanuvchi/hisob/$tx.1txt");
+$kirit=file_get_contents("foydalanuvchi/hisob/$tx.1.txt");
+$odam = file_get_contents("foydalanuvchi/referal/$tx.txt");
+bot("sendMessage",[
+"chat_id"=>$admin,
+"text"=>"<b>✅ Foydalanuvchi topildi:</b> <a href='tg://user?id=$tx'>$tx</a>
+
+<b>Asosiy balans:</b> $asos $pul
+<b>Sarmoya balans:</b> $tpul $pul
+<b>Takliflari:</b> $odam ta
+
+<b>Kiritgan pullari:</b> $kirit $pul",
+'parse_mode'=>"html",
+"reply_markup"=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔕 Bandan olish",'callback_data'=>"unban"]],
+[['text'=>"➕ Pul qo'shish",'callback_data'=>"val_qoshish"],['text'=>"➖ Pul ayirish",'callback_data'=>"val_ayirish"]],
+[['text'=>"📊 Sarmoya qo'shish",'callback_data'=>"tolov_qoshish"],['text'=>"📊 Sarmoya ayirish",'callback_data'=>"tolov_ayirish"]],
+]])
+]); 
+unlink("fbsh.txt");
+}else{
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Ushbu foydalanuvchi botdan foydalanmaydi!</b>
+
+<i>Qayta yuboring:</i>",
+'parse_mode'=>'html',
+]);
+}}else{
+if(file_exists("foydalanuvchi/hisob/$tx.txt")){
+file_put_contents("step/odam.txt",$tx);
+$asos = file_get_contents("foydalanuvchi/hisob/$tx.txt");
+$tpul = file_get_contents("foydalanuvchi/hisob/$tx.1txt");
+$kirit=file_get_contents("foydalanuvchi/hisob/$tx.1.txt");
+$odam = file_get_contents("foydalanuvchi/referal/$tx.txt");
+bot("sendMessage",[
+"chat_id"=>$admin,
+"text"=>"<b>✅ Foydalanuvchi topildi:</b> <a href='tg://user?id=$tx'>$tx</a>
+
+<b>Asosiy balans:</b> $asos $pul
+<b>Sarmoya balans:</b> $tpul $pul
+<b>Takliflari:</b> $odam ta
+
+<b>Kiritgan pullari:</b> $kirit $pul",
+'parse_mode'=>"html",
+"reply_markup"=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔔 Banlash",'callback_data'=>"ban"]],
+[['text'=>"➕ Pul qo'shish",'callback_data'=>"val_qoshish"],['text'=>"➖ Pul ayirish",'callback_data'=>"val_ayirish"]],
+[['text'=>"📊 Sarmoya qo'shish",'callback_data'=>"tolov_qoshish"],['text'=>"📊 Sarmoya ayirish",'callback_data'=>"tolov_ayirish"]],
+]])
+]);
+unlink("fbsh.txt");
+}else{
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Ushbu foydalanuvchi botdan foydalanmaydi!</b>
+
+<i>Qayta yuboring:</i>",
+'parse_mode'=>'html',
+]);
+}}}}
+
+if($data=="ban"){
+file_put_contents("ban/$saved.txt","ban");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>banlandi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Admin tomonidan bloklandingiz!</b>",
+'parse_mode'=>"html",
+]);
+unlink("step/odam.txt");
+}
+
+if($data=="unban"){
+unlink("ban/$saved.txt");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>banlandan olindi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Admin tomonidan blokdan olindingiz!</b>",
+'parse_mode'=>"html",
+]);
+unlink("step/odam.txt");
+}
+
+$valqosh = file_get_contents("valqosh.txt");
+if($data == "val_qoshish" and $ccid==$admin){
+file_put_contents("valqosh.txt","valqosh");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'parse_mode'=>"html",
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>ning hisobiga qancha pul qo'shmoqchisiz?</b>",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+
+if($valqosh == "valqosh" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("valqosh.txt");
+unlink("step/odam.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Adminlar tomonidan hisobingiz $tx $pul to'ldirildi</b>",
+'parse_mode'=>"html",
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi hisobiga $tx $pul qo'shildi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$currency=file_get_contents("foydalanuvchi/hisob/$saved.1.txt");
+$get = file_get_contents("foydalanuvchi/hisob/$saved.txt");
+$get += $tx;
+$currency += $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1.txt",$currency);
+file_put_contents("foydalanuvchi/hisob/$saved.txt", $get);
+unlink("valqosh.txt");
+unlink("step/odam.txt");
+}}
+
+$valayir = file_get_contents("valayir.txt");
+if($data == "val_ayirish" and $ccid==$admin){
+file_put_contents("valayir.txt","valayir");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'parse_mode'=>"html",
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>ning hisobidan qancha pul ayirmoqchisiz?</b>",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+
+if($valayir == "valayir" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("valayir.txt");
+unlink("step/odam.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Adminlar tomonidan hisobingizdan $tx $pul olib tashlandi</b>",
+'parse_mode'=>"html",
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi hisobidan $tx $pul olib tashlandi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$currency=file_get_contents("foydalanuvchi/hisob/$saved.1.txt");
+$get = file_get_contents("foydalanuvchi/hisob/$saved.txt");
+$get -= $tx;
+$currency -= $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1.txt",$currency);
+file_put_contents("foydalanuvchi/hisob/$saved.txt", $get);
+unlink("valayir.txt");
+unlink("step/odam.txt");
+}}
+
+$tolqosh = file_get_contents("tvalqosh.txt");
+if($data=="tolov_qoshish" and $ccid==$admin){
+file_put_contents("tvalqosh.txt","tvalqosh");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'parse_mode'=>"html",
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>ning sarmoya hisobiga qancha pul qo'shmoqchisiz?</b>",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+
+if($tolqosh == "tvalqosh" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tvalqosh.txt");
+unlink("step/odam.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Adminlar tomonidan sarmoya hisobingiz $tx $pul to'ldirildi</b>",
+'parse_mode'=>"html",
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi sarmoya hisobiga $tx $pul qo'shildi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$currency=file_get_contents("foydalanuvchi/hisob/$saved.1.txt");
+$currency += $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1.txt",$currency);
+$buyurtmab=file_get_contents("foydalanuvchi/hisob/$saved.1txt");
+$buyurtmab+= $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1txt", $buyurtmab);
+unlink("tvalqosh.txt");
+unlink("step/odam.txt");
+}}
+
+$tolayir = file_get_contents("tvalayir.txt");
+if($data=="tolov_ayirish" and $ccid==$admin){
+file_put_contents("tvalayir.txt","tvalayir");
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'parse_mode'=>"html",
+'text'=>"<a href='tg://user?id=$saved'>$saved</a> <b>ning sarmoya hisobidan qancha pul ayirmoqchisiz?</b>",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+
+if($tolayir == "tvalayir" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tvalayir.txt");
+unlink("step/odam.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$saved,
+'text'=>"<b>Adminlar tomonidan sarmoya hisobingizdan $tx $pul olib tashlandi</b>",
+'parse_mode'=>"html",
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi sarmoya hisobidan $tx $pul olib tashlandi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$currency=file_get_contents("foydalanuvchi/hisob/$saved.1.txt");
+$currency -= $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1.txt",$currency);
+$buyurtmab=file_get_contents("foydalanuvchi/hisob/$saved.1txt");
+$buyurtmab-= $tx;
+file_put_contents("foydalanuvchi/hisob/$saved.1txt", $buyurtmab);
+unlink("tvalayir.txt");
+unlink("step/odam.txt");
+}}
+
+if($tx=="💳 Hamyonlar" and $cid==$admin){
+$kategoriya = file_get_contents("sozlamalar/hamyon/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title- ni o'chirish","callback_data"=>"delete-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"➕ Yangi to'lov tizimi qo'shish",'callback_data'=>"yangi_tolov"]];
+$keysboard2[] = [['text'=>"🔗 Taklif narxi",'callback_data'=>"taklif_narxi"],['text'=>"💶 Valyuta nomi",'callback_data'=>"valyuta_nomi"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$key,
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Yangi to'lov tizimi qo'shish",'callback_data'=>"yangi_tolov"]],
+[['text'=>"🔗 Taklif narxi",'callback_data'=>"taklif_narxi"],['text'=>"💶 Valyuta nomi",'callback_data'=>"valyuta_nomi"]],
+]])
+]);
+}}
+
+if(mb_stripos($data, "delete-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$royxat = file_get_contents("sozlamalar/hamyon/kategoriya.txt");
+$k = str_replace("\n".$kat."","",$royxat);
+file_put_contents("sozlamalar/hamyon/kategoriya.txt",$k);
+deleteFolder("sozlamalar/hamyon/$kat");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>To'lov tizimi o'chirildi!</b>",
+'parse_mode'=>'html',
+]);
+}
+
+if($data== "yangi_tolov"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>Yangi to'lov tizimi nomini yuboring:
+
+Masalan:</b> Click",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","tolov");
+}
+
+if($userstep=="tolov"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if(isset($text)){
+$kategoriya2 = file_get_contents("sozlamalar/hamyon/kategoriya.txt");
+file_put_contents("sozlamalar/hamyon/kategoriya.txt","$kategoriya2\n$text");
+mkdir("sozlamalar/hamyon/$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Ushbu to'lov tizimidagi hamyoningiz raqamini yuboring:</b>",
+'parse_mode'=>'html',
+]);
+file_put_contents("step/$cid.txt","raqam-$text");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Yangi to'lov tizimi nomini yuboring:
+
+Masalan:</b> Click",
+'parse_mode'=>'html',
+]);
+}}}
+
+if(mb_stripos($userstep, "raqam-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+unlink("sozlamalar/hamyon/$kat");
+}else{
+if(is_numeric($text)){
+file_put_contents("sozlamalar/hamyon/$kat/raqam.txt",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Yangi to'lov tizimi qo'shildi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+unlink("step/$cid.txt");
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Ushbu to'lov tizimidagi hamyoningiz raqamini yuboring:</b>",
+'parse_mode'=>'html',
+]);
+}}}
+
+if($tx=="🎛 Tugmalar" and $cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🎛 Tugma sozlash bo'limidasiz tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🖥 Asosiy menyudagi tugmalar",'callback_data'=>"asosiy_tugma"]],
+[['text'=>"💵 Pul ishlash bo'limi tugmalari",'callback_data'=>"pulishlash_tugma"]],
+[['text'=>"⚠️ O'z holiga qaytarish",'callback_data'=>"reset_tugma"]],
+]])
+]);
+}
+
+if($data=="tugma_sozlash" and $ccid==$admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🎛 Tugma sozlash bo'limidasiz tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🖥 Asosiy menyudagi tugmalar",'callback_data'=>"asosiy_tugma"]],
+[['text'=>"💵 Pul ishlash bo'limi tugmalari",'callback_data'=>"pulishlash_tugma"]],
+[['text'=>"⚠️ O'z holiga qaytarish",'callback_data'=>"reset_tugma"]],
+]])
+]);
+}
+
+if($data=="asosiy_tugma" and $ccid==$admin){
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"$tugma1",'callback_data'=>"tg1"]],
+[['text'=>"$tugma2",'callback_data'=>"tg2"],['text'=>"$tugma3",'callback_data'=>"tg3"]],
+[['text'=>"$tugma5",'callback_data'=>"tg5"],['text'=>"$tugma4",'callback_data'=>"tg4"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"tugma_sozlash"]],
+]])
+]);
+}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="tg1" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","tg1");
+}
+if($tugma == "tg1" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma1.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="tg2" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","tg2");
+}
+if($tugma == "tg2" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma2.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="tg3" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","tg3");
+}
+if($tugma == "tg3" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma3.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="tg4" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","tg4");
+}
+if($tugma == "tg4" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma4.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="tg5" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","tg5");
+}
+if($tugma == "tg5" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma5.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+if($data=="pulishlash_tugma" and $ccid==$admin){
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"$tugma7",'callback_data'=>"pultg2"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"tugma_sozlash"]],
+]])
+]);
+}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="pultg1" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","pultg1");
+}
+if($tugma == "pultg1" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma6.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+$tugma=file_get_contents("tugma.txt");
+if($data=="pultg2" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma uchun yangi nom yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("tugma.txt","pultg2");
+}
+if($tugma == "pultg2" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("tugma.txt");
+}else{
+file_put_contents("sozlamalar/tugma/tugma7.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Qabul qilindi!</b>
+
+<i>Tugma nomi</i> <b>$tx</b> <i>ga o'zgartirildi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+unlink("tugma.txt");
+}}
+
+if($data=="reset_tugma" and $ccid==$admin){
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Tugma nomlari o'chirilmoqda...</b>",
+'parse_mode'=>"html",
+]);
+sleep(2);
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Tugma nomlari o'chirilib, o'z holiga qaytarildi!</b>",
+'parse_mode'=>"html",
+]);
+unlink("sozlamalar/tugma/tugma1.txt");
+unlink("sozlamalar/tugma/tugma2.txt");
+unlink("sozlamalar/tugma/tugma3.txt");
+unlink("sozlamalar/tugma/tugma4.txt");
+unlink("sozlamalar/tugma/tugma5.txt");
+unlink("sozlamalar/tugma/tugma6.txt");
+unlink("sozlamalar/tugma/tugma7.txt");
+}
+
+$admin6_menu = json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔐 Majburiy obuna",'callback_data'=>"majburiy_obuna"]],
+]]);
+
+if($data=="kanalsoz" and $ccid==$admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔐 Majburiy obuna",'callback_data'=>"majburiy_obuna"]],
+]])
+]);
+unlink("step/$ccid.txt");
+}
+
+if($tx == "📊 Statistika" and $cid == $admin){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+$load = sys_getloadavg();
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>💡 O'rtacha yuklanish:</b> <code>$load[0]</code>
+
+📈 <b>Aktiv botlar: $aktivbot ta</b>
+📊 <b>Yaratilgan botlar: $hammabot ta</b>
+👥 <b>Foydalanuvchilar: $lich ta</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔁 Yangilash",'callback_data'=>"stats"]],
+[['text'=>"📊 Hisoblar",'callback_data'=>"hisob"],['text'=>"📊 Do'stlar",'callback_data'=>"dostlar"]],
+]])
+]);
+}
+
+if($data=="hisob" and $ccid == $admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+$hisoblar = hisob();
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"$hisoblar",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"stats"]],
+]])
+]);
+}
+
+if($data=="dostlar" and $ccid == $admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+$dostlar = dostlar();
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"$dostlar",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"stats"]],
+]])
+]);
+}
+
+if($data=="stats" and $ccid == $admin){
+$lichka=file_get_contents("statistika/obunachi.txt");
+$lich=substr_count($lichka,"\n");
+$load = sys_getloadavg();
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>💡 O'rtacha yuklanish:</b> <code>$load[0]</code>
+
+📈 <b>Aktiv botlar: $aktivbot ta</b>
+📊 <b>Yaratilgan botlar: $hammabot ta</b>
+👥 <b>Foydalanuvchilar: $lich ta</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔁 Yangilash",'callback_data'=>"stats"]],
+[['text'=>"📊 Hisoblar",'callback_data'=>"hisob"],['text'=>"📊 Do'stlar",'callback_data'=>"dostlar"]],
+]])
+]);
+}
+
+if($tx=="📢 Kanallar" and $cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin6_menu
+]);
+}
+
+if($data=="majburiy_obuna" and $ccid==$admin){
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Majburiy obunalarni sozlash bo'limidasiz:</b>
+
+<i>Avval <b>asosiy kanal</b>ni ulab keyin kanal qo'shing!</i>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📋 Ro'yxatni ko'rish",'callback_data'=>"majburiy_obuna3"]],
+[['text'=>"📢 Asosiy kanal",'callback_data'=>"majburiy_obuna4"],['text'=>"➕ Kanal qo'shish",'callback_data'=>"majburiy_obuna1"]],
+[['text'=>"🗑 O'chirish",'callback_data'=>"majburiy_obuna2"],['text'=>"◀️ Orqaga",'callback_data'=>"kanalsoz"]],
+
+]])
+]);
+unlink("step/$cid.txt");
+}
+
+$majburiy = file_get_contents("maj.txt");
+if($data=="majburiy_obuna1" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📢 Kerakli kanalni manzilini yuboring:</b>
+
+Namuna: <code>@MAKERNEWX</code>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("maj.txt","majburiy1");
+}
+if($majburiy == "majburiy1" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("maj.txt");
+}else{
+if(isset($message)){
+$kanal=file_get_contents("sozlamalar/kanal/ch.txt");
+if(mb_stripos($kanal,$tx)==false){
+file_put_contents("sozlamalar/kanal/ch.txt", "$kanal\n$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$tx qabul qilindi!</b>
+
+⚠️ @$botname ni kanalingizga admin qiling!",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+}}
+unlink("maj.txt");
+}}
+
+$majburiy = file_get_contents("maj.txt");
+if($data=="majburiy_obuna4" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📢 Kerakli kanalni manzilini yuboring:</b>
+
+Namuna: <code>@MAKERNEWX</code>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("maj.txt","majburiy4");
+}
+if($majburiy == "majburiy4" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("maj.txt");
+}else{
+deleteFolder("sozlamalar/kanal/ch.txt");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>$tx qabul qilindi!</b>
+
+⚠️ @$botname ni kanalingizga admin qiling!",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+file_put_contents("sozlamalar/kanal/ch.txt","$text");
+unlink("maj.txt");
+}}
+
+
+$majburiyoc = file_get_contents("majoch.txt");
+if($data=="majburiy_obuna2" and $ccid == $admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗑 O'chiriladigan kanal manzilini yuboring:</b>
+
+Namuna: <code>@MAKERNEWX</code>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("majoch.txt","majoch");
+}
+if($majburiyoc=="majoch" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("majoch.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗑 $tx ni o'chirish yakunlandi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu,
+]);
+$kanal = file_get_contents("sozlamalar/kanal/ch.txt");
+if(mb_stripos($kanal,$tx)!==false){
+$ochir = str_replace("\n".$tx."","",$kanal);
+file_put_contents("sozlamalar/kanal/ch.txt",$ochir);
+unlink("majoch.txt");
+}}}
+
+if($data=="majburiy_obuna3" and $ccid==$admin){
+if($kanallar==null){
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Kanallar ulanmagan!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"majburiy_obuna"]],
+]])
+]);
+}else{
+$opshi=substr_count($kanallar,"\n");
+bot('editMessageText',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+'text'=>"<b>Ulangan kanallar ro'yxati ⤵️</b>
+➖➖➖➖➖➖➖➖
+
+<b>Asosiy kanal:</b> <i>$kanallar</i>
+",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"majburiy_obuna"]],
+]])
+]);
+}}
+
+if($tx == "/panel"){
+if($cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🗄 Boshqaruv paneliga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$admin1_menu
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🖥 Asosiy menyudasiz</b>",
+'parse_mode'=>"html",
+]);
+}}
+
+if(isset($message)){
+$get = file_get_contents("statistika/obunachi.txt");
+if(mb_stripos($get,$fid)==false){
+file_put_contents("statistika/obunachi.txt", "$get\n$fid");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>👤 Yangi aʼzo
+✉️ Lichka:</b> <a href='tg://user?id=$fid'>$name</a>",
+'parse_mode'=>"html"
+]);
+}}
+
+if($text == "/start"){
+if($cid!= $admin){
+bot('sendmessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🖥 Asosiy menyudasiz</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menu,
+]);
+}else{
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🖥 Asosiy menyudasiz</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menuad,
+]);
+}}
+
+if($tx=="$tugma1" and joinchat($fid)=="true"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🤖 Botlarni boshqarish bo'limiga xush kelibsiz!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"➕ Yangi bot ochish"]],
+[['text'=>"⚙️ Botni sozlash"],['text'=>"💵 To'lov qilish"]],
+[['text'=>"🗄 Buyurtmalar"],['text'=>"🔚 Orqaga"]],
+]])
+]);
+}
+
+if($tx=="🗄 Buyurtmalar" and joinchat($fid)=="true"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"➕ Yangi buyurtma",url=>"tg://user?id=$admin"]],
+[['text'=>"📂 Mening buyurtmam",'callback_data'=>"buyurtma_royxat"]],
+]])
+]);
+}
+
+if($data=="buyurtmalar" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"➕ Yangi buyurtma",url=>"tg://user?id=$admin"]],
+[['text'=>"📂 Mening buyurtmam",'callback_data'=>"buyurtma_royxat"]],
+]])
+]);
+}
+
+if($data=="buyurtma_royxat" and joinchat($ccid)=="true"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"⏱ <b>Yuklanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 1,
+'text'=>"⏱ <b>Yuklanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🙁 Buyurtma mavjud emas!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"◀️ Orqaga","callback_data"=>"buyurtmalar"]],
+]])
+]);
+}
+
+$board2=file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+$more2 = explode("\n",$board2);
+$soni2 = substr_count($board2,"\n");
+$key2=[];
+for ($for2 = 1; $for2 <= $soni2; $for2++) {
+$title2=str_replace("\n","",$more2[$for2]);
+$key2[]=["text"=>"💵 $title2","callback_data"=>"botpay_$title2"];
+$key2board2=array_chunk($key2, 1);
+$keyboard2=json_encode([
+'inline_keyboard'=>$key2board2,
+]);
+}
+
+if($tx=="💵 To'lov qilish" and joinchat($fid)=="true"){
+$botsss = file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+if($botsss){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyboard2,
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📂 Sizda hech qanday bot yo'q</b>",
+'parse_mode'=>'html',
+]);
+}}
+
+if(mb_stripos($data,"orqa_")!==false){
+$ex=explode("orqa_",$data)[1];
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"💵 $ex",'callback_data'=>"botpay_$ex"]],
+]])
+]);
+}
+
+if(mb_stripos($data,"botpay_")!==false){
+$ex=explode("botpay_",$data)[1];
+$turi = file_get_contents("foydalanuvchi/bot/$ccid/turi.txt");
+if($turi=="ObunachiBot"){
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🗓 Necha kunlik to'lovni amalga oshirmoqchisiz?</b>
+
+<i>1 kunlik to'lov - 200 $pul
+3 kunlik to'lov - 600 $pul
+7 kunlik to'lov - 1400 $pul
+15 kunlik to'lov - 3000 $pul
+30 kunlik to'lov - 6000 $pul</i>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"🗒 To'lov holati","callback_data"=>"holati"]],
+[['text'=>"1",'callback_data'=>"dataPay=1=200=$ex"],['text'=>"3",'callback_data'=>"dataPay=3=600=$ex"],['text'=>"7",'callback_data'=>"dataPay=7=1400=$ex"],['text'=>"15",'callback_data'=>"dataPay=15=3000=$ex"],['text'=>"30",'callback_data'=>"dataPay=30=6000=$ex"]],
+[["text"=>"◀️ Orqaga","callback_data"=>"botpay_$ex"]],
+]])
+]);
+}
+if($turi=="ViPObunachiBot"){
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🗓 Necha kunlik to'lovni amalga oshirmoqchisiz?</b>
+
+<i>1 kunlik to'lov - 200 $pul
+3 kunlik to'lov - 600 $pul
+7 kunlik to'lov - 1400 $pul
+15 kunlik to'lov - 3000 $pul
+30 kunlik to'lov - 6000 $pul</i>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"🗒 To'lov holati","callback_data"=>"holati"]],
+[['text'=>"1",'callback_data'=>"dataPay=1=200=$ex"],['text'=>"3",'callback_data'=>"dataPay=3=600=$ex"],['text'=>"7",'callback_data'=>"dataPay=7=1400=$ex"],['text'=>"15",'callback_data'=>"dataPay=15=3000=$ex"],['text'=>"30",'callback_data'=>"dataPay=30=6000=$ex"]],
+[["text"=>"◀️ Orqaga","callback_data"=>"orqa_$ex"]],
+]])
+]);
+}}
+if(mb_stripos($data,"dataPay=")!==false){
+$kun=explode("=",$data)[1];
+$narx=explode("=",$data)[2];
+$ex=explode("=",$data)[3];
+$p=file_get_contents("foydalanuvchi/hisob/$ccid.txt");
+if($p>=$narx){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>✅ Botingiz uchun $kun kunlik to'lov to'landi!</b>
+
+<i>Hisobingizdan $narx $pul olib tashlandi</i>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"◀️ Orqaga","callback_data"=>"botpay_$ex"]],
+]])
+]);
+file_put_contents("foydalanuvchi/hisob/$ccid.txt",$p-$narx);
+date_default_timezone_set('Asia/Tashkent');
+$t=date("d");
+$files=json_decode(file_get_contents("foydalanuvchi/bot/$ccid/kunlik.tolov"));
+$d['kun']=$files->kun+$kun;
+$d['sana']=$t;
+$d['puli']=$files->puli+$narx;
+file_put_contents("foydalanuvchi/bot/$ccid/kunlik.tolov",json_encode($d));
+}else{
+bot("answerCallbackQuery",[
+"callback_query_id"=>$callid,
+"text"=>"😞 Kechirasiz, hisobingizda yetarli mablag' mavjud emas!",
+"show_alert"=>true,
+]);
+}}
+
+if($data=="holati"){
+$txolat=json_decode(file_get_contents("foydalanuvchi/bot/$ccid/kunlik.tolov"));
+bot("answerCallbackQuery",[
+"callback_query_id"=>$callid,
+"text"=>"⏳ Qolgan kunlar: ".$txolat->kun." kun",
+"show_alert"=>true,
+]);
+}
+
+date_default_timezone_set('Asia/Tashkent'); 
+$t=date("d"); 
+$glob=glob("foydalanuvchi/bot/*/turi.txt"); 
+foreach($glob as $globa){ 
+$ids = str_replace(["foydalanuvchi/bot/","/turi.txt"], ["",""], $globa); 
+$f=file_get_contents("foydalanuvchi/bot/$ids/turi.txt"); 
+$files = json_decode(file_get_contents("foydalanuvchi/bot/$ids/kunlik.tolov")); 
+echo $files->kun; 
+if($f=="ObunachiBot"){ 
+if($files->sana!=$t){ 
+$d["puli"]=$files->puli-200; 
+$d["sana"]=$t; 
+$d["kun"]=$files->kun-1; 
+file_put_contents("foydalanuvchi/bot/$ids/kunlik.tolov",json_encode($d)); 
+} 
+if($files->kun==0 or $files->kun<=0){ 
+bot('sendMessage',[ 
+'chat_id'=>$ids, 
+'text'=>"<b>Sizning botingiz uyqu rejimga o'tkazildi</b>", 
+'parse_mode'=>"html", 
+]); 
+file_put_contents("https://api.telegram.org/bot$t/deletewebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$ids/$f.php");
+if($files->puli>=200){ 
+date_default_timezone_set('Asia/Tashkent'); 
+$t=date("d"); 
+$d['sana']=$t; 
+$f=$files->puli-200; 
+$d['puli']=$f; 
+$d['kun']=$files->kun-1; 
+file_put_contents("foydalanuvchi/bot/$ids/kunlik.tolov",json_encode($d)); 
+}else{ 
+file_put_contents("https://api.telegram.org/bot$t/deletewebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$ids/$f.php");
+}}}
+if($f=="ViPObunachiBot"){ 
+if($files->sana!=$t){ 
+$d["puli"]=$files->puli-200; 
+$d["sana"]=$t; 
+$d["kun"]=$files->kun-1; 
+file_put_contents("foydalanuvchi/bot/$ids/kunlik.tolov",json_encode($d)); 
+} 
+if($files->kun==0 or $files->kun<=0){ 
+bot('sendMessage',[ 
+'chat_id'=>$ids, 
+'text'=>"<b>Sizning botingiz uyqu rejimga o'tkazildi</b>", 
+'parse_mode'=>"html", 
+]); 
+file_put_contents("https://api.telegram.org/bot$t/deletewebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$ids/$f.php");
+if($files->puli>=200){ 
+date_default_timezone_set('Asia/Tashkent'); 
+$t=date("d"); 
+$d['sana']=$t; 
+$f=$files->puli-200; 
+$d['puli']=$f; 
+$d['kun']=$files->kun-1; 
+file_put_contents("foydalanuvchi/bot/$ids/kunlik.tolov",json_encode($d)); 
+}else{ 
+file_put_contents("https://api.telegram.org/bot$t/deletewebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$ids/$f.php");
+}}}}
+
+$board=file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+$more = explode("\n",$board);
+$soni = substr_count($board,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$key[]=["text"=>"️🤖 $title","callback_data"=>"set_$title"];
+$keyboard2=array_chunk($key, 2);
+$keyboard=json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+
+if($tx=="⚙️ Botni sozlash" and joinchat($fid)=="true"){
+$botsss = file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+if($botsss){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyboard,
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📂 Sizda hech qanday bot yo'q</b>",
+'parse_mode'=>'html',
+]);
+}}
+
+$backboard=file_get_contents("foydalanuvchi/bot/$ccid/bots.txt");
+$backmore = explode("\n",$backboard);
+$backsoni = substr_count($backboard,"\n");
+$backkey=[];
+for ($backfor = 1; $backfor <= $backsoni; $backfor++) {
+$title=str_replace("\n","",$backmore[$backfor]);
+$backkey[]=["text"=>"️🤖 $title","callback_data"=>"set_$title"];
+$backkeyboard2=array_chunk($backkey, 2);
+$backkeyboard=json_encode([
+'inline_keyboard'=>$backkeyboard2,
+]);
+}
+
+if(mb_stripos($data,"back_")!==false){
+$ex=explode("back_",$data)[1];
+$botsss = file_get_contents("foydalanuvchi/bot/$ccid/bots.txt");
+if($botsss){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$backkeyboard,
+]);
+}else{
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📂 Sizda hech qanday bot yo'q</b>",
+'parse_mode'=>'html',
+]);
+}}
+
+if(mb_stripos($data,"set_")!==false){
+$ex=explode("set_",$data)[1];
+$token=file_get_contents("foydalanuvchi/bot/$ccid/token.txt");
+$turi=file_get_contents("foydalanuvchi/bot/$ccid/turi.txt");
+$kunida=file_get_contents("foydalanuvchi/bot/$ccid/kunida.txt");
+$soatida=file_get_contents("foydalanuvchi/bot/$ccid/soat.txt");
+bot('editmessagetext',[ 
+'chat_id'=>$ccid, 
+'message_id'=>$cmid, 
+'text'=>"<b>✅ @$ex tanlandi!</b> 
+ 
+<b><i>🔑 Bot tokeni:</i></b> <code>$token</code> 
+<b><i>🗓 Bot ochilgan vaqt:</i></b> $kunida | $soatida 
+<b><i>📂 Bot turi:</i></b> <i>$turi</i> 
+ 
+<b><i> 🔽 Quyidagi tugmalar yordamida botingizni sozlashingiz mumkin:</i></b>", 
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔑 Tokenni almashtirish",'callback_data'=>"token_$ex"]],
+[['text'=>"🔄 Yangilash",'callback_data'=>"up_$ex"],['text'=>"🗑 O'chirish",'callback_data'=>"del_$ex"]],
+[["text"=>"◀️ Orqaga","callback_data"=>"back_$ex"]],
+]])
+]);
+}
+
+if(mb_stripos($data,"kesh_")!==false){
+$ex=explode("kesh_",$data)[1];
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"⏱ <b>Tozalanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 1,
+'text'=>"⏱ <b>Tozalanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 2,
+'text'=>"⏱ <b>Tozalanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 3,
+'text'=>"⏱ <b>Tozalanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>💡 Kesh fayllar muvaffaqiyatli tozalandi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"plus_$ex"]],
+]])
+]);
+}
+
+if(mb_stripos($data,"del_")!==false){
+$ex=explode("del_",$data)[1];
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>⚠️ @$ex ni o'chirib yuborishga ishonchingiz komilmi?</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑 O'chirish",'callback_data'=>"dels_$ex"]],
+[["text"=>"◀️ Orqaga","callback_data"=>"set_$ex"]],
+]])
+]);
+}
+
+if(mb_stripos($data,"dels_")!==false){
+$ex=explode("dels_",$data)[1];
+$turi = file_get_contents("foydalanuvchi/bot/$ccid/$ex/turi.txt");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🗑 @$ex ni o'chirish yakunlandi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[["text"=>"◀️ Orqaga","callback_data"=>"back_$ex"]],
+]])
+]);
+$aktivbot = file_get_contents("statistika/aktivbot.txt");
+$aktivbot -= 1;
+file_put_contents("statistika/aktivbot.txt", $aktivbot);
+deleteFolder("foydalanuvchi/bot/$ccid");
+$bots2 = file_get_contents("foydalanuvchi/bot/$ccid/bots.txt");
+unlink("foydalanuvchi/bot/$ccid/turi.txt");
+unlink("foydalanuvchi/bot/$ccid/user.json");
+if(mb_stripos($bots2,$ex)!==false){
+$ex1 = str_replace("\n".$ex."","",$bots2);
+file_put_contents("foydalanuvchi/bot/$ccid/bots.txt",$ex1);
+}}
+
+if(mb_stripos($data,"up_")!==false){
+$ex=explode("up_",$data)[1];
+$turi = file_get_contents("foydalanuvchi/bot/$ccid/turi.txt");
+$tokeni = file_get_contents("foydalanuvchi/bot/$ccid/token.txt");
+$kod = file_get_contents("botlar/$turi.php");
+$kod = str_replace("API_TOKEN", "$tokeni", $kod);
+$kod = str_replace("ADMIN_ID", "$ccid", $kod);
+file_put_contents("foydalanuvchi/bot/$ccid/$turi.php","$kod");
+file_put_contents("foydalanuvchi/bot/$ccid/botholat.txt","activ");
+$get = json_decode(file_get_contents("https://api.telegram.org/bot$tokeni/setwebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$ccid/$turi.php"))->result;
+if($get){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"⏱ <b>Yangilanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 1,
+'text'=>"⏱ <b>Yangilanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 2,
+'text'=>"⏱ <b>Yangilanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid + 3,
+'text'=>"⏱ <b>Yangilanmoqda...</b>",
+'parse_mode'=>'html',
+]);
+bot('editmessagetext',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🔄 Botingiz muvaffaqiyatli yangilandi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➡️ Botga o'tish",'url'=>"https://t.me/$ex"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"set_$ex"]],
+]])
+]);
+}}
+
+if($text == "$tugma5" and joinchat($fid)=="true"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>$tugma5-ga xush kelibsiz</b>
+
+<i>O'z mahsulotingizni soting yoki sotib oling!</i>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Rek berish kanalda","callback_data"=>"kanalid"]],
+[['text'=>"📊 Statistika","callback_data"=>"botstat"]],
+[['text'=>"📋 Elon joylash",'callback_data'=>"sotish"],['text'=>"📇 Elon kuzatish",'callback_data'=>"sotib_olish"]],
+]])
+]);
+}
+
+$hisob = file_get_contents("foydalanuvchi/hisob/$cid.txt");
+$rekkanal = file_get_contents("rek.kanal");
+$reknarx = file_get_contents("rek.narx");
+if($data == "kanalid" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📦 $rekkanal kanaliga reklama berish $reknarx ni tashkil etadi
+
+💰 Sizning hisobingizda </b> $hisob $pul",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✔️ Reklama berish","callback_data"=>"kanalaydi"]],
+[['text'=>"◀️ Orqaga","callback_data"=>"men"]],
+]])
+]);
+}
+
+$reknarx = file_get_contents("rek.narx");
+if($data=="kanalaydi"){
+$userstep=file_get_contents("step/$ccid.step");
+	$pul = file_get_contents("foydalanuvchi/hisob/$ccid.txt"); 
+	if($pul>="$reknarx"){
+bot('sendmessage',[
+'chat_id'=>$ccid,
+'text'=>"💎 <b>Marxamat, reklamangiz matnini kiriting. Men uni kanalga joylayman!
+
+⚠️ Faqatgina matn qabul qilinadi</b>
+<b>Admin $adminuser</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$bosh,
+]);
+file_put_contents("step/$ccid.txt","rektayyor");
+}else{
+bot('DeleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"🙁 <b>Kechirasiz, hisobingizda mablag' yetarli emas!
+
+Agarda 500 boʻlsagina siz rek berishingiz mumkin!!!</b>
+
+<b>Admin $adminuser</b>",
+			'parse_mode'=>"html",
+			'reply_markup'=>json_encode([
+	'inline_keyboard'=>[
+	[['text'=>"💸 Pul ishlash",'callback_data'=>"orqaga3"]],
+	]]),
+	]);
+			}
+		}
+	 
+
+
+$reknarx = file_get_contents("rek.narx");
+$rekkanal = file_get_contents("rek.kanal");
+if($userstep == "rektayyor"){
+unlink("step/$cid.txt");
+	if($text == "❌ Bekor qilish"){
+        bot('SendMessage',[
+		'chat_id'=>$ccid,
+		'text'=>"🖥️ *Asosiy menyu*",
+		'parse_mode'=>"markdown",
+		'reply_markup'=>$menu,
+		]);
+		unlink("step/$cid.txt");
+		}else{
+			bot('SendMessage',[
+			'chat_id'=>$admin,
+			'text'=>"<b><a href='tg://user?id=$ccid'>$name</a>dan yangi reklama $rekkanal ga joylandi</b>",
+			'parse_mode'=>"html",
+			]);
+			bot('SendMessage',[
+		'chat_id'=>"$rekkanal",
+		'text'=>"<b>#reklama
+
+$text</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+	'inline_keyboard'=>[
+	[['text'=>"💎 Tekin reklama",'url'=>"https://t.me/$botname"]],
+	]]),
+]);
+	bot('SendMessage',[
+		'chat_id'=>$ccid,
+		'text'=>"💎 <b>Reklamangiz  joylandi</b>
+<b>Admin $adminuser</b>",
+		'parse_mode'=>"html",
+		'reply_markup'=>$menu,
+		]);
+		unlink("step/$cid.txt");
+		$balans= file_get_contents("foydalanuvchi/hisob/$cid.txt");
+     $plus=$balans-"$reknarx";
+  $b = file_put_contents("foydalanuvchi/hisob/$cid.txt","$plus");
+		}
+		}
+
+if($data=="men" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>$tugma5-ga xush kelibsiz</b>
+
+<i>O'z mahsulotingizni soting yoki sotib oling!</i>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📊 Statistika","callback_data"=>"botstat"]],
+[['text'=>"📋 Elon joylash",'callback_data'=>"sotish"],['text'=>"📇 Elon kuzatish",'callback_data'=>"sotib_olish"]],
+]])
+]);
+}
+
+if($data == "botstat" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🧾 Sotuvdagi mahsulotlar soni:</b> $num ta",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑 Bazani tozalash","callback_data"=>"tbaza=$admin"]],
+[['text'=>"◀️ Orqaga","callback_data"=>"men"]],
+]])
+]);
+}
+
+if(stripos($data,"tbaza=")!==false && stripos($statistika,"$callfrid")!==false){
+$ex = explode("=",$data);
+$odam = $ex[1];
+if(stripos($admin,"$callfrid")!== false){
+bot("deletemessage",[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+"chat_id"=>$odam,
+"text"=>"🗑 <b>Baza tozalandi</b>",
+"parse_mode"=>'html',
+]);
+deleteFolder("baza/");
+}else{
+bot('answercallbackquery',[
+'callback_query_id'=>$cqid,
+'text'=>"⚠️ Faqat admin tozalashi mumkin!",
+'show_alert'=>true,
+]);
+}}
+
+if($data == "sotish" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Mahsulotingiz haqida malumot yozing:
+
+Namuna:</b> <code>Bot turi: Nakrutka bot
+Azosi: 500 ta
+Useri: @PBMemberBot
+Narxi: 50.000 so'm
+Obmen: Yo'q</code>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔚 Orqaga"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","bot_sotish");
+}
+
+if($userstep == "bot_sotish"){
+if($cid==$admin){
+if($tx=="🔚 Orqaga"){
+unlink("step/$admin.txt");
+}else{
+$num=file_get_contents("baza/all.num");
+$ok = $num + 1;
+file_put_contents("baza/all.num","$ok");
+file_put_contents("baza/$admin.num","$ok");
+file_put_contents("baza/$ok.botext", "$tx");
+file_put_contents("baza/$ok.admin",$admin);
+unlink("step/$admin.txt");
+bot("SendMessage",[
+'chat_id'=>$admin,
+'text'=>"<b>🧾 Mahsulotingiz sotuvga qo'shildi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menuad,
+]);
+unlink("step/$admin.txt");
+}}else{
+if($tx=="🔚 Orqaga"){
+unlink("step/$cid.txt");
+}else{
+$num=file_get_contents("baza/all.num");
+$ok = $num + 1;
+file_put_contents("baza/all.num","$ok");
+file_put_contents("baza/$cid.num","$ok");
+file_put_contents("baza/$ok.botext", "$tx");
+file_put_contents("baza/$ok.admin",$cid);
+unlink("step/$cid.txt");
+bot("SendMessage",[
+'chat_id'=>$cid,
+'text'=>"<b>🧾 Mahsulotingiz sotuvga qo'shildi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menu,
+]);
+unlink("step/$cid.txt");
+}}}
+
+if($data=="sotib_olish" and joinchat($ccid)=="true"){
+$array = rand(1,$num);
+$bk = $array - 1;
+$ali=file_get_contents("baza/$array.botext");
+if($ali){
+$caption = file_get_contents("baza/$array.botext");
+$ega= file_get_contents("baza/$array.admin");
+bot("deletemessage",[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot("sendPhoto",[
+'chat_id'=>$ccid,
+'photo'=>"https://t.me/botim1chi/440",
+'caption'=>"Elon raqam: $array | $soat
+
+<b>$caption</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true, 
+'inline_keyboard'=>[
+[['text'=>"☎️ Murojat",url=>"tg://user?id=$ega"]],
+[['text'=>"️⏪ Qaytish",'callback_data'=>"next=$bk"],['text'=>"️⏩ O'tkazish",'callback_data'=>"next=$array"]],
+[['text'=>"🏠 Menyu",'callback_data'=>"men"]],
+]])
+]);
+}else{
+bot("answerCallbackQuery",[
+"callback_query_id"=>$callid,
+"text"=>"⚠️ Sotuvga qo'yilgan mahsulotlar topilmadi...",
+"show_alert"=>true,
+]);
+}}
+
+if(mb_stripos($data,"next=")!==false){
+$next = explode("=",$data)[1];
+$nex = $next + 1;
+$bk = $next - 1;
+$ali2=file_get_contents("baza/$nex.botext");
+if($ali2){
+$caption = file_get_contents("baza/$nex.botext");
+$ega= file_get_contents("baza/$nex.admin");
+bot("deletemessage",[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot("sendPhoto",[
+'chat_id'=>$ccid,
+'photo'=>"https://t.me/botim1chi/440",
+'caption'=>"Elon raqam: $nex | $soat
+
+<b>$caption</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true, 
+'inline_keyboard'=>[
+[['text'=>"☎️ Murojat",url=>"tg://user?id=$ega"]],
+[['text'=>"️⏪ Qaytish",'callback_data'=>"next=$bk"],['text'=>"️⏩ O'tkazish",'callback_data'=>"next=$nex"]],
+[['text'=>"🏠 Menyu",'callback_data'=>"men"]],
+]])
+]);
+}else{
+bot("answerCallbackQuery",[
+"callback_query_id"=>$callid,
+"text"=>"⚠️ Boshqa mahsulotlar topilmadi...",
+"show_alert"=>true,
+]);
+}}
+
+if($text == "➕ Yangi bot ochish" and joinchat($cid)==true){
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title = str_replace("\n","",$more[$for]);
+$key[]=["text"=>"$title","callback_data"=>"bolim-$title"];
+$keyboard2 = array_chunk($key, 2);
+$bolim = json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+if($kategoriya == null){
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>⚠️ Kategoriyalar mavjud emas!</b>",
+'parse_mode'=>'html',
+]);
+exit();
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"📋 <b>Quyidagi bo‘limlardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$bolim,
+]);
+exit();
+}}
+
+if($data == "orqaga" and joinchat($ccid)=="true"){
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title = str_replace("\n","",$more[$for]);
+$key[]=["text"=>"$title","callback_data"=>"bolim-$title"];
+$keyboard2 = array_chunk($key, 2);
+$bolim = json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"📋 <b>Quyidagi bo‘limlardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$bolim,
+]);
+exit();
+}
+
+if(mb_stripos($data, "bolim-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$royxat = file_get_contents("sozlamalar/bot/$kat/royxat.txt");
+$kategoriya = file_get_contents("sozlamalar/bot/kategoriya.txt");
+$more = explode("\n",$royxat);
+$soni = substr_count($royxat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"🤖 $title","callback_data"=>"botyarat-$title-$kat"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"orqaga"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($royxat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"🤖 <b>Quyidagi botlardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"🚫 Botlar mavjud emas!",
+'show_alert'=>true,
+]);
+}
+}
+
+if(mb_stripos($data, "botyarat-")!==false){
+$bots=file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+$ex = explode("-",$data);
+$royxat = $ex[1];
+$kategoriya = $ex[2];
+$type = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/turi.txt");
+$narx = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/narx.txt");
+$tavsif = file_get_contents("sozlamalar/bot/$kategoriya/$royxat/tavsif.txt");
+if($bots){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🤖 $type</b>
+
+<b>💬 Bot tili:</b> O'zbekcha
+<b>💵 Bot narxi:</b> $narx $pul
+<b>🗓 Kunlik to'lov:</b> 200 $pul
+
+📋 <b>Qo'shimcha ma'lumot:</b> <i>$tavsif</i>
+
+🎁 Bonus sifatida 10 kunlik to'lov bepul taqdim etiladi!",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ Yaratish",'callback_data'=>"botbor"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"bolim-$kategoriya"]],
+]])
+]);
+}else{
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🤖 $type</b>
+
+<b>💬 Bot tili:</b> O'zbekcha
+<b>💵 Bot narxi:</b> $narx $pul
+<b>🗓 Kunlik to'lov:</b> 200 $pul
+
+📋 <b>Qo'shimcha ma'lumot:</b> <i>$tavsif</i>
+
+🎁 Bonus sifatida 10 kunlik to'lov bepul taqdim etiladi!",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ Yaratish",'callback_data'=>"bots-$type-$narx-$royxat-$kategoriya"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"bolim-$kategoriya"]],
+]])
+]);
+}}
+
+if($data =="botbor"){
+bot("answerCallbackQuery",[
+'callback_query_id'=>$callid,
+'text'=>"⚠️ Sizda aktiv bot mavjud!",
+'show_alert'=>true,
+]);
+}
+
+if(mb_stripos($data, "bots-")!==false){
+$ex = explode("-",$data);
+$turi = $ex[1];
+$narx = $ex[2];
+$royxat = $ex[3];
+$kategoriya = $ex[4];
+$get = file_get_contents("foydalanuvchi/hisob/$ccid.txt");
+if($get < $narx){
+bot("answerCallbackQuery",[
+'callback_query_id'=>$callid,
+'text'=>"⚠️ Hisobingizda mablag' yetarli emas",
+'show_alert'=>true,
+]);
+}else{
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🔑 Botingizni tokenini yuboring:</b>
+
+<i>Token haqida ma'lumotga ega bo'lmasangiz qo'llanma bilan tanishib chiqing:</i>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔚 Orqaga"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","bots&token-$turi-$narx-$royxat-$kategoriya");
+}}
+
+if(mb_stripos($userstep, "bots&token-")!==false){
+$ex = explode("-",$userstep);
+$turi = $ex[1];
+$narx = $ex[2];
+$nomi = $ex[3];
+$kategoriya = $ex[4];
+if(mb_stripos($tx, ":")!==false){
+$getid = bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>✅ Siz yuborgan bot tokeni qabul qilindi!</b>",
+'parse_mode'=>'html',
+])->result->message_id;
+$botuser = json_decode(file_get_contents("https://api.telegram.org/bot$tx/getme"))->result->username;
+$kod = file_get_contents("botlar/$turi.php");
+$kod = str_replace("API_TOKEN", "$tx", $kod);
+$kod = str_replace("ADMIN_ID", "$fid", $kod);
+
+mkdir("foydalanuvchi/bot/$cid");
+file_put_contents("foydalanuvchi/bot/$cid/$turi.php", $kod);
+
+$get = json_decode(file_get_contents("https://api.telegram.org/bot$tx/setwebhook?url=https://".$_SERVER['SERVER_NAME']."/Nakmak/foydalanuvchi/bot/$cid/$turi.php"))->result;
+
+if($get){
+$botuser = json_decode(file_get_contents("https://api.telegram.org/bot$tx/getme"))->result->username;
+$nomi = json_decode(file_get_contents("https://api.telegram.org/bot$tx/getme"))->result->first_name;
+$id = json_decode(file_get_contents("https://api.telegram.org/bot$tx/getme"))->result->id;
+mkdir("foydalanuvchi/bot/$cid");
+$soat = date("H:i",strtotime("2 hour"));
+$kun = date("d.m.y",strtotime("2 hour"));
+file_put_contents("foydalanuvchi/bot/$cid/soat.txt","$soat");
+file_put_contents("foydalanuvchi/bot/$cid/kunida.txt","$kun");
+file_put_contents("foydalanuvchi/bot/$cid/token.txt","$tx");
+file_put_contents("foydalanuvchi/bot/$cid/botholat.txt","activ");
+file_put_contents("foydalanuvchi/bot/$cid/turi.txt","$turi");
+file_put_contents("foydalanuvchi/bot/$cid/bots.txt");
+if(isset($message)){
+$bots=file_get_contents("foydalanuvchi/bot/$cid/bots.txt");
+if(mb_stripos($bots,$botuser)==false){
+file_put_contents("foydalanuvchi/bot/$cid/bots.txt", "$bots\n$botuser");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>➕ Yangi bot yaratildi!</b>
+
+🧾 <b>Bot turi</b>: $turi
+🔎 <b>Bot useri</b>: @$botuser",
+'parse_mode'=>"html",
+]);
+sleep(0.5);
+bot('deleteMessage',[
+'chat_id'=>$cid,
+'message_id'=>$mid,
+]);
+sleep(1);
+bot('editMessageText',[
+'chat_id'=>$cid,
+'message_id'=>$getid,
+'text'=>"<b>ℹ️ Botingiz tayyor. Quyidagi tugma orqali botingizga o'tishingiz mumkin.</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➡️ Botga o'tish",'url'=>"https://t.me/$botuser"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"orqagauz"]],
+]])
+]);
+$pul = file_get_contents("foydalanuvchi/hisob/$cid.txt");
+$f=$pul/200;
+date_default_timezone_set('Asia/Tashkent');
+$t=date("d");
+$d['sana']=$t;
+$d['kun']=10;
+$d['puli']=2000;
+file_put_contents("foydalanuvchi/bot/$cid/kunlik.tolov",json_encode($d));
+$gett = file_get_contents("foydalanuvchi/hisob/$cid.txt");
+$gett -= $narx;
+file_put_contents("foydalanuvchi/hisob/$cid.txt", $gett);
+$aktivbot = file_get_contents("statistika/aktivbot.txt");
+$aktivbot += 1;
+file_put_contents("statistika/aktivbot.txt", $aktivbot);
+$hammabot = file_get_contents("statistika/hammabot.txt");
+$hammabot += 1;
+file_put_contents("statistika/hammabot.txt", $hammabot);
+}}}
+unlink("step/$cid.txt");
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'message_id'=>$getid,
+'text'=>"<b>⛔️ Kechirasiz token qabul qilinmadi!</b>",
+'parse_mode'=>"html",
+]);
+unlink("step/$cid.txt");
+}
+unlink("step/$ccid.txt");
+}
+
+if($tx=="$tugma2" and joinchat($fid)=="true"){
+$odam=file_get_contents("foydalanuvchi/referal/$cid.txt");
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🔎 ID raqamingiz:</b> <code>$cid</code>
+
+<b>💵 Asosiy balans:</b> $asosiy $pul
+<b>🏦 Qo'shimcha balans:</b> $sar $pul
+<b>🔗 Takliflaringiz:</b> $odam ta
+
+<b>💳 Botga kiritgan pullaringiz:</b> $kiritgan $pul",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔁 O'tkazmalar",'callback_data'=>"puliz"]],
+[['text'=>"💳 Hisobni to'ldirish",'callback_data'=>"oplata"]],
+]])
+]);
+}
+
+if($data == "orqaga12" and joinchat($ccid)=="true"){
+$hisob = file_get_contents("foydalanuvchi/hisob/$ccid.txt");
+$kiritgan = file_get_contents("foydalanuvchi/hisob/$ccid.1.txt");
+$sar = file_get_contents("foydalanuvchi/hisob/$ccid.1txt");
+$odam=file_get_contents("foydalanuvchi/referal/$ccid.txt");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🔎 ID raqamingiz:</b> <code>$ccid</code>
+
+<b>💵 Asosiy balans:</b> $hisob $pul
+<b>🏦 Qo'shimcha balans:</b> $sar $pul
+<b>🔗 Takliflaringiz:</b> $odam ta
+
+<b>💳 Botga kiritgan pullaringiz:</b> $kiritgan $pul",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🔁 O'tkazmalar",'callback_data'=>"puliz"]],
+[['text'=>"💳 Hisobni to'ldirish",'callback_data'=>"oplata"]],
+]])
+]);
+}
+
+
+
+if($data == "puliz" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>Kerakli foydalanuvchi ID raqamini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]]
+]])
+]);
+file_put_contents("step/$ccid.txt","perevodid");
+}
+if($userstep == "perevodid" and $tx !== "🔙 Orqaga" and joinchat($fid)=="true"){
+file_put_contents("otkazma/$fid.idraqam","$tx");
+unlink("step/$cid.txt");
+$getid = bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qancha mablag'ingizni o'tkazmoqchisiz?
+
+Hisobingiz:</b> $asosiy $pul",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]]
+]])
+]);
+
+file_put_contents("step/$cid.txt","perevodid1");
+}
+if($userstep == "perevodid1" and $tx !== "🔙 Orqaga" and joinchat($fid)=="true"){
+file_put_contents("otkazma/$cid.pulraqam","$tx");
+$raqamid = file_get_contents("otkazma/$cid.idraqam");
+$raqapul = file_get_contents("otkazma/$cid.pulraqam");
+$olmos1 = file_get_contents("foydalanuvchi/hisob/$raqamid.txt");
+$olmos2 = file_get_contents("foydalanuvchi/hisob/$cid.txt");
+$csful = $raqapul / 1 * 1;
+if($olmos2>=$csful and $tx>=0){
+$olmoslar1 = $olmos1 + $raqapul;
+$olmoslar2 = $olmos2 - $csful;
+
+file_put_contents("foydalanuvchi/hisob/$raqamid.txt","$olmoslar1");
+file_put_contents("foydalanuvchi/hisob/$cid.txt","$olmoslar2");
+bot("sendMessage",[
+"chat_id"=>$raqamid,
+"text"=>"<b>Hisobingizga</b> <a href='tg://user?id=$cid'>$cid</a><b> tomonidan $tx $pul o'tkazdi.</b>",
+'parse_mode'=>'html',
+]);
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>✅ O'tkazma muvaffaqiyatli amalga oshirildi!</b>",
+'parse_mode'=>'html',
+]);
+unlink("step/$cid.txt");
+}else{
+bot("sendMessage",[
+"chat_id"=>$cid,
+"text"=>"<b>⚠️ Hisobingizda mablag' yetarli emas!</b>",
+'parse_mode'=>'html',
+]);
+}}
+
+if($data=="oplata" and joinchat($ccid)==true){
+$kategoriya = file_get_contents("sozlamalar/hamyon/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title = str_replace("\n","",$more[$for]);
+$key[]=["text"=>"$title","callback_data"=>"karta-$title"];
+$keyboard2 = array_chunk($key, 1);
+$keyboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"orqaga12"]];
+$bolim = json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+if($kategoriya == null){
+bot("answerCallbackQuery",[
+"callback_query_id"=>$callid,
+"text"=>"⚠️ To'lov tizimlari qo'shilmagan!",
+"show_alert"=>true,
+]);
+}else{
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>💳 Quyidagi to'lov tizimlaridan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$bolim,
+]);
+exit();
+}}
+
+if(mb_stripos($data, "karta-")!==false){
+$ex = explode("-",$data);
+$kategoriya = $ex[1];
+$raqam = file_get_contents("sozlamalar/hamyon/$kategoriya/raqam.txt");
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📲 To‘lov turi:</b> <u>$kategoriya</u>
+
+💳 Karta: <code>$raqam</code>
+📝 Izoh: #ID$ccid
+
+Almashuvingiz muvaffaqiyatli bajarilishi uchun quyidagi harakatlarni amalga oshiring: 
+1) Istalgan pul miqdorini tepadagi Hamyonga tashlang
+2) «✅ To'lov qildim» tugmasini bosing; 
+4) Qancha pul miqdoni yuborganingizni kiritin;
+3) Toʻlov haqidagi suratni botga yuboring;
+3) Operator tomonidan almashuv tasdiqlanishini kuting!",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ To'lov qildim",'callback_data'=>"tolov"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"oplata"]],
+]])
+]);
+}
+
+if($data == "tolov" and joinchat($ccid)=="true"){
+bot('DeleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>To'lov miqdorini kiriting:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'oplata');
+}
+
+if($userstep == "oplata" and joinchat($ccid)=="true"){
+if($tx=="🔙 Orqaga"){
+unlink("step/$cid.txt");
+}else{
+file_put_contents("step/hisob.$cid",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>To'lovingizni chek yoki skreenshotini shu yerga yuboring:</b>",
+'parse_mode'=>'html',
+]);
+file_put_contents("step/$cid.txt",'rasm');
+}}
+
+if($userstep == "rasm"){
+if($cid==$admin){
+if($tx=="🔙 Orqaga"){
+unlink("step/$fid.txt");
+}else{
+$photo = $message->photo;
+$file = $photo[count($photo)-1]->file_id;
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"*Hisobni to'ldirganingiz haqida ma'lumot asosiy adminga yuborildi. Agar to'lovni amalga oshirganingiz haqida ma'lumot mavjud bo'lsa, hisobingiz to'ldiriladi.*",
+'parse_mode'=>'MarkDown',
+'reply_markup'=>$main_menuad,
+]);
+$hisob=file_get_contents("step/hisob.$fid");
+unlink("step/$fid.txt");
+bot('sendPhoto',[
+'chat_id'=>$admin,
+'photo'=>$file,
+'caption'=>"📄 <b>Foydalanuvchidan check:
+
+👮‍♂️ Foydalanuvchi:</b> <a href='https://tg://user?id=$cid'>$name</a>
+🔎 <b>ID raqami:</b> $fid
+💵 <b>To'lov miqdori:</b> $hisob $pul",
+'disable_web_page_preview'=>true,
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ Hisobini to'ldirish",'callback_data'=>"on=$fid"]],
+[['text'=>"❌ Bekor qilish",'callback_data'=>"off=$fid"]],
+]])
+]);
+}}else{
+if($tx=="🔙 Orqaga"){
+unlink("step/$fid.txt");
+}else{
+$photo = $message->photo;
+$file = $photo[count($photo)-1]->file_id;
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*Hisobni to'ldirganingiz haqida ma'lumot asosiy adminga yuborildi. Agar to'lovni amalga oshirganingiz haqida ma'lumot mavjud bo'lsa, hisobingiz to'ldiriladi.*",
+'parse_mode'=>'MarkDown',
+'reply_markup'=>$main_menu,
+]);
+$hisob=file_get_contents("step/hisob.$fid");
+unlink("step/$fid.txt");
+bot('sendPhoto',[
+'chat_id'=>$admin,
+'photo'=>$file,
+'caption'=>"📄 <b>Foydalanuvchidan check:
+
+👮‍♂️ Foydalanuvchi:</b> <a href='https://tg://user?id=$cid'>$name</a>
+🔎 <b>ID raqami:</b> $fid
+💵 <b>To'lov miqdori:</b> $hisob $pul",
+'disable_web_page_preview'=>true,
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ Hisobini to'ldirish",'callback_data'=>"on=$fid"]],
+[['text'=>"❌ Bekor qilish",'callback_data'=>"off=$fid"]],
+]])
+]);
+}}}
+
+if(mb_stripos($data,"on=")!==false){
+$odam=explode("=",$data)[1];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+$hisob=file_get_contents("step/hisob.$odam");
+bot('SendMessage',[
+'chat_id'=>$odam,
+'text'=>"<b>Hisobingiz $hisob $pul ga to'ldirildi</b>",
+'parse_mode'=>'html',
+]);
+$currency=file_get_contents("foydalanuvchi/hisob/$odam.1.txt");
+$get = file_get_contents("foydalanuvchi/hisob/$odam.txt");
+$get += $hisob;
+$currency += $hisob;
+file_put_contents("foydalanuvchi/hisob/$odam.txt",$get);
+file_put_contents("foydalanuvchi/hisob/$odam.1.txt",$currency);
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi hisobi $hisob $pul ga to'ldirildi</b>",
+'parse_mode'=>'html',
+]);
+unlink("step/hisob.$odam");
+}
+
+if(mb_stripos($data,"off=")!==false){
+$odam=explode("=",$data)[1];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+$hisob=file_get_contents("step/hisob.$odam");
+bot('SendMessage',[
+'chat_id'=>$odam,
+'text'=>"<b>Hisobingizni $hisob $pul ga to'ldirish bekor qilindi</b>",
+'parse_mode'=>'html',
+]);
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Foydalanuvchi cheki bekor qilindi</b>",
+'parse_mode'=>'html',
+]);
+unlink("step/hisob.$odam");
+}
+
+if($tx=="$tugma3" and joinchat($fid)=="true"){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"$tugma7",'callback_data'=>"taklifnoma"]],
+]])
+]);
+}
+
+if($data == "orqaga3" and joinchat($ccid)=="true"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"$tugma7",'callback_data'=>"taklifnoma"]],
+]])
+]);
+}
+
+if($data == "taklifnoma" and joinchat($ccid)=="true"){
+$odam=file_get_contents("foydalanuvchi/referal/$ccid.txt");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>🔗 Sizning taklif havolangiz:</b>
+
+<code>https://t.me/$botname?start=$ccid</code>
+
+<b>1 ta taklif uchun $taklifpul so'm beriladi
+
+Sizning takliflaringiz: $odam ta</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"👥 Do'stlarga yuborish",'url'=>"https://t.me/share/url?url=https://t.me/$botname?start=$ccid"]],
+[['text'=>"🔚 Orqaga",'callback_data'=>"orqaga3"]],
+]])
+]);
+}
+
+if($text=="$tugma4" and joinchat($cid)==true){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📝 Murojaat matnini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]],
+]])
+]);
+file_put_contents("step/$cid.txt","murojat");
+}
+
+if($data=="boglanish" and joinchat($ccid)==true){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Murojaat matnini yuboring:</b>
+Siz ham o'z biznesingizni boshlang bizning bot bilan @zero_builder_bot",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","murojat");
+}
+
+if($userstep=="murojat"){
+if($text=="🔙 Orqaga"){
+unlink("step/$cid.txt");
+}else{
+file_put_contents("step/$cid.murojat","$cid");
+$murojat=file_get_contents("step/$cid.murojat");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📨 Yangi murojat keldi:</b> $murojat
+
+<b>📑 Murojat matni:</b> $text
+
+<b>⏰ Kelgan vaqti:</b> $soat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"💌 Javob yozish",'callback_data'=>"yozish=$murojat"]],
+]])
+]);
+unlink("step/$murojat.txt");
+if($cid==$admin){
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>✅ Murojaatingiz yuborildi.</b>
+
+<i>Tez orada javob qaytaramiz!</i>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menuad,
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$murojat,
+'text'=>"<b>✅ Murojaatingiz yuborildi.</b>
+
+<i>Tez orada javob qaytaramiz!</i>",
+'parse_mode'=>'html',
+'reply_markup'=>$main_menu,
+]);
+}}}
+
+if(mb_stripos($data,"yozish=")!==false){
+$odam=explode("=",$data)[1];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>Javob matnini yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🔙 Orqaga"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","javob");
+file_put_contents("step/$ccid.javob","$odam");
+}
+
+if($userstep=="javob"){
+if($tx=="🔙 Orqaga"){
+unlink("step/$admin.step");
+unlink("step/$admin.javob");
+}else{
+$murojat=file_get_contents("step/$cid.javob");
+bot('sendMessage',[
+'chat_id'=>$murojat,
+'text'=>"<b>☎️ Administrator:</b>
+
+<i>$text</i>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"Javob yozish",'callback_data'=>"boglanish"]],
+]])
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Javob yuborildi</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$main_menuad,
+]);
+unlink("step/$murojat.murojat");
+unlink("step/$admin.step");
+unlink("step/$admin.javob");
+}}
+
+/*if($tx == "📩 Reklama Xizmati" and $cid == $admin){*/
+if($text=="🛠️ Sozlamalar" and joinchat($cid)==true){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Menulardan birini tanlang</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📦 Nakrutka Boʻlim",'callback_data'=>"nak_menu"]],
+[['text'=>"🤖 Maker Boʻlim",'callback_data'=>"mak_menu"]],
+]])
+]);
+}
+
+$link_by = file_get_contents("nak/$ccid/havola.txt");
+$son_by = file_get_contents("nak/$ccid/nechta.txt");
+
+if($text == "📦 Buyurtma berish" and joinchat($cid)==true){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title = str_replace("\n","",$more[$for]);
+$titlle = str_replace("\n","",$more[$for]);
+$key[]=["text"=>"$title","callback_data"=>"nakkat-$title"];
+$keyboard2 = array_chunk($key, 2);
+$nakkat = json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+if($kategoriya == null){
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>⚠️ Kategoriyalar mavjud emas!</b>",
+'parse_mode'=>'html',
+]);
+exit();
+}else{
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📱 Quyidagi ijtimoiy tarmoqlardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$nakkat,
+]);
+exit();
+}}
+
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+if($data == "bass" and joinchat($ccid)=="true"){
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$key=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title = str_replace("\n","",$more[$for]);
+$key[]=["text"=>"$title","callback_data"=>"nakkat-$title"];
+$keyboard2 = array_chunk($key, 2);
+$nakkat = json_encode([
+'inline_keyboard'=>$keyboard2,
+]);
+}
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📱 Quyidagi ijtimoiy tarmoqlardan birini tanlang:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$nakkat,
+]);
+exit();
+}
+
+if(mb_stripos($data, "nakkat-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$xizmat = file_get_contents("sozlamalar/xizmat/$kat/xizmat.txt");
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$xizmat);
+$soni = substr_count($xizmat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title","callback_data"=>"ichkinak-$title-$kat"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bass"]];
+$ichkinak = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($xizmat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>⬇️ Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$ichkinak,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"📂 Xizmatlar mavjud emas!",
+'show_alert'=>true,
+]);
+}
+}
+
+if(mb_stripos($data, "ichkinak-")!==false){
+$ex = explode("-",$data);
+$xiz = $ex[1];
+$kat = $ex[2];
+$xizmat = file_get_contents("sozlamalar/xizmatlar/$kat/$xiz.txt");
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$xizmat);
+$soni = substr_count($xizmat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title","callback_data"=>"buyurtma_berish-$title-$kat"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bass"]];
+$xizmatlarim = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($xizmat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>⬇️ Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$xizmatlarim,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"📂 Xizmatlar mavjud emas!",
+'show_alert'=>true,
+]);
+}
+}
+
+if(mb_stripos($data, "buyurtma_berish-")!==false){
+$ex = explode("-",$data);
+$royxat = $ex[1];
+$kategoriya = $ex[2];
+$id = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/id.txt");
+$narxi = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/narxi.txt");
+$tavsif = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/tavsiya.txt");
+$min = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/min.txt");
+$max = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/max.txt");
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🚀 Xizmat nomi: $royxat
+
+🆔 Xizmat ID'si: $id
+💰 Narxi (1000x): $narxi $pul
+📑 Malumot:</b> $tavsif
+
+⏬ Minimal buyurtma - $min ta
+⏫ Maksimal buyurtma - $max ta",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅ Buyurtma berish",'callback_data'=>"tanla-$royxat-$narxi-$min-$max-$kategoriya-$id"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"bass"]],
+]])
+]);
+}
+
+mkdir("nak");
+mkdir("nak/$cid");
+$step = file_get_contents("step/$cid.step");
+$api_kalit=file_get_contents("sozlamalar/api_kalit.txt");
+$api_sayt=file_get_contents("sozlamalar/api_sayt.txt");
+$holat = file_get_contents("sozlamalar/holat.txt");
+if(mb_stripos($data, "tanla-")!==false){
+$ex = explode("-",$data);
+$turi = $ex[1];
+$narx = $ex[2];
+$min = $ex[3];
+$max = $ex[4];
+$orid = $ex[6];
+$ba = $ex[8];
+$kategoriya = $ex[5];
+ bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$ccid,
+]);
+bot('SendMessage',[
+'chat_id'=>$ccid,
+'text'=>"*📎 Kerakli havolani kiriting (https://):*",
+'parse_mode'=>'markdown',
+'reply_markup'=>$back
+]);
+    file_put_contents("step/$ccid.step","botsin-$turi-$narx-$min-$max-$kategoriya-$orid-$ba");
+}
+
+if(mb_stripos($step, "botsin-")!==false){
+$ex = explode("-",$step);
+$turi = $ex[1];
+$narx = $ex[2];
+$min = $ex[3];
+$max = $ex[4];
+$kategoriya = $ex[5];
+$orid = $ex[6];
+$ba = $ex[7];
+if(isset($text)){		
+file_put_contents("nak/$cid/havola.txt",$text);
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"*⬇️ Kerakli buyurtma miqdorini kiriting:*",
+'parse_mode'=>'markdown',
+]);
+file_put_contents("step/$cid.step","vjfin-$turi-$narx-$min-$max-$orid-$ba");
+exit();
+}
+}
+
+if(mb_stripos($step, "vjfin-")!==false){
+$ex = explode("-",$step);
+$tur = $ex[1];
+$narx = $ex[2];
+$min = $ex[3];
+$max = $ex[4];
+$orid = $ex[5];
+$ba = $ex[6];
+if(is_numeric($text) and $text>0){
+if($text>=$min and $text<=$max){
+file_put_contents("nak/$cid/nechta.txt",$text);
+$link_by = file_get_contents("nak/$cid/havola.txt");
+$soni_by = file_get_contents("nak/$cid/nechta.txt");
+$rak=$text/1000*$narx;
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>➡️ Ma'lumotlarni o'qib chiqing:
+
+💵 Buyurtma narxi: $rak $pul
+📎 Buyurtma manzili:</b> <code> $link_by </code>
+🔢 Buyurtma miqdori: <code> $soni_by </code> ta
+
+<b>⚠️ Ma'lumotlar to'g'ri bo'lsa (✅ Yuborish) tugmasiga bosing va sizning xisobingizdan $rak $pul miqdorda pul yechib olinadi va buyurtma yuboriladi buyurtmani bekor qilish imkoni bo'lmaydi.</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[       
+[['text'=>"✅ Yuborish",'callback_data'=>"tasdiqnakin-$tur-$rak-$orid-$ba-$link-$text"],],
+[['text'=>"❌️ Bekor qilish",'callback_data'=>"yopish"],],
+]
+])
+]);
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*⚠️ Buyurtma miqdorini notog’ri kiritilmoqda.
+ 
+⏬ Minimal buyurtma - $min
+ ⏫ Maksimal buyurtma - $max
+ 
+🔄 Boshqa miqdor kiriting.*",
+'parse_mode'=>'markdown',
+'reply_markup'=>$black,
+]);
+}
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*⚠️ Buyurtma miqdori faqat raqamdan tashkil topgan boʻlishi kerak!*",
+'parse_mode'=>'markdown',
+'reply_markup'=>$black,
+]);
+}
+}
+
+if(mb_stripos($data, "tasdiqnakin-")!==false){
+$ex = explode("-",$data);
+$turi = $ex[1];
+$narx = $ex[2];
+$orid = $ex[3];
+$ba = $ex[4];
+$link = $ex[5];
+$son = $ex[6];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$ccid,
+]);
+$pul = file_get_contents("foydalanuvchi/hisob/$ccid.txt");
+if($pul>=$narx){
+$link_by = file_get_contents("nak/$ccid/havola.txt");
+$son_by = file_get_contents("nak/$ccid/nechta.txt");
+$urll=json_decode(file_get_contents("https://$api_sayt/api/v2/?key=$api_kalit&action=add&link=$link_by&quantity=$son_by&service=$orid"),true);
+$order=$urll['order'];
+$error=$urll['error'];
+if(isset($error)){
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"$orid $error",
+'parse_mode'=>"html",
+'reply_markup'=>$menu,
+]);
+}else{
+$mm = $pul - $narx;
+file_put_contents("foydalanuvchi/hisob/$ccid.txt","$mm");
+bot('sendMessage',[
+'chat_id'=>$ccid,
+ 'text'=>"✅ Buyurtma qabul qilindi!
+
+ Buyurtma IDsi: <code>$order</code>
+
+Yuqoridagi ID orqali buyurtmangiz haqida ma'lumot olishingiz mumkin!",
+'parse_mode'=>"html",
+'disable_web_page_preview'=>true,
+'reply_markup'=>$main_menu,
+]);
+$bson=file_get_contents("foydalanuvchi/buyurtma/$ccid.txt");
+$b = $bson +1;
+file_put_contents("foydalanuvchi/buyurtma/$ccid.txt","b");
+//
+unlink("step/$ccud.step");
+unlink("nak/$ccid/havola.txt");
+unlink("nak/$ccid/nechta.txt");
+}
+}else{
+bot('sendmessage',[
+'chat_id'=>$ccid,
+'text'=>"⚠️ Balansingizda mablag' yetarli emas!",
+'reply_markup'=>$main_menu,
+]);
+}
+unlink("step/$ccid.step");
+unlink("nak/$ccid/havola.txt");
+unlink("nak/$ccid/nechta.txt");
+}
+
+if($data == "yopish" and joinchat($ccid)=="true"){
+unlink("step/$ccid.step");
+unlink("nak/$ccid/havola.txt");
+unlink("nak/$ccid/nechta.txt");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+}
+
+
+mkdir("status");
+mkdir("$cid");
+
+$api_kalit=file_get_contents("sozlamalar/api_kalit.txt");
+$api_sayt=file_get_contents("sozlamalar/api_sayt.txt");
+$okstat=file_get_contents("status/$cid.status");
+if($text=="📊 Buyurtma kuzatish" and joinchat($cid)==true){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*🆔 Buyurtma ID sini kiriting:*",
+'parse_mode'=>"MarkDown",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"⬅️ Orqaga"]]
+]])
+]);
+mkdir("status");
+file_put_contents("status/$cid.status","1");
+}
+if($okstat==1){
+if(is_numeric($text)){
+$orderstat=json_decode(file_get_contents("https://$api_sayt/api/v2?key=$api_kalit&action=status&order=$text"),true);
+$miqdor=$orderstat['remains'];
+$xolati=$orderstat['status'];
+if($orderstat['status'] !=null or $orderstat['remains'] !=null){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*
+🆔 Buyurtma idsi: $text
+🔎 Buyurtmangiz: $xolati
+🔢 Qoldiq miqdori: $miqdor ta*",
+'parse_mode'=>"MarkDown",
+'reply_markup'=>$main_menu,
+]);unlink("status/$cid.status");
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"*🤷‍♂ Mavjud emas!*" ,
+'parse_mode'=>"MarkDown",
+]);
+unlink("status/$cid.status");
+}
+}
+}
+
+
+if($tx == "🛍️ Xizmatlar" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"🛍️ <b>Xizmatlar sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📂 Bo'lim",'callback_data'=>"kategoriyaxiz"]],
+[['text'=>"📂 Ichki bolim",'callback_data'=>"ichki"]],
+[['text'=>"🛍️ Xizmatlar",'callback_data'=>"xizmat"]],
+]])
+]);
+}
+
+if($data == "kategoriyaxiz"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📂 <b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Kategoriya qo'shish",'callback_data'=>"adbolim"]],
+[['text'=>"🗑 Kategoriya",'callback_data'=>"delbolim"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"nakxiz"]]
+]])
+]);
+}
+
+if($data == "xizmat"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📂 <b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Ichki xizmat qo'shish",'callback_data'=>"IchkiAdXiz"]],
+[['text'=>"🗑️ Oʻchirish",'callback_data'=>"xizochir"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"nakxiz"]]
+]])
+]);
+}
+
+//Add Xizmat
+
+if($data == "IchkiAdXiz"){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"ichkisetxiz-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$keyy = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Kategoriyalar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyy,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "ichkisetxiz-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$xizmat = file_get_contents("sozlamalar/xizmat/$kat/xizmat.txt");
+$more = explode("\n",$xizmat);
+$soni = substr_count($xizmat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"xizmatset-$title-$kat"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$keyyy = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($xizmat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Xizmatlar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyyy,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Xizmatlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "xizmatset-")!==false){
+$ex = explode("-",$data);
+$xiz = $ex[1];
+$kat = $ex[2];
+mkdir("sozlamalar/xizmatlar/$kat");
+mkdir("sozlamalar/xizmatlar/$kat/$xiz");
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi xizmat nomini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","royhatset-$xiz-$kat");
+}
+if(mb_stripos($userstep, "royhatset-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+mkdir("sozlamalar/xizmatlar/$roy/$text");
+$royhat = file_get_contents("sozlamalar/xizmatlar/$roy/$xiz.txt");
+file_put_contents("sozlamalar/xizmatlar/$roy/$xiz.txt","$royhat\n$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b> qabul qilindi!
+
+Xizmat narxini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$cid.txt","xizmatnarx-$xiz-$roy-$text");
+}
+}}}
+
+if(mb_stripos($userstep, "xizmatnarx-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+$turi = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+}else{
+if($cid == $admin){
+if(isset($text)){
+file_put_contents("sozlamalar/xizmatlar/$roy/$turi/narxi.txt","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b> qabul qilindi!
+
+ma'lumotlarni kiriting:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$cid.txt","xizmattavsiya-$xiz-$roy-$turi");
+}}}}
+if(mb_stripos($userstep, "xizmattavsiya-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+$turi = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+file_put_contents("sozlamalar/xizmatlar/$roy/$turi/tavsiya.txt","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b> qabul qilindi!
+
+Minimal buyurtmani kiriting:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$cid.txt","min-$xiz-$roy-$turi");
+}}}}
+if(mb_stripos($userstep, "min-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+$turi = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+file_put_contents("sozlamalar/xizmatlar/$roy/$turi/min.txt","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b> qabul qilindi!
+
+Maksimal buyurtmani kiriting:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+file_put_contents("step/$cid.txt","max-$xiz-$roy-$turi");
+}}}
+if(mb_stripos($userstep, "max-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+$turi = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+file_put_contents("sozlamalar/xizmatlar/$roy/$turi/max.txt","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b> qabul qilindi!
+
+Ushbu Xizmat idsini kiriting:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$cid.txt","id-$xiz-$roy-$turi");
+}}}}
+if(mb_stripos($userstep, "id-")!==false){
+$ex = explode("-",$userstep);
+$xiz = $ex[1];
+$roy = $ex[2];
+$turi = $ex[3];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+file_put_contents("sozlamalar/xizmatlar/$roy/$turi/id.txt","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Xizmati qoʻshildi:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+if($data == "ichki"){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📂 <b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"➕ Xizmat qo'shish",'callback_data'=>"ichkiqosh"]],
+[['text'=>"🗑️ Oʻchirish",'callback_data'=>"listXiz"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"nakxiz"]]
+]])
+]);
+}
+
+//Delete Ichki bolim
+
+if($data == "listXiz"){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"settxiz-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$keyy = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Kategoriyalar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyy,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "settxiz-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$xizmat = file_get_contents("sozlamalar/xizmat/$kat/xizmat.txt");
+$more = explode("\n",$xizmat);
+$soni = substr_count($xizmat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"xizmatsozlash-$title-$kat"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$keyyy = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($xizmat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Xizmatlar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$keyyy,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Xizmatlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "xizmatsozlash-")!==false){
+$ex = explode("-",$data);
+$royxat = $ex[1];
+$kategoriya = $ex[2];
+$narxi = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/narxi.txt");
+$tavsif = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/tavsiya.txt");
+$min = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/min.txt");
+$max = file_get_contents("sozlamalar/xizmatlar/$kategoriya/$royxat/max.txt");
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>🗄 Xizmat nomi:</b> $royxat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑️ Oʻchirish",'callback_data'=>"delxizmat-$royhat-$kategoriya"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"Xizmatlar"]],
+]])
+]);
+}
+
+if(mb_stripos($data, "delxizmat-")!==false){
+$ex = explode("-",$data);
+$roy = $ex[1];
+$kat = $ex[2];
+$royxat = file_get_contents("sozlamalar/xizmat/$kat/xizmat.txt");
+$k = str_replace("\n\n".$roy."","",$royxat);
+file_put_contents("sozlamalar/xizmat/$kat/xizmat.txt",$k);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>O'chirish yakunlandi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"kategoriya"]]
+]])
+]);
+deleteFolder("sozlamalar/xizmat/$kat/$roy");
+}
+
+if($data == "nakxiz"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"🛍️ <b>Xizmatlar sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📂 Bo'lim",'callback_data'=>"kategoriyaxiz"]],
+[['text'=>"📂 Ichki bolim",'callback_data'=>"ichki"]],
+[['text'=>"🛍️ Xizmatlar",'callback_data'=>"xizmat"]],
+]])
+]);
+}
+
+//Add Ichki bolim 
+
+if($data == "ichkiqosh"){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title","callback_data"=>"ichkiqosh-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$ichkiqosh = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Qaysi kategoriyaga qo'shamiz?</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$ichkiqosh,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "ichkiqosh-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi xizmat nomini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt","ichkiqosh-$kat");
+exit();
+}
+if(mb_stripos($userstep, "ichkiqosh-")!==false){
+$ex = explode("-",$userstep);
+$kat = $ex[1];
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+mkdir("sozlamalar/xizmat/$kat/$text");
+file_put_contents("sozlamalar/xizmat/$kat/$text/xizmat.txt");
+$xizmat = file_get_contents("sozlamalar/xizmat/$kat/xizmat.txt");
+file_put_contents("sozlamalar/xizmat/$kat/xizmat.txt","$xizmat\n$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b>nomli xizmat qo'shildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+//Delete bolim
+if($data == "delbolim"){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$kategoriya);
+$soni = substr_count($kategoriya,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$title=str_replace("\n","",$more[$for]);
+$keys[]=["text"=>"$title - sozlash","callback_data"=>"delbolim-$title"];
+$keysboard2 = array_chunk($keys, 1);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"bbosh"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($kategoriya != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>📋 Kategoriyalar ro'yxati:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"😔 Kategoriyalar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+if(mb_stripos($data, "delbolim-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"📁 <b>Kategoriya nomi:</b> $kat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"🗑 O'chirish",'callback_data'=>"deletebolim-$kat"]],
+[['text'=>"◀️ Orqaga",'callback_data'=>"listKat"]]
+]])
+]);
+}
+if(mb_stripos($data, "deletebolim-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$k = str_replace("\n".$kat."","",$kategoriya);
+file_put_contents("sozlamalar/xizmat/kategoriya.txt",$k);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>O'chirish yakunlandi!</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Orqaga",'callback_data'=>"kategoriya"]]
+]
+])
+]);
+deleteFolder("sozlamalar/xizmat/$kat");
+}
+
+//Add bolim
+
+if($data == "adbolim"){
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi kategoriya nomini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'adbolim');
+exit();
+}
+if($userstep == "adbolim"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+$kategoriya = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+file_put_contents("sozlamalar/xizmat/kategoriya.txt","$kategoriya\n$text");
+mkdir("sozlamalar/xizmat/$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"$text <b>nomli kategoriya qo'shildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+if($text){
+if($holat == "❌"){
+if($cid == $admin){
+}else{
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"⛔️ <b>Bot vaqtinchalik o'chirilgan!</b>
+
+<i>⚙️ Botda ta'mirlash ishlari olib borilayotgan bo'lishi mumkin!</i>",
+'parse_mode'=>'html',
+]);
+exit();
+}
+}else{
+}
+}
+
+if($data){
+if($holat == "❌"){
+if($ccid == $admin){
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$qid,
+'text'=>"⛔️ Bot vaqtinchalik o'chirilgan!
+
+⚙️ Botda ta'mirlash ishlari olib borilayotgan bo'lishi mumkin!",
+'show_alert'=>true,
+]);
+exit();
+}
+}else{
+}
+}
+
+if($text == "🤖 Bot holati"){
+if($cid == $admin){
+bot('SendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🔎 Hozirgi holat:</b> $holat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅",'callback_data'=>"holat-✅"],['text'=>"❌",'callback_data'=>"holat-❌"]],
+[['text'=>"Yopish",'callback_data'=>"boshqaruv"]]
+]
+])
+]);
+}
+}
+
+if(mb_stripos($data, "holat-")!==false){
+$ex = explode("-",$data);
+$xolat = $ex[1];
+file_put_contents("sozlamalar/holat.txt",$xolat);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$mid2,
+'text'=>"<b>🔎 Hozirgi holat:</b> $xolat",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"✅",'callback_data'=>"holat-✅"],['text'=>"❌",'callback_data'=>"holat-❌"]],
+[['text'=>"Yopish",'callback_data'=>"boshqaruv"]]
+]
+])
+]);
+}
+
+$api_kalit=file_get_contents("sozlamalar/api_kalit.txt");
+$api_sayt=file_get_contents("sozlamalar/api_sayt.txt");
+$holat = file_get_contents("sozlamalar/holat.txt");
+
+if($tx == "🔑 Api sozlamalari" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>🔑 Api sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📋 Hozirgi holati",'callback_data'=>"api_holati"]],
+[['text'=>"🔑 Api kalit",'callback_data'=>"Api_kalit"],['text'=>"🔑 Api sayt",'callback_data'=>"Api_sayt"]],
+[['text'=>"💵 Api hisob",'callback_data'=>"Api_hisob"]],
+]])
+]);
+}
+
+if($data=="api_holati"){
+$api_balance = json_decode(file_get_contents("https://$api_sayt/api/v2?key=$api_kalit&action=balance"),true);
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>
+🔑 Api kalit: $api_kalit
+
+🔑 Api Sayt: $api_sayt
+
+💵 API Balansingizda
+".$api_balance['balance']." $pul </b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Ortga",'callback_data'=>"api_sozlamalari"]],
+]])
+]);
+}
+
+if($data=="Api_hisob" and $ccid==$admin){
+$api_balance = json_decode(file_get_contents("https://$api_sayt/api/v2?key=$api_kalit&action=balance"),true);
+if($api_balance){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>💵 API Balansingizda
+".$api_balance['balance']." $pul </b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"◀️ Ortga",'callback_data'=>"api_sozlamalari"]],
+]])
+]);
+}else{
+bot("answerCallbackQuery",[
+'callback_query_id'=>$callid,
+'text'=>"⚠️ Api kalit yoki api sayt kiritilmagan!",
+'show_alert'=>true,
+]);
+}
+}
+
+$api=file_get_contents("api.txt");
+if($data=="Api_kalit" and $ccid==$admin){
+bot('DeleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📝 $api_sayt dan olingan api kalitni yuboring:</b>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("api.txt","kalit");
+}
+if($api == "kalit" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("taklif.txt");
+}else{
+file_put_contents("sozlamalar/api_kalit.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Muvaffaqiyatli o'zgartirildi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$asosiy_soz
+]);
+unlink("api.txt");
+}}
+
+if($data=="Api_sayt" and $ccid==$admin){
+bot('DeleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>📝 Api olinadigan saytni yuboring:
+Namuna</b> <code>Topsmm.uz</code>",
+'parse_mode'=>"html",
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("api.txt","sayt");
+}
+if($api == "sayt" and $cid==$admin){
+if($tx=="🗄 Boshqaruv"){
+unlink("taklif.txt");
+}else{
+file_put_contents("sozlamalar/api_sayt.txt","$tx");
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>Muvaffaqiyatli o'zgartirildi!</b>",
+'parse_mode'=>"html",
+'reply_markup'=>$asosiy_soz
+]);
+unlink("api.txt");
+}}
+
+if($data == "api_sozlamalari" and $ccid == $admin){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$admin,
+'text'=>"<b>🔑 Api sozlash bo'limidasiz:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📋 Hozirgi holati",'callback_data'=>"api_holati"]],
+[['text'=>"🔑 Api kalit",'callback_data'=>"Api_kalit"],['text'=>"🔑 Api sayt",'callback_data'=>"Api_sayt"]],
+[['text'=>"💵 Api hisob",'callback_data'=>"Api_hisob"]],
+]])
+]);
+}
+
+$bolim = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+if($data == "xizochir"){
+$bolim = file_get_contents("sozlamalar/xizmat/kategoriya.txt");
+$more = explode("\n",$bolim);
+$soni = substr_count($bolim,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$ichida = file_get_contents("sozlamalar/bot/".$more[$for]."/ichkibolim.txt");
+$ta = substr_count($ichida,"\n");
+$keys[]=["text"=>"$more[$for] $ta->","callback_data"=>"xizdel-".$more[$for]];
+$keysboard2 = array_chunk($keys, $byson);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"xizmat"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($bolim != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"🔒 Bo'limlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "xizdel-")!==false){
+$ex = explode("-",$data);
+$kat = $ex[1];
+$royxat = file_get_contents("sozlamalar/bot/$kat/ichkibolim.txt");
+file_put_contents("step/$ccid.bol","$kat");
+$more = explode("\n",$royxat);
+$soni = substr_count($royxat,"\n");
+$keys=[];
+for ($for = 1; $for <= $soni; $for++) {
+$ichida = file_get_contents("sozlamalar/bot/$kat/".$more[$for]."/xizmatbolim.txt");
+$ta = substr_count($ichida,"\n");
+$keys[]=["text"=>"$more[$for] $ta->","callback_data"=>"delochir-".$more[$for]];
+$keysboard2 = array_chunk($keys, $ibyson);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"xizochir"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($royxat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"<b>Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"🔒 Ichki bo'limlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "delochir-")!==false){
+$ex = explode("-",$data);
+$roy = $ex[1];
+$kat = file_get_contents("step/$ccid.bol");
+file_put_contents("step/$ccid.ich","$roy");
+$royxat = file_get_contents("sozlamalar/bot/$kat/$roy/xizmatbolim.txt");
+$ids = explode("\n",$royxat);
+$soni = substr_count($royxat,"\n");
+foreach($ids as $id){
+$key = [];
+$text = "";
+for ($for = 1; $for <= $soni; $for++) {
+$text .= "<b>$for</b> ".$ids[$for]."\n";
+$key[]=["text"=>"$for","callback_data"=>"deletexiz-".$ids[$for]];
+}
+$keysboard2 = array_chunk($key, $xizson);
+$keysboard2[] = [['text'=>"◀️ Orqaga",'callback_data'=>"xizdel-$kat"]];
+$key = json_encode([
+'inline_keyboard'=>$keysboard2,
+]);
+}
+if($royxat != null){
+bot('editMessageText',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+'text'=>"🗑 <b>O'chiriladigan xizmatni tanlang:</b>
+
+$text",
+'parse_mode'=>'html',
+'reply_markup'=>$key,
+]);
+}else{
+bot('answerCallbackQuery',[
+'callback_query_id'=>$callid,
+'text'=>"🔒 Ichki bo'limlar mavjud emas!",
+'show_alert'=>true,
+]);
+}}
+
+if(mb_stripos($data, "deletexiz-")!==false){
+$ex = explode("-",$data);
+$xiz = $ex[1];
+$roy = file_get_contents("step/$ccid.ich");
+$kat = file_get_contents("step/$ccid.bol");
+$royxat = file_get_contents("sozlamalar/bot/$kat/$roy/xizmatbolim.txt");
+$k = str_replace("\n".$xiz."","",$royxat);
+file_put_contents("sozlamalar/bot/$kat/$roy/xizmatbolim.txt",$k);
+bot('deleteMessage',[
+'chat_id'=>$ccid,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>$xiz - nomli xizmat o'chirildi</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+deleteFolder("sozlamalar/xizmatlar/$kat/$roy/$xiz");
+}
+
+
+
+$reknarx = file_get_contents("rek.narx");
+$rekkanal = file_get_contents("rek.kanal");
+$adminuser = file_get_contents("admin.user");
+if($tx=="*⃣ Birlamchi sozlamalar" and $cid == $admin){
+bot('sendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>📋 Quyidagilardan birini tanlang:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'inline_keyboard'=>[
+[['text'=>"📋 Hozirgi holat",'callback_data'=>"hholat"]],
+[['text'=>"🔗 Taklif narxi",'callback_data'=>"taklif_narxi"],['text'=>"💶 Valyuta nomi",'callback_data'=>"valyuta_nomi"]],
+[['text'=>"👨‍💻 Admin useri",'callback_data'=>"adminuser"],['text'=>"✏️ Foiz qoʻyish",'callback_data'=>"foizqoy"]],
+[['text'=>"🆕 Rek kanal",'callback_data'=>"rek_kanal"],['text'=>"🆓 Rek narx",'callback_data'=>"rek_narx"]],
+]])
+]);
+}
+
+if($data == "rek_narx"){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi reklama narxini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'rek_narx');
+exit();
+}
+
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+
+if($userstep == "rek_narx"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+$reknarx = file_get_contents("rek.narx");
+file_put_contents("rek.narx","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qabul qilidim</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+if($data == "rek_kanal"){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi Reklama kanal userini yuboring:
+Namuna</b> <code>@Reliabledev</code>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'rek_kanal');
+exit();
+}
+
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+
+if($userstep == "rek_kanal"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+$rekkanal = file_get_contents("rek.kanal");
+file_put_contents("rek.kanal","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qabul qilidim</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+
+if($data == "hholat"){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 
+
+🔗 Taklif narxi - $taklifpul
+💶 Valyuta nomi - $pul
+
+👨‍💻 Admin useri - $adminuser
+
+🆓 Reklama kanali - $rekkanal
+🆕 Reklama narxi - $reknarx</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"],['text'=>"◀️ Orqaga"]],
+]])
+]);
+exit();
+}
+
+if($data == "adminuser"){
+bot('deleteMessage',[
+'chat_id'=>$admin,
+'message_id'=>$cmid,
+]);
+bot('sendMessage',[
+'chat_id'=>$ccid,
+'text'=>"<b>📝 Yangi admin userini yuboring:</b>",
+'parse_mode'=>'html',
+'reply_markup'=>json_encode([
+'resize_keyboard'=>true,
+'keyboard'=>[
+[['text'=>"🗄 Boshqaruv"]],
+]])
+]);
+file_put_contents("step/$ccid.txt",'adminuser');
+exit();
+}
+
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+//Tarqatgan kot mehnatimni qadrlela @khorn_ff & @Reliabledev
+
+if($userstep == "adminuser"){
+if($tx=="🗄 Boshqaruv"){
+unlink("step/$cid.txt");
+}else{
+if($cid == $admin){
+if(isset($text)){
+$adminuser = file_get_contents("admin.user");
+file_put_contents("admin.user","$text");
+bot('SendMessage',[
+'chat_id'=>$cid,
+'text'=>"<b>Qabul qilidim</b>",
+'parse_mode'=>'html',
+'reply_markup'=>$admin1_menu,
+]);
+}
+unlink("step/$cid.txt");
+}}}
+
+?>
