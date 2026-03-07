@@ -1,2 +1,0 @@
-aiogram==3.7.0
-aiohttp>=3.9.0
