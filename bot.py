@@ -4,7 +4,7 @@ define('BOT_TOKEN', '8745440078:AAFBIYJw_BplZeK0jYRjJkwM0oTVyHrJ99o');
 define('API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/');
 
 // PRO foydalanuvchilar ID ro'yxati
-$pro_users = [123456789, 8537782289]; // Pro sotib olgan ID larni shu yerga yozing
+$pro_users = [123456789, 987654321]; // Pro sotib olgan ID larni shu yerga yozing
 
 // Bot username-ni avtomatik aniqlash
 $me = json_decode(file_get_contents(API_URL . "getMe"), true);
